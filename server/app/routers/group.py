@@ -1,29 +1,22 @@
 import os
-import shutil
-from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core import security
+from app import models, schemas
+from app.core.config import settings
+from app.core.security import get_current_user
 from app.db.database import get_db
-from app.models import models
-from app.schemas import assignment, event, group, message, user
-from app.services import geocoding
 
 group_router = APIRouter()
 
-TIMETABLES_EXTENSION = {'ics'}
-TIMETABLES_DIR = "app/db/schedules"
-
-@group_router.get("/groups/", response_model=List[group.Group])
+@group_router.get("/groups/", response_model=List[schemas.Group])
 def get_group(
     group_id: Optional[int] = None,
     skip: int = 0,
     limit: int = 20,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
@@ -34,10 +27,11 @@ def get_group(
     else:
         return db.query(models.Group).offset(skip).limit(limit).all()
 
-@group_router.get("/groups/{group_id}/members", response_model=List[user.User])
+
+@group_router.get("/groups/{group_id}/members", response_model=List[schemas.User])
 def get_group_members(
     group_id: int,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if not db.query(models.Group).first():
@@ -46,83 +40,21 @@ def get_group_members(
     return db.query(models.User).filter(models.User.student_group_id == group_id or models.User.teaching_groups == group_id).all()
 
 
-@group_router.get("/groups/{group_id}/assignments", response_model=List[assignment.Assignment])
-def get_assignments(
-    group_id: int,
-    skip: int = 0,
-    limit: int = 100,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    query = db.query(models.Assignment)
-
-    if current_user.role == models.UserRole.STUDENT:
-        if not current_user.student_group_id:
-            raise HTTPException(status_code=404, detail="You can't access assignments from a group you're not part of")
-        query = query.filter(models.Assignment.group_id == current_user.student_group_id)
-    else:
-        query = query.filter(models.Assignment.group_id == group_id)
-
-    return query.order_by(models.Assignment.due_date.asc()).offset(skip).limit(limit).all()
-
-@group_router.get("/groups/{group_id}/schedules", response_class=FileResponse)
-def get_schedule(
-    group_id: int,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
-
-    if not group:
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-
-    if not group.schedule_path == "":
-        raise HTTPException(status_code=404, detail=f"No schedule saved for the group {group_id}")
-
-    if not os.path.exists(group.schedule_path):
-        raise HTTPException(status_code=404, detail="An error occured while fecthing the schedule for this group")
-
-    return group.schedule_path
-
-@group_router.get("/groups/{group_id}/messages", response_model=List[message.Message])
+@group_router.get("/groups/{group_id}/messages", response_model=List[schemas.Message])
 def get_messages(
     group_id: int,
     skip: int = 0,
     limit: int = 20,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     return db.query(models.Message).filter(models.Message.group_id == group_id).offset(skip).limit(limit).all()
 
-@group_router.post("/groups/{group_id}/assignments", response_model=assignment.Assignment)
-def new_assignments(
-    group_id: int,
-    assignment_data: assignment.NewAssignment,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
-        raise HTTPException(status_code=403, detail="Only administrators/teachers can post new assignments")
 
-    new_assignment = models.Assignment(
-        title = assignment_data.title,
-        description = assignment_data.description,
-        due_date = assignment_data.due_date,
-        created_at = datetime.now(timezone.utc),
-        group_id = group_id,
-        creator_id = current_user.id
-    )
-
-    db.add(new_assignment)
-    db.commit()
-    db.refresh(new_assignment)
-
-    return new_assignment
-
-@group_router.post("/groups/", response_model=group.Group)
+@group_router.post("/groups/", response_model=schemas.Group)
 def create_group(
-    group_data: group.NewGroup,
-    current_user: models.User = Depends(security.get_current_user),
+    group_data: schemas.NewGroup,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN.value:
@@ -139,76 +71,12 @@ def create_group(
 
     return new_group
 
-@group_router.post("/groups/{group_id}/events", response_model=event.Event)
-def create_event(
-    group_id: int,
-    event_data: event.NewEvent,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
-    if not group:
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-
-    (address, latitude, longitude) = geocoding.get_coordinates(event_data.location) if event_data.location else None, None, None
-
-    new_event = models.Event(
-        title = event_data.title,
-        description = event_data.description,
-        date = event_data.date,
-        location = address,
-        latitude = latitude,
-        longitude = longitude,
-        type = event_data.type,
-        creator_id = current_user.id,
-        group_id = group_id
-    )
-
-    db.add(new_event)
-    db.commit()
-    db.refresh(new_event)
-
-    return new_event
-
-@group_router.post("/groups/{group_id}/schedules")
-def upload_schedule(
-    group_id: int,
-    file: UploadFile = File(...),
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administrators can upload a new group's schedule")
-
-    if not file.filename or file.filename.strip() == "":
-        raise HTTPException(status_code=400, detail="No file selected")
-
-    file_ext = file.filename.split(".")[1]
-    if file_ext not in TIMETABLES_EXTENSION:
-        raise HTTPException(status_code=415, detail=f"Unsupported file extension ({file_ext}), should be .ics")
-
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
-
-    if not group:
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-
-    file_path = f"{TIMETABLES_DIR}/group_{group_id}.ics"
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    group.schedule_path = file_path
-
-    db.commit()
-    db.refresh(group)
-
-    return {"message": "Schedule succesfuly uploaded"}
-
-@group_router.patch("/groups/{group_id}", response_model=group.Group)
+@group_router.patch("/groups/{group_id}", response_model=schemas.Group)
 def update_group_name(
     group_id: int,
-    group_data: group.UpdateGroup,
-    current_user: models.User = Depends(security.get_current_user),
+    group_data: schemas.UpdateGroup,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN.value:
@@ -227,10 +95,11 @@ def update_group_name(
 
     return group
 
+
 @group_router.delete("/groups/{group_id}")
 def delete_group(
     group_id: int,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN:
@@ -241,8 +110,8 @@ def delete_group(
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if group.schedule_path and os.path.exists(f"{TIMETABLES_DIR}/group_{group_id}.ics"):
-        os.remove(f"{TIMETABLES_DIR}/group_{group_id}.ics")
+    if group.schedule_path and os.path.exists(f"{settings.SCHEDULES_PATH}/group_{group_id}.ics"):
+        os.remove(f"{settings.SCHEDULES_PATH}/group_{group_id}.ics")
 
     events = db.query(models.Event).filter(models.Event.group_id == group_id).all()
     for e in events:
@@ -252,25 +121,3 @@ def delete_group(
     db.commit()
 
     return {"message": "Group succesfuly deleted"}
-
-@group_router.delete("/groups/{group_id}/schedules")
-def remove_schedule(
-    group_id: int,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administrators can delete a group's schedule")
-
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
-
-    if not group:
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-
-    os.remove(f"{TIMETABLES_DIR}/group_{group_id}.ics")
-    group.schedule_path = ""
-
-    db.commit()
-    db.refresh(group)
-
-    return {"message": "Schedule succesfuly removed"}

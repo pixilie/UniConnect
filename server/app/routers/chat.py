@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from jose import jwt
 from sqlalchemy.orm import Session
 
+from app import models
 from app.core.config import settings
 from app.db.database import get_db
-from app.models import models
 from app.services.socket_manager import manager
 
 ws_router = APIRouter()
@@ -35,7 +35,7 @@ async def websocket_endpoint(
             await websocket.close(code=1008)
             return
 
-    except Exception as e:
+    except Exception:
         await websocket.close(code=1008)
         return
 

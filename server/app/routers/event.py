@@ -3,20 +3,19 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core import security
+from app import models, schemas
+from app.core.security import get_current_user
 from app.db.database import get_db
-from app.models import models
-from app.schemas import event
-from app.services import geocoding
+from app.services.geocoding import get_coordinates
 
 events_router = APIRouter()
 
-@events_router.get("/events/", response_model=List[event.Event])
+@events_router.get("/events/", response_model=List[schemas.Event])
 def get_event(
     event_id: Optional[int] = None,
     skip: int = 0,
     limit: int = 20,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Event)
@@ -26,11 +25,45 @@ def get_event(
 
     return query.offset(skip).limit(limit).all()
 
-@events_router.patch("/events/{event_id}", response_model=event.Event)
+
+@events_router.post("/groups/{group_id}/events", response_model=schemas.Event)
+def create_event(
+    group_id: int,
+    event_data: schemas.NewEvent,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
+
+    if not group:
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
+
+    (address, latitude, longitude) = get_coordinates(event_data.location) if event_data.location else None, None, None
+
+    new_event = models.Event(
+        title = event_data.title,
+        description = event_data.description,
+        date = event_data.date,
+        location = address,
+        latitude = latitude,
+        longitude = longitude,
+        type = event_data.type,
+        creator_id = current_user.id,
+        group_id = group_id
+    )
+
+    db.add(new_event)
+    db.commit()
+    db.refresh(new_event)
+
+    return new_event
+
+
+@events_router.patch("/events/{event_id}", response_model=schemas.Event)
 def update_event(
     event_id: int,
-    event_data: event.UpdateEvent,
-    current_user: models.User = Depends(security.get_current_user),
+    event_data: schemas.UpdateEvent,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     event = db.query(models.Event).filter(models.Event.id == event_id).first()
@@ -46,7 +79,7 @@ def update_event(
         setattr(event, key, value)
 
     if event_data.location:
-        (address, latitude, longitude) = geocoding.get_coordinates(event_data.location)
+        (address, latitude, longitude) = get_coordinates(event_data.location)
         if address and latitude and longitude:
             event.location = address
             event.latitude = latitude
@@ -57,10 +90,11 @@ def update_event(
 
     return event
 
+
 @events_router.delete("/events/{event_id}")
 def delete_event(
     event_id: int,
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     event = db.query(models.Event).filter(models.Event.id == event_id).first()

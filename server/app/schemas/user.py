@@ -2,12 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
+from app.models.models import UserRole
 
-class RegistrationRequest(BaseModel):
-    first_name: str
-    last_name: str
-    email: EmailStr
-    password: str
 
 class User(BaseModel):
     id: int
@@ -29,4 +25,4 @@ class UserUpdatePassword(BaseModel):
     new_password: str
 
 class UserRoleUpdate(BaseModel):
-    role: str
+    role: UserRole

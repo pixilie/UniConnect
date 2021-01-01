@@ -57,7 +57,7 @@ class Group(Base):
     events = relationship("Event", back_populates="group")
     assignments = relationship("Assignment", back_populates="group")
     resources = relationship("Resource", back_populates="group")
-    elections = relationship("Election", back_populates="group")
+    polls = relationship("Poll", back_populates="group")
 
 
 class User(Base):
@@ -143,8 +143,8 @@ class Resource(Base):
     group = relationship("Group", back_populates="resources")
 
 
-class Election(Base):
-    __tablename__ = "elections"
+class Poll(Base):
+    __tablename__ = "polls"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column()
@@ -152,24 +152,23 @@ class Election(Base):
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
-    group = relationship("Group", back_populates="elections")
-    candidates = relationship("Candidate", back_populates="election")
-    votes = relationship("Vote", back_populates="election")
+    group = relationship("Group", back_populates="poll")
+    choices = relationship("Choice", back_populates="poll")
+    votes = relationship("Vote", back_populates="polls")
 
 
-class Candidate(Base):
-    __tablename__ = "candidates"
+class Choice(Base):
+    __tablename__ = "choices"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    first_name: Mapped[str] = mapped_column()
-    last_name: Mapped[str] = mapped_column()
+    text: Mapped[str] = mapped_column()
     manifesto: Mapped[str | None] = mapped_column(Text)
     photo_url: Mapped[str | None] = mapped_column()
 
-    election_id: Mapped[int | None] = mapped_column(ForeignKey("elections.id"))
+    poll_id: Mapped[int | None] = mapped_column(ForeignKey("polls.id"))
 
-    election = relationship("Election", back_populates="candidates")
-    votes = relationship("Vote", back_populates="candidate")
+    poll = relationship("Poll", back_populates="choices")
+    votes = relationship("Vote", back_populates="choice")
 
 
 class Vote(Base):
@@ -178,13 +177,13 @@ class Vote(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     voted_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
-    election_id: Mapped[int | None] = mapped_column(ForeignKey("elections.id"))
-    candidate_id: Mapped[int | None] = mapped_column(ForeignKey("candidates.id"))
+    poll_id: Mapped[int | None] = mapped_column(ForeignKey("polls.id"))
+    choice_id: Mapped[int | None] = mapped_column(ForeignKey("choices.id"))
 
     voter = relationship("User", back_populates="votes")
-    election = relationship("Election", back_populates="votes")
-    candidate = relationship("Candidate", back_populates="votes")
+    poll = relationship("Poll", back_populates="votes")
+    choice = relationship("Choice", back_populates="votes")
 
     __table_args__ = (
-        UniqueConstraint('user_id', 'election_id', name='unique_user_vote_per_election'),
+        UniqueConstraint('user_id', 'poll_id', name='unique_user_vote_per_polls'),
     )
