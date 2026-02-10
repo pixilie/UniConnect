@@ -32,7 +32,7 @@ The project focuses on collaborative software development, clean architecture, a
 ### Backend
 - Python
 - RESTful API
-- SQL database (PostgreSQL)
+- SQL database (SQLite / PostgreSQL)
 
 ### Tools
 - Git & GitHub
@@ -61,12 +61,14 @@ More details can be found in the `docs/` directory.
 
 ## Installation & Setup
 
-### Backend
+### Backend (UV)
 1. Navigate to the `server/` directory
-2. Create a virtual environment
-3. Install dependencies
-4. Configure environment variables
-5. Run the backend server
+2. Run ``uv run uvicorn app.main:app --reload`` (You need to have ``uv`` installed, see [here](https://docs.astral.sh/uv/getting-started/installation/) for more)
+
+### Backend (Nix)
+1. Navigate to the `server/` directory
+2. Run ``direnv allow``
+2. Run ``uvicorn app.main:app --reload``
 
 ### Frontend
 1. Navigate to the `website/` directory
