@@ -39,6 +39,7 @@ class ClassGroup(Base):
     users = relationship("User", back_populates="class_group")
     messages = relationship("Message", back_populates="class_group")
     events = relationship("StudyEvent", back_populates="class_group")
+    assignments = relationship("Assignment", back_populates="class_group")
 
 
 class User(Base):
@@ -52,12 +53,12 @@ class User(Base):
     role = Column(
         String, default=UserRole.STUDENT
     )
-
     class_id = Column(Integer, ForeignKey("classes.id"), nullable=True)
 
     class_group = relationship("ClassGroup", back_populates="users")
     messages = relationship("Message", back_populates="author")
     created_events = relationship("StudyEvent", back_populates="creator")
+    created_assignments = relationship("Assignment", back_populates="creator")
 
 
 class Message(Base):
@@ -89,3 +90,19 @@ class StudyEvent(Base):
 
     creator = relationship("User", back_populates="created_events")
     class_group = relationship("ClassGroup", back_populates="events")
+
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    due_date = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    class_id = Column(Integer, ForeignKey("classes.id"))
+    creator_id = Column(Integer, ForeignKey("users.id"))
+
+    class_group = relationship("ClassGroup", back_populates="assignments")
+    creator = relationship("User", back_populates="created_assignments")
