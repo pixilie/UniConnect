@@ -2,13 +2,12 @@ import enum
 from datetime import datetime, timezone
 
 from sqlalchemy import (
-    Boolean,
     Column,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     String,
+    Table,
     Text,
 )
 from sqlalchemy.orm import relationship
@@ -16,19 +15,24 @@ from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 
-# Enums definition
 class UserRole(str, enum.Enum):
-    ADMIN = "Administrator"
-    TEACHER = "Teacher"
-    CLASS_REPR = "Class Representative"
-    STUDENT = "Student"
+    ADMIN = "administrator"
+    TEACHER = "teacher"
+    CLASS_REPR = "class_representative"
+    STUDENT = "student"
 
 class MessageType(str, enum.Enum):
     STANDARD = "Standard"
     ANNOUNCEMENT = "Announcement"
 
+teacher_classes_association = Table(
+    "teacher_classes",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("class_group_id", Integer, ForeignKey("classes.id"), primary_key=True)
+)
 
-# Tables definition
+
 class ClassGroup(Base):
     __tablename__ = "classes"
 
@@ -36,7 +40,12 @@ class ClassGroup(Base):
     name = Column(String, unique=True, nullable=False)
     schedule_path = Column(String, nullable=True)
 
-    users = relationship("User", back_populates="class_group")
+    students = relationship("User", back_populates="student_class", foreign_keys="[User.student_class_id]")
+    teachers = relationship(
+        "User",
+        secondary=teacher_classes_association,
+        back_populates="teaching_classes"
+    )
     messages = relationship("Message", back_populates="class_group")
     events = relationship("StudyEvent", back_populates="class_group")
     assignments = relationship("Assignment", back_populates="class_group")
@@ -50,12 +59,19 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    role = Column(
-        String, default=UserRole.STUDENT
-    )
-    class_id = Column(Integer, ForeignKey("classes.id"), nullable=True)
+    role = Column(String, default=UserRole.STUDENT)
+    student_class_id = Column(Integer, ForeignKey("classes.id"), nullable=True)
 
-    class_group = relationship("ClassGroup", back_populates="users")
+    student_class = relationship(
+        "ClassGroup",
+        back_populates="students",
+        foreign_keys=[student_class_id]
+    )
+    teaching_classes = relationship(
+        "ClassGroup",
+        secondary=teacher_classes_association,
+        back_populates="teachers"
+    )
     messages = relationship("Message", back_populates="author")
     created_events = relationship("StudyEvent", back_populates="creator")
     created_assignments = relationship("Assignment", back_populates="creator")
