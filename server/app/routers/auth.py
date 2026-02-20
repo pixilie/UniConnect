@@ -11,7 +11,9 @@ auth_router = APIRouter()
 
 @auth_router.post("/register", response_model=auth.User)
 def register_user(user: auth.RegistrationRequest, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == user.email).first():
+    query = db.query(models.User)
+
+    if query.filter(models.User.email == user.email).first():
         raise HTTPException(status_code=400, detail="User already exists")
 
     hashed_pw = security.get_password_hash(user.password)
@@ -20,7 +22,8 @@ def register_user(user: auth.RegistrationRequest, db: Session = Depends(get_db))
         email = user.email,
         hashed_password = hashed_pw,
         first_name = user.first_name,
-        last_name = user.last_name
+        last_name = user.last_name,
+        role = models.UserRole.ADMIN.value if query.count() == 0 else models.UserRole.STUDENT.value
     )
 
     db.add(new_user)
