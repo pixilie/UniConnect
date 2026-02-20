@@ -32,7 +32,7 @@ teacher_classes_association = Table(
     Column("class_group_id", Integer, ForeignKey("classes.id"), primary_key=True)
 )
 
-
+# Tables definition
 class ClassGroup(Base):
     __tablename__ = "classes"
 
@@ -92,7 +92,7 @@ class Message(Base):
     class_group = relationship("ClassGroup", back_populates="messages")
 
 
-class StudyEvent(Base):
+class Event(Base):
     __tablename__ = "study_events"
 
     id = Column(Integer, primary_key=True, index=True)
