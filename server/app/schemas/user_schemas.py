@@ -3,13 +3,13 @@ from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 
 
-class RegisterRequest(BaseModel):
+class RegistrationRequest(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
     password: str
 
-class UserOut(BaseModel):
+class User(BaseModel):
     id: int
     email: EmailStr
     first_name: str
