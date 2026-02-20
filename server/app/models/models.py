@@ -1,15 +1,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    String,
-    Table,
-    Text,
-)
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
@@ -24,6 +16,10 @@ class UserRole(str, enum.Enum):
 class MessageType(str, enum.Enum):
     STANDARD = "Standard"
     ANNOUNCEMENT = "Announcement"
+
+class EventType(str, enum.Enum):
+    STUDY = "Study session"
+    ACTIVITY = "ACTIVITY"
 
 teacher_classes_association = Table(
     "teacher_classes",
@@ -84,7 +80,6 @@ class Message(Base):
     content = Column(Text, nullable=False)
     message_type = Column(String, default=MessageType.STANDARD)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-
     user_id = Column(Integer, ForeignKey("users.id"))
     class_id = Column(Integer, ForeignKey("classes.id"))
 
@@ -98,11 +93,13 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
-    event_date = Column(DateTime, nullable=False)
+    date = Column(DateTime, nullable=False)
     location = Column(String, nullable=True)
-
+    type =  Column(String, nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     creator_id = Column(Integer, ForeignKey("users.id"))
-    class_id = Column(Integer, ForeignKey("classes.id"))
+    group_id = Column(Integer, ForeignKey("classes.id"))
 
     creator = relationship("User", back_populates="created_events")
     class_group = relationship("ClassGroup", back_populates="events")
@@ -116,7 +113,6 @@ class Assignment(Base):
     description = Column(Text, nullable=True)
     due_date = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-
     class_id = Column(Integer, ForeignKey("classes.id"))
     creator_id = Column(Integer, ForeignKey("users.id"))
 
