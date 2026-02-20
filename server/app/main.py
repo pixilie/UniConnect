@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.db.database import Base, engine
-from app.routers import assignment, auth, chat, event, group, schedule, user
+from app.routers import assignment, auth, chat, event, group, message, schedule, user
 
 # Database init
 Base.metadata.create_all(bind=engine)
@@ -15,6 +15,7 @@ app.include_router(assignment.assignment_router, prefix="/api", tags=["Assignmen
 app.include_router(schedule.schedule_router, prefix="/api", tags=["Schedules"])
 app.include_router(group.group_router, prefix="/api", tags=["Groups"])
 app.include_router(event.events_router, prefix="/api", tags=["Events"])
+app.include_router(message.message_router, prefix="/api", tags=["Messages"])
 app.include_router(chat.ws_router)
 
 @app.get("/")
