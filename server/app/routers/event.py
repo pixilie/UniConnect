@@ -88,7 +88,7 @@ def update_event(
 
     return event
 
-@events_router.delete("/events/event_id={event_id}/")
+@events_router.delete("/events/event_id={event_id}")
 def delete_event(
     event_id: int,
     current_user: models.User = Depends(security.get_current_user),
