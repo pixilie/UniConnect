@@ -6,12 +6,12 @@ from pydantic import BaseModel
 class Group(BaseModel):
     id: int
     name: str
-    schedule_path: Optional[str]
+    schedule_path: Optional[str] = None
 
 class NewGroup(BaseModel):
     name: str
-    schedule_path: Optional[str]
+    schedule_path: Optional[str] = None
 
 class UpdateGroup(BaseModel):
-    name: str
-    schedule_path: Optional[str]
+    name: Optional[str] = None
+    schedule_path: Optional[str] = None

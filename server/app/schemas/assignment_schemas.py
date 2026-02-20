@@ -23,6 +23,6 @@ class NewAssignment(BaseModel):
     due_date: datetime
 
 class UpdateAssignment(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    due_date: Optional[datetime]
+    title: Optional[str] = None
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
