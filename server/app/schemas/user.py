@@ -30,5 +30,5 @@ class UserUpdatePassword(BaseModel):
 
 class UserUpdateAdmin(BaseModel):
     role: Optional[str] = None
-    student_class_id: Optional[int] = None
-    teaching_class_ids: Optional[List[int]] = None
+    student_group_id: Optional[int] = None
+    teaching_group_ids: Optional[List[int]] = None

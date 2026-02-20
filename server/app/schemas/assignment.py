@@ -10,7 +10,7 @@ class Assignment(BaseModel):
     description: str
     due_date: datetime
     created_at: datetime
-    class_id: int
+    group_id: int
     creator_id: int
 
     class Config:
@@ -19,7 +19,7 @@ class Assignment(BaseModel):
 class NewAssignment(BaseModel):
     title: str
     description: str
-    class_id: int
+    group_id: int
     due_date: datetime
 
 class UpdateAssignment(BaseModel):

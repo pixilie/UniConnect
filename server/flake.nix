@@ -32,13 +32,7 @@
               uv
             ];
             buildInputs = with pkgs; [
-              python313Packages.fastapi
               python313Packages.uvicorn
-              python313Packages.requests
-              python313Packages.sqlalchemy
-              python312Packages.pydantic
-              python313Packages.psycopg2
-              python312Packages.websockets
             ];
 
             LD_LIBRARY_PATH = makeLibraryPath buildInputs;

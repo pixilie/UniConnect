@@ -1,62 +1,16 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core import security
 from app.db.database import get_db
 from app.models import models
-from app.schemas import user_schemas
+from app.schemas import user
 
 user_router = APIRouter()
 
-@user_router.post("/register", response_model=user_schemas.User)
-def register_user(user: user_schemas.RegistrationRequest, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == user.email).first():
-        raise HTTPException(status_code=400, detail="User already exists")
-
-    hashed_pw = security.get_password_hash(user.password)
-
-    new_user = models.User(
-        email = user.email,
-        hashed_password = hashed_pw,
-        first_name = user.first_name,
-        last_name = user.last_name
-    )
-
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
-
-
-@user_router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == form_data.username).first()
-
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token = security.create_access_token(
-        data={
-            "sub": str(user.id),
-            "role": user.role
-        }
-    )
-
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user_role": user.role
-    }
-
-@user_router.get("/users", response_model=List[user_schemas.User])
+@user_router.get("/users", response_model=List[user.User])
 def search_users(
     search: Optional[str] = None,
     role: Optional[str] = None,
@@ -80,9 +34,49 @@ def search_users(
 
     return query.offset(skip).limit(limit).all()
 
-@user_router.patch("/users/me", response_model=user_schemas.User)
+@user_router.post("/users/me/password")
+def change_password(
+    passwords: user.UserUpdatePassword,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    if not security.verify_password(passwords.old_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incrorrect password")
+
+    current_user.hashed_password = security.get_password_hash(passwords.new_password)
+
+    db.commit()
+    return {"message": "Password succesfuly updated"}
+
+@user_router.post("/users/user_id={user_id}/group_id={group_id}")
+def add_group_to_teacher(
+    user_id: int,
+    group_id: int,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+    if current_user.role != models.UserRole.ADMIN.value:
+        raise HTTPException(status_code=403, detail="You need administrator privileges to do that")
+
+    teacher = db.query(models.User).filter(models.User.id == user_id).first()
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
+
+    if not teacher or not group:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    if teacher.role != models.UserRole.TEACHER.value:
+         raise HTTPException(status_code=400, detail="This user is not a teacher")
+
+    if group not in teacher.teaching_groups:
+        teacher.teaching_groups.append(group)
+        db.commit()
+
+    return {"message": "Succesfuly added group"}
+
+@user_router.patch("/users/me", response_model=user.User)
 def update_my_profile(
-    updates: user_schemas.UserUpdateProfile,
+    updates: user.UserUpdateProfile,
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -99,17 +93,64 @@ def update_my_profile(
 
     return current_user
 
-@user_router.post("/users/me/password")
-def change_password(
-    passwords: user_schemas.UserUpdatePassword,
+@user_router.patch("/users/user_id={user_id}", response_model=user.User)
+def update_user_status(
+    user_id: int,
+    updates: user.UserUpdateAdmin,
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
+    target_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-    if not security.verify_password(passwords.old_password, current_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incrorrect password")
+    if target_user.role in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
+        if current_user.role != models.UserRole.ADMIN.value:
+            raise HTTPException(status_code=403, detail="You need admin privileges to do that")
+    else:
+        if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
+             raise HTTPException(status_code=403, detail="Permission denied")
 
-    current_user.hashed_password = security.get_password_hash(passwords.new_password)
+    if updates.role:
+        target_user.role = updates.role
+
+    if updates.student_group_id is not None:
+        if updates.student_group_id > 0:
+            cls = db.query(models.Group).filter(models.Group.id == updates.student_group_id).first()
+            if not cls:
+                 raise HTTPException(status_code=404, detail="Group not found")
+
+        target_user.student_group_id = updates.student_group_id
+
+    if updates.teaching_group_ids is not None:
+        groups_to_teach = db.query(models.Group).filter(models.Group.id.in_(updates.teaching_group_ids)).all()
+
+        target_user.teaching_groups = groups_to_teach
 
     db.commit()
-    return {"message": "Password succesfuly updated"}
+    db.refresh(target_user)
+    return target_user
+
+@user_router.delete("/users/users={user_id}/group={group_id}")
+def remove_group_from_teacher(
+    user_id: int,
+    group_id: int,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+    if current_user.role != models.UserRole.ADMIN.value:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    teacher = db.query(models.User).filter(models.User.id == user_id).first()
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
+
+    if not teacher or not group:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    if group in teacher.teaching_groups:
+        teacher.teaching_groups.remove(group)
+        db.commit()
+    else:
+        raise HTTPException(status_code=400, detail="This user is not teaching to this group")
+
+    return {"message": "Group succesfuly deleted"}

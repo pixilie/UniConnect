@@ -7,25 +7,25 @@ from pydantic import BaseModel
 class Event(BaseModel):
     id: int
     title: str
-    desription: str
+    description: str
     date: datetime
     type: str
-    location: str
-    latitude: float
-    longitude: float
+    location: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     creator_id: int
     group_id: int
 
 class NewEvent(BaseModel):
     title: str
-    desription: str
+    description: str
     date: datetime
     type: str
-    location: str
+    location: Optional[str] = None
 
 class UpdateEvent(BaseModel):
     title: Optional[str] = None
-    desription: Optional[str] = None
+    description: Optional[str] = None
     date: Optional[datetime] = None
     type: Optional[str] = None
     location: Optional[str] = None
