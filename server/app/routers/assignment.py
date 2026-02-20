@@ -11,7 +11,7 @@ from app.schemas import assignment_schemas
 
 assignment_router = APIRouter()
 
-@assignment_router.post("/new_assignements/group_id={group_id}", response_model=assignment_schemas.Assignment)
+@assignment_router.post("/assignements/group_id={group_id}", response_model=assignment_schemas.Assignment)
 def new_assignments(
     group_id: int,
     assignment_data: assignment_schemas.NewAssignment,
@@ -36,7 +36,7 @@ def new_assignments(
 
     return new_assignment
 
-@assignment_router.delete("/remove_assignements/assignment_id={assignment_id}")
+@assignment_router.delete("/assignements/assignment_id={assignment_id}")
 def remove_assignment(
     assignment_id: int,
     current_user: models.User = Depends(security.get_current_user),
@@ -55,7 +55,7 @@ def remove_assignment(
 
     return {"message": "Assignment succesfuly deleted"}
 
-@assignment_router.patch("/update_assignment/assignment_id={assignment_id}", response_model=assignment_schemas.Assignment)
+@assignment_router.patch("/assignment/assignment_id={assignment_id}", response_model=assignment_schemas.Assignment)
 def update_assignment(
     assignment_id: int,
     update: assignment_schemas.UpdateAssignment,
