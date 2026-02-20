@@ -34,6 +34,14 @@ def search_users(
 
     return query.offset(skip).limit(limit).all()
 
+@user_router.get("/users/me", response_model=user.User)
+def get_my_profile(
+    updates: user.UserUpdateProfile,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(models.User).filter(models.User.id == current_user.id).first()
+
 @user_router.post("/users/me/password")
 def change_password(
     passwords: user.UserUpdatePassword,
