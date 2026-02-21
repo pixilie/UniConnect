@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 
 from app.db.database import Base, engine
-from app.routers import assignment, auth, chat, event, group, message, schedule, user
+from app.routers import (
+    assignment,
+    auth,
+    chat,
+    event,
+    group,
+    message,
+    schedule,
+    user,
+)
 
 # Database init
 Base.metadata.create_all(bind=engine)

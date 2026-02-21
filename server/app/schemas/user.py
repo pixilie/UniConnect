@@ -28,7 +28,11 @@ class UserUpdatePassword(BaseModel):
     old_password: str
     new_password: str
 
-class UserUpdateAdmin(BaseModel):
-    role: Optional[str] = None
-    student_group_id: Optional[int] = None
-    teaching_group_ids: Optional[List[int]] = None
+class UserRoleUpdate(BaseModel):
+    role: str
+
+class UserGroupUpdate(BaseModel):
+    group_id: Optional[int] = None
+
+class TeacherUpdateGroup(BaseModel):
+    group_id: int
