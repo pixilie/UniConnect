@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core import security
 from app.db.database import get_db
 from app.models import models
-from app.schemas import assignment, event, group, user
+from app.schemas import assignment, event, group, message, user
 
 group_router = APIRouter()
 
@@ -82,6 +82,16 @@ def get_schedule(
         raise HTTPException(status_code=404, detail="Schedule not found")
 
     return group.schedule_path
+
+@group_router.get("/groups/{group_id}/messages", response_model=List[message.Message])
+def get_messages(
+    group_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(models.Message).filter(models.Message.group_id == group_id).offset(skip).limit(limit).all()
 
 @group_router.post("/groups/{group_id}/assignments", response_model=assignment.Assignment)
 def new_assignments(

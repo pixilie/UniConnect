@@ -7,7 +7,6 @@ from app.routers import (
     chat,
     event,
     group,
-    message,
     user,
 )
 
@@ -22,7 +21,6 @@ app.include_router(user.user_router, prefix="/api", tags=["Users"])
 app.include_router(assignment.assignment_router, prefix="/api", tags=["Assignments"])
 app.include_router(group.group_router, prefix="/api", tags=["Groups"])
 app.include_router(event.events_router, prefix="/api", tags=["Events"])
-app.include_router(message.message_router, prefix="/api", tags=["Messages"])
 app.include_router(chat.ws_router)
 
 @app.get("/")
