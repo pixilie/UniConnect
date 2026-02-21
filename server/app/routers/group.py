@@ -1,5 +1,6 @@
 import os
 import shutil
+from pickle import INT
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core import security
 from app.db.database import get_db
 from app.models import models
-from app.schemas import assignment, event, group
+from app.schemas import assignment, event, group, user
 
 group_router = APIRouter()
 
@@ -31,6 +32,18 @@ def get_group(
         return db.query(models.Group).filter(group_id == models.Group.id)
     else:
         return db.query(models.Group).offset(skip).limit(limit).all()
+
+@group_router.get("/groups/{group_id}/members", response_model=List[user.User])
+def get_group_members(
+    group_id: int,
+    current_user: models.User = Depends(security.get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not db.query(models.Group).first():
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    return db.query(models.User).filter(models.User.student_group_id == group_id or models.User.teaching_groups == group_id).all()
+
 
 @group_router.get("/groups/{group_id}/assignments", response_model=List[assignment.Assignment])
 def get_assignments(
