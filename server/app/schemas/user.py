@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -30,9 +30,3 @@ class UserUpdatePassword(BaseModel):
 
 class UserRoleUpdate(BaseModel):
     role: str
-
-class UserGroupUpdate(BaseModel):
-    group_id: Optional[int] = None
-
-class TeacherUpdateGroup(BaseModel):
-    group_id: int

@@ -57,10 +57,10 @@ def change_password(
 
     return {"message": "Password succesfuly updated"}
 
-@user_router.patch("/users/{user_id}/teacher-group")
+@user_router.patch("/users/{user_id}/teacher-group/{group_id}")
 def update_teacher_group(
     user_id: int,
-    data: user.TeacherUpdateGroup,
+    group_id: int,
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -68,7 +68,7 @@ def update_teacher_group(
         raise HTTPException(status_code=403, detail="Permission denied")
 
     teacher = db.query(models.User).filter(models.User.id == user_id).first()
-    group = db.query(models.Group).filter(models.Group.id == data.group_id).first()
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not teacher or not group:
         raise HTTPException(status_code=404, detail="Group or teacher not found")
@@ -128,10 +128,10 @@ def update_user_role(
     db.refresh(target_user)
     return target_user
 
-@user_router.patch("/users/{user_id}/student-group", response_model=user.User)
+@user_router.patch("/users/{user_id}/student-group/{group_id}", response_model=user.User)
 def update_user_student_group(
     user_id: int,
-    group_data: user.UserGroupUpdate,
+    group_id: Optional[int],
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -142,12 +142,12 @@ def update_user_student_group(
     if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
         raise HTTPException(status_code=403, detail="Only Teachers or Admins can assign groups")
 
-    if group_data.group_id is not None:
-        group = db.query(models.Group).filter(models.Group.id == group_data.group_id).first()
+    if group_id is not None:
+        group = db.query(models.Group).filter(models.Group.id == group_id).first()
         if not group:
              raise HTTPException(status_code=404, detail="Group not found")
 
-    target_user.student_group_id = group_data.group_id
+    target_user.student_group_id = group_id
 
     db.commit()
     db.refresh(target_user)
