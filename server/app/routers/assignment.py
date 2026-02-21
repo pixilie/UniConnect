@@ -11,26 +11,7 @@ from app.schemas import assignment
 
 assignment_router = APIRouter()
 
-@assignment_router.get("/assignments/group_id={group_id}", response_model=List[assignment.Assignment])
-def get_assignments(
-    group_id: int,
-    skip: int = 0,
-    limit: int = 100,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    query = db.query(models.Assignment)
-
-    if current_user.role == models.UserRole.STUDENT:
-        if not current_user.student_group_id:
-            return []
-        query = query.filter(models.Assignment.group_id == current_user.student_group_id)
-    else:
-        query = query.filter(models.Assignment.group_id == group_id)
-
-    return query.order_by(models.Assignment.due_date.asc()).offset(skip).limit(limit).all()
-
-@assignment_router.get("/assignments/assignment_id={assignment_id}", response_model=assignment.Assignment)
+@assignment_router.get("/assignments/{assignment_id}", response_model=assignment.Assignment)
 def get_assignment_detail(
     assignment_id: int,
     current_user: models.User = Depends(security.get_current_user),
@@ -47,32 +28,7 @@ def get_assignment_detail(
 
     return assignment
 
-@assignment_router.post("/assignements/group_id={group_id}", response_model=assignment.Assignment)
-def new_assignments(
-    group_id: int,
-    assignment_data: assignment.NewAssignment,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission Denied")
-
-    new_assignment = models.Assignment(
-        title = assignment_data.title,
-        description = assignment_data.description,
-        due_date = assignment_data.due_date,
-        created_at = datetime.now(timezone.utc),
-        group_id = group_id,
-        creator_id = current_user.id
-    )
-
-    db.add(new_assignment)
-    db.commit()
-    db.refresh(new_assignment)
-
-    return new_assignment
-
-@assignment_router.patch("/assignments/assignment_id={assignment_id}", response_model=assignment.Assignment)
+@assignment_router.patch("/assignments/{assignment_id}", response_model=assignment.Assignment)
 def update_assignment(
     assignment_id: int,
     update: assignment.UpdateAssignment,
@@ -99,7 +55,7 @@ def update_assignment(
     db.refresh(assignment)
     return assignment
 
-@assignment_router.delete("/assignements/assignment_id={assignment_id}")
+@assignment_router.delete("/assignments/{assignment_id}")
 def remove_assignment(
     assignment_id: int,
     current_user: models.User = Depends(security.get_current_user),

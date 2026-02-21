@@ -14,4 +14,3 @@ class NewGroup(BaseModel):
 
 class UpdateGroup(BaseModel):
     name: Optional[str] = None
-    schedule_path: Optional[str] = None

@@ -26,39 +26,7 @@ def get_event(
 
     return query.offset(skip).limit(limit).all()
 
-@events_router.post("/events/group_id={group_id}", response_model=event.Event)
-def create_event(
-    group_id: int,
-    event_data: event.NewEvent,
-    current_user: models.User = Depends(security.get_current_user),
-    db: Session = Depends(get_db)
-):
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
-
-    if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
-
-    (address, latitude, longitude) = geocoding.get_coordinates(event_data.location)
-
-    new_event = models.Event(
-        title = event_data.title,
-        description = event_data.description,
-        date = event_data.date,
-        location = address,
-        latitude = latitude,
-        longitude = longitude,
-        type = event_data.type,
-        creator_id = current_user.id,
-        group_id = group_id
-    )
-
-    db.add(new_event)
-    db.commit()
-    db.refresh(new_event)
-
-    return new_event
-
-@events_router.patch("/events/event_id={event_id}", response_model=event.Event)
+@events_router.patch("/events/{event_id}", response_model=event.Event)
 def update_event(
     event_id: int,
     event_data: event.UpdateEvent,
@@ -88,7 +56,7 @@ def update_event(
 
     return event
 
-@events_router.delete("/events/event_id={event_id}")
+@events_router.delete("/events/{event_id}")
 def delete_event(
     event_id: int,
     current_user: models.User = Depends(security.get_current_user),
