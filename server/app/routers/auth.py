@@ -45,14 +45,15 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
 
     access_token = security.create_access_token(
-        data={
+        data = {
             "sub": str(user.id),
-            "role": user.role
+            "role": str(user.role)
         }
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_role": user.role
+        "user_role": user.role,
+        "user_id": user.id
     }
