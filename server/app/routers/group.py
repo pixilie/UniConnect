@@ -1,6 +1,6 @@
 import os
 import shutil
-from pickle import INT
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -11,11 +11,12 @@ from app.core import security
 from app.db.database import get_db
 from app.models import models
 from app.schemas import assignment, event, group, message, user
+from app.services import geocoding
 
 group_router = APIRouter()
 
-ALLOWED_EXTENSION = {'ics'}
-UPLOAD_DIR = "app/db/timetables"
+TIMETABLES_EXTENSION = {'ics'}
+TIMETABLES_DIR = "app/db/schedules"
 
 @group_router.get("/groups/", response_model=List[group.Group])
 def get_group(
@@ -25,11 +26,11 @@ def get_group(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER]:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
+        raise HTTPException(status_code=403, detail="Only administrators/teachers can browse groups")
 
     if group_id:
-        return db.query(models.Group).filter(group_id == models.Group.id)
+        return db.query(models.Group).filter(models.Group.id == group_id)
     else:
         return db.query(models.Group).offset(skip).limit(limit).all()
 
@@ -40,7 +41,7 @@ def get_group_members(
     db: Session = Depends(get_db)
 ):
     if not db.query(models.Group).first():
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
     return db.query(models.User).filter(models.User.student_group_id == group_id or models.User.teaching_groups == group_id).all()
 
@@ -57,7 +58,7 @@ def get_assignments(
 
     if current_user.role == models.UserRole.STUDENT:
         if not current_user.student_group_id:
-            return []
+            raise HTTPException(status_code=404, detail="You can't access assignments from a group you're not part of")
         query = query.filter(models.Assignment.group_id == current_user.student_group_id)
     else:
         query = query.filter(models.Assignment.group_id == group_id)
@@ -73,13 +74,13 @@ def get_schedule(
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if not group.schedule_path:
-        raise HTTPException(status_code=404, detail="No schedule saved for this group")
+    if not group.schedule_path == "":
+        raise HTTPException(status_code=404, detail=f"No schedule saved for the group {group_id}")
 
     if not os.path.exists(group.schedule_path):
-        raise HTTPException(status_code=404, detail="Schedule not found")
+        raise HTTPException(status_code=404, detail="An error occured while fecthing the schedule for this group")
 
     return group.schedule_path
 
@@ -100,8 +101,8 @@ def new_assignments(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission Denied")
+    if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
+        raise HTTPException(status_code=403, detail="Only administrators/teachers can post new assignments")
 
     new_assignment = models.Assignment(
         title = assignment_data.title,
@@ -125,7 +126,7 @@ def create_group(
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="Permission denied")
+        raise HTTPException(status_code=403, detail="Only administrators can create groups")
 
     new_group = models.Group (
         name = group_data.name,
@@ -148,9 +149,9 @@ def create_event(
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    (address, latitude, longitude) = geocoding.get_coordinates(event_data.location)
+    (address, latitude, longitude) = geocoding.get_coordinates(event_data.location) if event_data.location else None, None, None
 
     new_event = models.Event(
         title = event_data.title,
@@ -177,22 +178,22 @@ def upload_schedule(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission Denied")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administrators can upload a new group's schedule")
 
     if not file.filename or file.filename.strip() == "":
         raise HTTPException(status_code=400, detail="No file selected")
 
     file_ext = file.filename.split(".")[1]
-    if file_ext not in ALLOWED_EXTENSION:
-        raise HTTPException(status_code=415, detail="Unsupported file extension, should be .ics")
+    if file_ext not in TIMETABLES_EXTENSION:
+        raise HTTPException(status_code=415, detail=f"Unsupported file extension ({file_ext}), should be .ics")
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    file_path = f"{UPLOAD_DIR}/group_{group_id}.ics"
+    file_path = f"{TIMETABLES_DIR}/group_{group_id}.ics"
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
@@ -211,12 +212,12 @@ def update_group_name(
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="Permission denied")
+        raise HTTPException(status_code=403, detail="Only administrators can modify a group")
 
-    group = db.query(models.Group).filter(group_id == models.Group.id).first()
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
     if group_data.name:
         group.name = group_data.name
@@ -232,21 +233,20 @@ def delete_group(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administrators can delete a group")
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if group.schedule_path and os.path.exists(f"{UPLOAD_DIR}/group_{group_id}.ics"):
-        os.remove(f"{UPLOAD_DIR}/group_{group_id}.ics")
+    if group.schedule_path and os.path.exists(f"{TIMETABLES_DIR}/group_{group_id}.ics"):
+        os.remove(f"{TIMETABLES_DIR}/group_{group_id}.ics")
 
     events = db.query(models.Event).filter(models.Event.group_id == group_id).all()
-    for event in events:
-        print(event)
-        db.delete(event)
+    for e in events:
+        db.delete(e)
 
     db.delete(group)
     db.commit()
@@ -259,15 +259,15 @@ def remove_schedule(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission Denied")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administrators can delete a group's schedule")
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    os.remove(f"{UPLOAD_DIR}/group_{group_id}.ics")
+    os.remove(f"{TIMETABLES_DIR}/group_{group_id}.ics")
     group.schedule_path = ""
 
     db.commit()

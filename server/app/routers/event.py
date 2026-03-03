@@ -38,8 +38,8 @@ def update_event(
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="You can only update the event you created")
+    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="You can only update events you created")
 
     updated_data = event_data.model_dump(exclude_unset=True)
     for key, value in updated_data.items():
@@ -47,9 +47,10 @@ def update_event(
 
     if event_data.location:
         (address, latitude, longitude) = geocoding.get_coordinates(event_data.location)
-        event.location = address
-        event.latitude = latitude
-        event.longitude = longitude
+        if address and latitude and longitude:
+            event.location = address
+            event.latitude = latitude
+            event.longitude = longitude
 
     db.commit()
     db.refresh(event)
@@ -65,10 +66,10 @@ def delete_event(
     event = db.query(models.Event).filter(models.Event.id == event_id).first()
 
     if not event:
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=404, detail=f"Event {event_id} not found")
 
-    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="You can only delete the event you created")
+    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="You can only delete events you created")
 
     db.delete(event)
     db.commit()

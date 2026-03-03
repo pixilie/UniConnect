@@ -32,6 +32,9 @@ def search_users(
     if role:
         query = query.filter(models.User.role == role)
 
+    if current_user.role == models.UserRole.STUDENT or current_user.role == models.UserRole.DELEGATE:
+        query = query.filter(models.User.student_group_id == current_user.student_group_id)
+
     return query.offset(skip).limit(limit).all()
 
 @user_router.get("/users/me", response_model=user.User)
@@ -64,22 +67,24 @@ def update_teacher_group(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administrators can update teacher's teaching groups")
 
-    teacher = db.query(models.User).filter(models.User.id == user_id).first()
+    user_to_change = db.query(models.User).filter(models.User.id == user_id).first()
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
-    if not teacher or not group:
-        raise HTTPException(status_code=404, detail="Group or teacher not found")
+    if not user_to_change:
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+    elif not group:
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if teacher.role != models.UserRole.TEACHER.value:
-         raise HTTPException(status_code=400, detail="This user is not a teacher")
+    if user_to_change.role != models.UserRole.TEACHER:
+         raise HTTPException(status_code=400, detail=f"User {user_to_change.first_name} {user_to_change.last_name} ({user_id}) is not a teacher")
 
-    if group not in teacher.teaching_groups:
-        teacher.teaching_groups.append(group)
+    if group not in user_to_change.teaching_groups:
+        user_to_change.teaching_groups.append(group)
     else:
-        teacher.teaching_groups.remove(group)
+        user_to_change.teaching_groups.remove(group)
 
     db.commit()
 
@@ -113,14 +118,14 @@ def update_user_role(
 ):
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not target_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
-    if target_user.role in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        if current_user.role != models.UserRole.ADMIN.value:
-            raise HTTPException(status_code=403, detail="Only Admins can modify other Admins/Teachers")
+    if target_user.role in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
+        if current_user.role != models.UserRole.ADMIN:
+            raise HTTPException(status_code=403, detail="Only administrators can modify administator/teacher user's role")
     else:
-        if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-             raise HTTPException(status_code=403, detail="Permission denied")
+        if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
+             raise HTTPException(status_code=403, detail="Only administrators/teachers can modify user's roles")
 
     target_user.role = role_data.role
 
@@ -137,15 +142,15 @@ def update_user_student_group(
 ):
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not target_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Only Teachers or Admins can assign groups")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administators can assign groups")
 
     if group_id is not None:
         group = db.query(models.Group).filter(models.Group.id == group_id).first()
         if not group:
-             raise HTTPException(status_code=404, detail="Group not found")
+             raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
     target_user.student_group_id = group_id
 
@@ -161,10 +166,10 @@ def delete_user(
 ):
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not target_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
-    if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="You need admin privileges to do that")
+    if current_user.role != models.UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only administators can delete a user")
 
     db.delete(target_user)
     db.commit()

@@ -1,6 +1,3 @@
-from datetime import datetime, timezone
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -20,11 +17,11 @@ def get_assignment_detail(
     assignment = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
 
     if not assignment:
-        raise HTTPException(status_code=404, detail="Assignment not found")
+        raise HTTPException(status_code=404, detail=f"Assignment {assignment_id} not found")
 
     if current_user.role == models.UserRole.STUDENT:
         if assignment.group_id != current_user.student_group_id:
-             raise HTTPException(status_code=403, detail="You can't see this assignment")
+             raise HTTPException(status_code=403, detail="You don't belong the group this assignment has been assigned to")
 
     return assignment
 
@@ -35,16 +32,16 @@ def update_assignment(
     current_user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
+        raise HTTPException(status_code=403, detail="Only administrators/teachers can update an assignment")
 
     assignment = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
 
     if not assignment:
-        raise HTTPException(status_code=404, detail="Devoir introuvable")
+        raise HTTPException(status_code=404, detail=f"Assignment {assignment_id} not found")
 
-    if current_user.role in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value] and assignment.creator_id != current_user.id:
-         raise HTTPException(status_code=403, detail="You can't modify this assignment")
+    if current_user.role != models.UserRole.ADMIN and assignment.creator_id != current_user.id:
+         raise HTTPException(status_code=403, detail="You can't modify this assignment because you don't created it")
 
     update_data = update.model_dump(exclude_unset=True)
 
@@ -53,6 +50,7 @@ def update_assignment(
 
     db.commit()
     db.refresh(assignment)
+
     return assignment
 
 @assignment_router.delete("/assignments/{assignment_id}")
@@ -62,12 +60,15 @@ def remove_assignment(
     db: Session = Depends(get_db)
 ):
     if current_user.role not in [models.UserRole.ADMIN.value, models.UserRole.TEACHER.value]:
-        raise HTTPException(status_code=403, detail="Permission Denied")
+        raise HTTPException(status_code=403, detail="Only administrator/teachers can delete an assigment")
 
     assignment = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
 
     if not assignment:
-        raise HTTPException(status_code=404, detail="Not found")
+        raise HTTPException(status_code=404, detail=f"Assignment {assignment_id} not found")
+
+    if current_user.role != models.UserRole.ADMIN and assignment.creator_id != current_user.id:
+         raise HTTPException(status_code=403, detail="You can't remove this assignment because you don't created it")
 
     db.delete(assignment)
     db.commit()

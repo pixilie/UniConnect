@@ -32,12 +32,10 @@ async def websocket_endpoint(
             return
 
         if user.student_group_id != group_id:
-            print("caca")
             await websocket.close(code=1008)
             return
 
     except Exception as e:
-        print(e)
         await websocket.close(code=1008)
         return
 
