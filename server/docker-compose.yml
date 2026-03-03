@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    container_name: uniconnect-api
+    ports:
+      - "8000:8000"
+    environment:
+      # URL format : postgresql://[USER]:[PASSWORD]@db:5432/[DB_NAME] | Please changer PASSWORD and SECRET_KEY
+      - DATABASE_URL=postgresql://user:7585408f5c1ca5f2e41871e1bd9228ee22a4102be78ea4e5c7ad52588cb924e0@db:5432/uniconnect
+      - SECRET_KEY=cbe10f75a59dcfca04fea8f7813a0bd2a16975cf71380c28730c58b61c36c5cb
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: uniconnect-postgres
+    environment:
+      # Values here must match with the values above
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=7585408f5c1ca5f2e41871e1bd9228ee22a4102be78ea4e5c7ad52588cb924e0
+      - POSTGRES_DB=uniconnect
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
