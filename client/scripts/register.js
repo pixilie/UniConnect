@@ -1,6 +1,6 @@
 async function register(firstName,lastName,email,password){
     try{
-        const res = await fetch("http://localhost:3000/api/register", {
+        const res = await fetch("https://uniconnect.pixilie.net/api/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
