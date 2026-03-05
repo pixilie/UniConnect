@@ -5,7 +5,7 @@ async function login(username, password) {
     params.append("password", password);
 
     try {
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch("https://uniconnect.pixilie.net/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params
