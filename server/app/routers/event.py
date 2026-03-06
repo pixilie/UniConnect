@@ -23,6 +23,9 @@ def get_event(
     if event_id:
         query = query.filter(models.Event.id == event_id)
 
+    if not query.first():
+        raise HTTPException(status_code=404, detail=f"Group {event_id} not found")
+
     return query.offset(skip).limit(limit).all()
 
 
