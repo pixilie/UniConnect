@@ -39,7 +39,6 @@ def search_users(
 
 @user_router.get("/users/me", response_model=schemas.User)
 def get_my_profile(
-    updates: schemas.UserUpdateProfile,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
