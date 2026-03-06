@@ -34,7 +34,7 @@ def get_group_members(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not db.query(models.Group).first():
+    if not db.query(models.Group).filter(models.Group.id == group_id).first():
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
     return db.query(models.User).filter(models.User.student_group_id == group_id or models.User.teaching_groups.contains(group_id)).all()
