@@ -13,6 +13,7 @@ events_router = APIRouter()
 @events_router.get("/events/", response_model=List[schemas.Event])
 def get_event(
     event_id: Optional[int] = None,
+    group_id: Optional[int] = None,
     skip: int = 0,
     limit: int = 20,
     current_user: models.User = Depends(get_current_user),
@@ -24,7 +25,13 @@ def get_event(
         query = query.filter(models.Event.id == event_id)
 
     if not query.first():
-        raise HTTPException(status_code=404, detail=f"Group {event_id} not found")
+        raise HTTPException(status_code=404, detail=f"Event {event_id} not found")
+
+    if group_id:
+        query = query.filter(models.Group.id == group_id)
+
+    if not query.first():
+        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
     return query.offset(skip).limit(limit).all()
 
