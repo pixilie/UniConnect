@@ -166,7 +166,7 @@ def update_user_student_group(
     return target_user
 
 
-@user_router.delete("/users/{user_id}", response_model=schemas.User)
+@user_router.delete("/users/{user_id}")
 def delete_user(
     user_id: int,
     current_user: models.User = Depends(get_current_user),
