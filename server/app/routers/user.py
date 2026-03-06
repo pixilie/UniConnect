@@ -123,6 +123,9 @@ def update_user_role(
     if not target_user:
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
+    if current_user == target_user:
+        raise HTTPException(status_code=403, detail="You can't change your roles")
+
     if target_user.role in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
         if current_user.role != models.UserRole.ADMIN:
             raise HTTPException(status_code=403, detail="Only administrators can modify administator/teacher user's role")
