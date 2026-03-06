@@ -152,9 +152,9 @@ class Poll(Base):
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
-    group = relationship("Group", back_populates="poll")
+    group = relationship("Group", back_populates="polls")
     choices = relationship("Choice", back_populates="poll")
-    votes = relationship("Vote", back_populates="polls")
+    votes = relationship("Vote", back_populates="poll")
 
 
 class Choice(Base):
@@ -185,5 +185,5 @@ class Vote(Base):
     choice = relationship("Choice", back_populates="votes")
 
     __table_args__ = (
-        UniqueConstraint('user_id', 'poll_id', name='unique_user_vote_per_polls'),
+        UniqueConstraint('user_id', 'poll_id', name='unique_user_vote_per_poll'),
     )
