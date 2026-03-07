@@ -1,45 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>register</title>
-    <link rel="stylesheet" href="../styles/register.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect - Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/register.css">
 </head>
-<h1>
-    UniConnect
-</h1>
+
 <body>
-    <div class="logo.png">
-        <img src="logo.png" alt="UniConnect Logo">
+
+  <div class="card">
+    <span class="logo-text">UniConnect</span>
+
+    <div class="form-grid">
+
+      <div class="input-group">
+        <input type="text" id="fullname" class="input-field" placeholder=" " required>
+        <label for="fullname" class="input-label">Full Name</label>
+      </div>
+
+      <div class="input-group">
+        <input type="email" id="email" class="input-field" placeholder=" " required>
+        <label for="email" class="input-label">University Email</label>
+      </div>
+
+      <div class="input-group">
+        <input type="password" id="password" class="input-field" placeholder=" " required>
+        <label for="password" class="input-label">Password</label>
+      </div>
+
     </div>
-    <div>
-        <input type="text" id="FullName" placeholder="Full name" minlength="2" maxlength="100" required><br>
-    <input type ="email" id="UniversityEmail" placeholder="Email"required><br>
-    <input type ="password" id="Password" placeholder="Password" minlength="6" maxlength="14" required><br>
-    <button class="btn-purpee"onclick="tryRegister()">Create Account</button>
-   </div>
-<p>Already have an account? <a href="login.html">Log in</a></p>
+
+    <button class="btn">Create Account</button>
+
+    <div class="footer-link">
+      Already have an account? <a href="login.html">Sign in</a>
+    </div>
+  </div>
+
 </body>
-<footer>
-    <script>
-    async function tryRegister(){
-              
-    fullName=document.getElementById("FullName").textContent;
-    email=document.getElementById("UniversityEmail").textContent;
-    password=document.getElementById("Password").textContent;
-            
-    names=fullName.split(" ");
-    firstName=names[0];
-    names.shift();
-    lastName=names.join(" ")
 
-    success=await register(firstName,lastName,email,password);
-
-    if(success)window.location.href='chat.html';
-    else alert("registration failed");
-
-}
-</script>
-</footer>
 </html>
