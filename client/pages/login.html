@@ -4,23 +4,27 @@
 <head>
   <meta charset="UTF-8">
   <title>UniConnect Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <link rel="stylesheet" href="../styles/login.css">
 </head>
 
 <body>
   <div class="login-container">
+
     <h1 class="title">UniConnect</h1>
+
     <form id="loginForm">
       <input type="email" id="email" placeholder="University Email" required>
       <input type="password" id="password" placeholder="Password" required>
       <a class="forgot" href="#">Forgot password?</a>
       <button type="submit">Sign In</button>
-      <p class="register">
-        No account yet? <a href="#">Register</a>
-      </p>
+      <p class="register">No account yet? <a href="#">Register</a></p>
       <p id="message"></p>
     </form>
+
   </div>
+
   <script src="../scripts/login.js"></script>
 </body>
 

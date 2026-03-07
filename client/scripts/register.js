@@ -11,26 +11,38 @@ async function register(firstName, lastName, email, password) {
         email: email,
         password: password
       })
-    })
+    });
+
     if (!res.ok) return false;
     return true;
+
   } catch (err) {
+    console.log(err);
     return false;
   }
 }
 
-async function tryRegister() {
-  fullName = document.getElementById("fullname").textContent;
-  email = document.getElementById("email").textContent;
-  password = document.getElementById("password").textContent;
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-  names = fullName.split(" ");
-  firstName = names[0];
+  let fullName = document.getElementById("fullname").value.trim();
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  let names = fullName.split(" ");
+  let firstName = names[0];
   names.shift();
-  lastName = names.join(" ")
+  let lastName = names.join(" ") || "";
+  let message = document.getElementById("message");
+  let success = await register(firstName, lastName, email, password);
 
-  success = await register(firstName, lastName, email, password);
-
-  if (success) window.location.href = 'chat.html';
-  else alert("registration failed");
-}
+  if (success) {
+    message.style.color = "green";
+    message.innerText = "Registration Successful!";
+    window.location.href = "login.html";
+  }
+  else {
+    message.style.color = "red";
+    message.innerText = "Registration failed. Email might already exist.";
+  }
+});

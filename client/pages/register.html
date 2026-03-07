@@ -11,36 +11,41 @@
 </head>
 
 <body>
-
   <div class="card">
     <span class="logo-text">UniConnect</span>
 
-    <div class="form-grid">
+    <form id="registerForm">
+      <div class="form-grid">
 
-      <div class="input-group">
-        <input type="text" id="fullname" class="input-field" placeholder=" " required>
-        <label for="fullname" class="input-label">Full Name</label>
+        <div class="input-group">
+          <input type="text" id="fullname" class="input-field" placeholder=" " required>
+          <label for="fullname" class="input-label">Full Name</label>
+        </div>
+
+        <div class="input-group">
+          <input type="email" id="email" class="input-field" placeholder=" " required>
+          <label for="email" class="input-label">University Email</label>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="password" class="input-field" placeholder=" " required>
+          <label for="password" class="input-label">Password</label>
+        </div>
+
       </div>
 
-      <div class="input-group">
-        <input type="email" id="email" class="input-field" placeholder=" " required>
-        <label for="email" class="input-label">University Email</label>
-      </div>
+      <p id="message" style="margin-top: 16px; font-size: 14px; text-align: center;"></p>
 
-      <div class="input-group">
-        <input type="password" id="password" class="input-field" placeholder=" " required>
-        <label for="password" class="input-label">Password</label>
-      </div>
-
-    </div>
-
-    <button class="btn">Create Account</button>
+      <button type="submit" class="btn">Create Account</button>
+    </form>
 
     <div class="footer-link">
       Already have an account? <a href="login.html">Sign in</a>
     </div>
+
   </div>
 
+  <script src="../scripts/register.js"></script>
 </body>
 
 </html>

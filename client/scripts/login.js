@@ -18,6 +18,7 @@ async function login(username, password) {
     return true;
 
   } catch (err) {
+    console.log(err);
     return false;
   }
 }
@@ -25,7 +26,6 @@ async function login(username, password) {
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  console.log("script running ");
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
 
@@ -35,7 +35,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
   if (success) {
     message.style.color = "green";
     message.innerText = "Login Successful!";
-    window.location.href = "../pages/chat.html";
+    window.location.href = "chat.html";
   }
   else {
     message.style.color = "red";
