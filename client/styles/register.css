@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #F4F4F7;
+  color: #1C1B1F;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  background: #FFFBFE;
+  border-radius: 28px;
+  padding: 40px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logo-text {
+  color: #6750A4;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  display: block;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: left;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #79747E;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+
+.input-label {
+  position: absolute;
+  left: 12px;
+  top: 16px;
+  background: #FFFBFE;
+  padding: 0 4px;
+  color: #79747E;
+  font-size: 16px;
+  transition: 0.2s;
+  pointer-events: none;
+}
+
+.input-field:focus {
+  border-color: #6750A4;
+  border-width: 2px;
+  outline: none;
+  padding: 13px 15px;
+}
+
+.input-field:focus~.input-label,
+.input-field:not(:placeholder-shown)~.input-label {
+  top: -10px;
+  font-size: 12px;
+  color: #6750A4;
+  font-weight: 500;
+}
+
+.btn {
+  background-color: #6750A4;
+  color: #FFFFFF;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 100px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s;
+}
+
+.btn:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.footer-link {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #666;
+}
+
+.footer-link a {
+  color: #6750A4;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-link a:hover {
+  text-decoration: underline;
+}
