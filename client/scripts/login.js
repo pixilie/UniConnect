@@ -20,3 +20,32 @@ async function login(username, password) {
         return false;
     }
 }
+
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+console.log("script running ");
+let email = document.getElementById("email").value;
+let password = document.getElementById("password").value;
+
+let message = document.getElementById("message");
+
+let success= await login(email,password);
+
+if(success){
+
+message.style.color = "green";
+message.innerText = "Login Successful!";
+
+window.location.href="../pages/chat.html";
+
+}
+else{
+
+message.style.color = "red";
+message.innerText = "Invalid email or password";
+
+}
+
+});
