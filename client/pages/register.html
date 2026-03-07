@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>register</title>
+    <link rel="stylesheet" href="../styles/register.css">
+</head>
+<h1>
+    UniConnect
+</h1>
+<body>
+    <div class="logo.png">
+        <img src="logo.png" alt="UniConnect Logo">
+    </div>
+    <div>
+        <input type="text" id="FullName" placeholder="Full name" minlength="2" maxlength="100" required><br>
+    <input type ="email" id="UniversityEmail" placeholder="Email"required><br>
+    <input type ="password" id="Password" placeholder="Password" minlength="6" maxlength="14" required><br>
+    <button class="btn-purpee"onclick="tryRegister()">Create Account</button>
+   </div>
+<p>Already have an account? <a href="login.html">Log in</a></p>
+</body>
+<footer>
+    <script>
+    async function tryRegister(){
+              
+    fullName=document.getElementById("FullName").textContent;
+    email=document.getElementById("UniversityEmail").textContent;
+    password=document.getElementById("Password").textContent;
+            
+    names=fullName.split(" ");
+    firstName=names[0];
+    names.shift();
+    lastName=names.join(" ")
+
+    success=await register(firstName,lastName,email,password);
+
+    if(success)window.location.href='chat.html';
+    else alert("registration failed");
+
+}
+</script>
+</footer>
+</html>
