@@ -1,81 +1,82 @@
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:#f2f2f6;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    margin:0;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f2f2f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
-.login-container{
-    background:white;
-    padding:40px;
-    width:360px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.1);
-    text-align:center;
+.login-container {
+  background: white;
+  padding: 40px;
+  width: 360px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.title{
-    color:#6A57A5;
-    margin-bottom:30px;
+.title {
+  color: #6A57A5;
+  margin-bottom: 30px;
 }
 
-input{
-    width:100%;
-    padding:12px;
-    margin:10px 0;
-    border-radius:6px;
-    border:1px solid #ccc;
-    font-size:14px;
-    box-sizing:border-box;
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-input:focus{
-    outline:none;
-    border:1px solid #5236B8;
+input:focus {
+  outline: none;
+  border: 1px solid #5236B8;
 }
 
-.forgot{
-    display:block;
-    text-align:right;
-    font-size:12px;
-    color:#6A57A5;
-    text-decoration:none;
-    margin-top:5px;
+.forgot {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #6A57A5;
+  text-decoration: none;
+  margin-top: 5px;
 }
 
-button{
-     width:100%;
-    padding:14px;
-    margin-top:20px;
-    background:#6A57A5;
-    color:white;
-    border:none;
-    border-radius:30px;
-    font-size:16px;
-    cursor:pointer;
-    box-shadow:0 5px 10px rgba(0,0,0,0.15);
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background: #6A57A5;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-button:hover{
-     background:#5c4a93;
-}
-.register{
-    margin-top:20px;
-    font-size:14px;
-    color:#666;
+button:hover {
+  background: #5c4a93;
 }
 
-.register a{
-    color:#6A57A5;
-
-    text-decoration:none;
-    font-weight:bold;
+.register {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
 }
 
-#message{
-    margin-top:15px;
-    font-weight:bold;
+.register a {
+  color: #6A57A5;
+
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#message {
+  margin-top: 15px;
+  font-weight: bold;
 }
