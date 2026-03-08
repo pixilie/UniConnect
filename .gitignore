@@ -1,0 +1,7 @@
+.direnv/
+.venv/
+__pycache__/
+app/__pycache__/
+app/db/*.db
+app/db/timetables/*
+.env

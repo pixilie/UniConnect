@@ -10,7 +10,8 @@ COPY pyproject.toml uv.lock ./
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir .
 
-COPY ./app ./app
+COPY ./app /app
+COPY ./client /client
 
 EXPOSE 8000
 
