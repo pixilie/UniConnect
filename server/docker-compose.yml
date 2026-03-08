@@ -8,8 +8,8 @@ services:
       - "8000:8000"
     environment:
       # URL format : postgresql://[USER]:[PASSWORD]@db:5432/[DB_NAME] | Please changer PASSWORD and SECRET_KEY
-      - DATABASE_URL=postgresql://user:6dc2a75a81040e94b5dbe2e00f82bc7eb4f320560751124d6bfd49d744b67af8@db:5432/uniconnect
-      - SECRET_KEY=6dc2a75a81040e94b5dbe2e00f82bc7eb4f320560751124d6bfd49d744b67af8
+      - DATABASE_URL=postgresql://user:to_change@db:5432/uniconnect
+      - SECRET_KEY=to_change
       - SCHEDULES_PATH=app/db/schedules
       - RESOURCES_PATH=app/db/resources
       - ALGORITHM=HS256
@@ -23,7 +23,7 @@ services:
     environment:
       # Values here must match with the values above
       - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=6dc2a75a81040e94b5dbe2e00f82bc7eb4f320560751124d6bfd49d744b67af8
+      - POSTGRES_PASSWORD=to_change
       - POSTGRES_DB=uniconnect
     ports:
       - "5432:5432"
