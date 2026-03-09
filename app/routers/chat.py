@@ -12,7 +12,7 @@ from app.services.socket_manager import manager
 
 ws_router = APIRouter()
 
-@ws_router.websocket("/ws/groups/{group_id}")
+@ws_router.websocket("/groups/{group_id}")
 async def websocket_endpoint(
     websocket: WebSocket,
     group_id: int,
