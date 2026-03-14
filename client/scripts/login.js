@@ -23,23 +23,48 @@ async function login(username, password) {
   }
 }
 
+async function getUserProfile(token) {
+  try {
+    const res = await fetch("https://uniconnect.pixilie.net/api/users/me", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
-
   let message = document.getElementById("message");
-  let success = await login(email, password);
 
-  if (success) {
+  let loginSuccess = await login(email, password);
+
+  if (loginSuccess) {
     message.style.color = "green";
-    message.innerText = "Login Successful!";
-    window.location.href = "chat.html";
-  }
-  else {
+    message.innerText = "Login Successful! Checking account status...";
+
+    const token = localStorage.getItem("token");
+    const userData = await getUserProfile(token);
+
+    if (userData && userData.group_id) {
+      window.location.href = "chat.html";
+    } else {
+      window.location.href = "no_group.html";
+    }
+
+  } else {
     message.style.color = "red";
     message.innerText = "Invalid email or password";
   }
-
 });
