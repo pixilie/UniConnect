@@ -18,16 +18,15 @@ def get_assignments(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.Assignment)
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="You can't access assignments from a group you're not part of")
 
-    if current_user.role == models.UserRole.STUDENT:
-        if not current_user.student_group_id:
-            raise HTTPException(status_code=404, detail="You can't access assignments from a group you're not part of")
-        query = query.filter(models.Assignment.group_id == current_user.student_group_id)
-    else:
-        query = query.filter(models.Assignment.group_id == group_id)
+    query = db.query(models.Assignment).filter(models.Assignment.group_id == group_id)
 
     return query.order_by(models.Assignment.due_date.asc()).offset(skip).limit(limit).all()
+
 
 @assignment_router.get("/assignments/{assignment_id}", response_model=schemas.Assignment)
 def get_assignment_detail(
@@ -40,8 +39,9 @@ def get_assignment_detail(
     if not assignment:
         raise HTTPException(status_code=404, detail=f"Assignment {assignment_id} not found")
 
-    if current_user.role == models.UserRole.STUDENT:
-        if assignment.group_id != current_user.student_group_id:
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if assignment.group_id not in current_group_ids:
              raise HTTPException(status_code=403, detail="You don't belong the group this assignment has been assigned to")
 
     return assignment
@@ -56,6 +56,11 @@ def new_assignments(
 ):
     if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
         raise HTTPException(status_code=403, detail="Only administrators/teachers can post new assignments")
+
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
     new_assignment = models.Assignment(
         title = assignment_data.title,
@@ -100,6 +105,7 @@ def update_assignment(
     db.refresh(assignment)
 
     return assignment
+
 
 @assignment_router.delete("/assignments/{assignment_id}")
 def remove_assignment(

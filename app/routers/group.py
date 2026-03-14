@@ -34,10 +34,15 @@ def get_group_members(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     if not db.query(models.Group).filter(models.Group.id == group_id).first():
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    return db.query(models.User).filter(models.User.student_group_id == group_id or models.User.teaching_groups.contains(group_id)).all()
+    return db.query(models.User).filter(models.User.groups.any(models.Group.id == group_id)).all()
 
 
 @group_router.get("/groups/{group_id}/messages", response_model=List[schemas.Message])
@@ -48,6 +53,11 @@ def get_messages(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     return db.query(models.Message).filter(models.Message.group_id == group_id).offset(skip).limit(limit).all()
 
 

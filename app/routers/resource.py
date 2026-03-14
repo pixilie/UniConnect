@@ -28,6 +28,9 @@ async def upload_resource(
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
+    if current_user.role != models.UserRole.ADMIN and group not in current_user.groups:
+        raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     if file.filename:
         file_ext = file.filename.split(".")[-1] if "." in file.filename else "unknown"
         safe_filename = f"{uuid4().hex}.{file_ext}"
@@ -63,13 +66,15 @@ def get_group_resources(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     query = db.query(models.Resource).filter(models.Resource.group_id == group_id)
 
     if category:
         query = query.filter(models.Resource.category == category)
-
-    if current_user.role == models.UserRole.STUDENT or current_user.role == models.UserRole.DELEGATE:
-        query = query.filter(models.User.student_group_id == current_user.student_group_id)
 
     return query.all()
 
@@ -83,6 +88,11 @@ def download_resource(
     resource = db.query(models.Resource).filter(models.Resource.id == resource_id).first()
     if not resource:
         raise HTTPException(status_code=404, detail=f"Resource {resource_id} not found")
+
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if resource.group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this resource")
 
     if not os.path.exists(resource.file_path):
         raise HTTPException(status_code=404, detail="File missing on the server")

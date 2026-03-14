@@ -37,8 +37,8 @@ class ResourceCategory(str, enum.Enum):
 
 
 # --- TABLES DEFINITION ---
-teacher_groups_association = Table(
-    "teacher_groups",
+user_groups_association = Table(
+    "user_groups",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
     Column("group_id", Integer, ForeignKey("groups.id"), primary_key=True)
@@ -51,8 +51,7 @@ class Group(Base):
     name: Mapped[str] = mapped_column(unique=True)
     schedule_path: Mapped[str | None] = mapped_column()
 
-    students = relationship("User", back_populates="student_group")
-    teachers = relationship("User", secondary=teacher_groups_association, back_populates="teaching_groups")
+    members = relationship("User", secondary=user_groups_association, back_populates="groups")
     messages = relationship("Message", back_populates="group")
     events = relationship("Event", back_populates="group")
     assignments = relationship("Assignment", back_populates="group")
@@ -71,8 +70,7 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(default=UserRole.STUDENT)
     student_group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
-    student_group = relationship("Group", back_populates="students", foreign_keys=[student_group_id])
-    teaching_groups = relationship("Group", secondary=teacher_groups_association, back_populates="teachers")
+    groups = relationship("Group", secondary=user_groups_association, back_populates="members")
     messages = relationship("Message", back_populates="author")
     created_events = relationship("Event", back_populates="creator")
     created_assignments = relationship("Assignment", back_populates="creator")

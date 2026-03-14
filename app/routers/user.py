@@ -32,7 +32,8 @@ def search_users(
         query = query.filter(models.User.role == role)
 
     if current_user.role == models.UserRole.STUDENT or current_user.role == models.UserRole.DELEGATE:
-        query = query.filter(models.User.student_group_id == current_user.student_group_id)
+        current_group_ids = [g.id for g in current_user.groups]
+        query = query.filter(models.User.groups.any(models.Group.id.in_(current_group_ids)))
 
     return query.offset(skip).limit(limit).all()
 
@@ -82,10 +83,10 @@ def update_teacher_group(
     if user_to_change.role != models.UserRole.TEACHER:
          raise HTTPException(status_code=400, detail=f"User {user_to_change.first_name} {user_to_change.last_name} ({user_id}) is not a teacher")
 
-    if group not in user_to_change.teaching_groups:
-        user_to_change.teaching_groups.append(group)
+    if group not in user_to_change.groups:
+        user_to_change.groups.append(group)
     else:
-        user_to_change.teaching_groups.remove(group)
+        user_to_change.groups.remove(group)
 
     db.commit()
 
@@ -158,8 +159,9 @@ def update_user_student_group(
         group = db.query(models.Group).filter(models.Group.id == group_id).first()
         if not group:
              raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-
-    target_user.student_group_id = group_id
+        target_user.groups = [group]
+    else:
+        target_user.groups = []
 
     db.commit()
     db.refresh(target_user)

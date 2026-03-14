@@ -31,9 +31,11 @@ async def websocket_endpoint(
             await websocket.close(code=1008)
             return
 
-        if user.student_group_id != group_id:
-            await websocket.close(code=1008)
-            return
+        if user.role != models.UserRole.ADMIN:
+            current_group_ids = [g.id for g in user.groups]
+            if group_id not in current_group_ids:
+                await websocket.close(code=1008)
+                return
 
     except Exception:
         await websocket.close(code=1008)

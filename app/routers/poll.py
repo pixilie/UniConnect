@@ -18,6 +18,11 @@ def create_poll(
     if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER, models.UserRole.DELEGATE]:
         raise HTTPException(status_code=403, detail="Only administrators can update teacher's teaching groups")
 
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
@@ -40,6 +45,11 @@ def add_choice_to_poll(
     if not poll:
         raise HTTPException(status_code=404, detail=f"Poll {poll_id} not found")
 
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if poll.group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this poll")
+
     if not poll.is_active:
         raise HTTPException(status_code=400, detail="Cannot add choices to a closed poll")
 
@@ -60,6 +70,12 @@ def vote_for_choice(
     poll = db.query(models.Poll).filter(models.Poll.id == poll_id).first()
     if not poll:
         raise HTTPException(status_code=404, detail=f"Poll {poll_id} not found")
+
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if poll.group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this poll")
+
     if not poll.is_active:
         raise HTTPException(status_code=400, detail="This poll is closed")
 
@@ -91,6 +107,11 @@ def get_poll_results(
     poll = db.query(models.Poll).filter(models.Poll.id == poll_id).first()
     if not poll:
         raise HTTPException(status_code=404, detail="Poll not found")
+
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if poll.group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this poll")
 
     total_votes = db.query(models.Vote).filter(models.Vote.poll_id == poll_id).count()
 

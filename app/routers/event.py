@@ -21,6 +21,10 @@ def get_event(
 ):
     query = db.query(models.Event)
 
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        query = query.filter(models.Event.group_id.in_(current_group_ids))
+
     if event_id:
         query = query.filter(models.Event.id == event_id)
 
@@ -43,6 +47,11 @@ def create_event(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:

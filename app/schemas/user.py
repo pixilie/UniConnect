@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
-from app.models.models import UserRole
+from app.models.models import Group, UserRole
 
 
 class User(BaseModel):
@@ -11,7 +11,7 @@ class User(BaseModel):
     first_name: str
     last_name: str
     role: str
-    group_id: int | None = None
+    groups: List[Group] = []
 
     class Config:
         from_attributes = True
