@@ -85,7 +85,7 @@ def toggle_user_group(
             target_user.groups = []
         else:
             target_user.groups = [group]
-    elif target_user.role == models.UserRole.TEACHER:
+    else:
         if group in target_user.groups:
             target_user.groups.remove(group)
         else:
