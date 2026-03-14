@@ -1,18 +1,20 @@
-const chat=document.getElementById("chatBox");
-const input=document.getElementById("messageInput");
-const messageTemplate=document.getElementById("messageTemplate");
-const profileName=document.getElementById("currentUserName");
-const profileAvatar=document.getElementById("currentUserAvatar");
-const profileRole=document.getElementById("currentUserRole");
+const chat = document.getElementById("chatBox");
+const input = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const messageTemplate = document.getElementById("messageTemplate");
+const profileName = document.getElementById("currentUserName");
+const profileAvatar = document.getElementById("currentUserAvatar");
+const profileRole = document.getElementById("currentUserRole");
+
 let profileData;
-let group_id=0;
-let username="";
+let group_id = 0;
+let username = "";
 let socket;
 
 async function WSConnect() {
     const res = await fetch("https://uniconnect.pixilie.net/api/users/me", {
         method: "GET",
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
@@ -24,16 +26,17 @@ async function WSConnect() {
     }
 
     profileData = await res.json();
-    group_id = profileData.id;
-    username = `${profileData.first_name} ${profileData.last_name}`;
-    profileName.textContent=username;
-    profileAvatar.textContent=`${profileData.first_name.charAt(0)}${profileData.last_name.charAt(0)}`;
-    profileRole.textContent=profileData.role;
 
-    socket = new WebSocket(`wss://uniconnect.pixilie.net/ws/groups/${group_id}`);
+    group_id = profileData.group_id;
+    username = `${profileData.first_name} ${profileData.last_name}`;
+    profileName.textContent = username;
+    profileAvatar.textContent = `${profileData.first_name.charAt(0)}${profileData.last_name.charAt(0)}`;
+    profileRole.textContent = profileData.role;
+
+    const token = localStorage.getItem("token");
+    socket = new WebSocket(`wss://uniconnect.pixilie.net/ws/groups/${group_id}?token=${token}`);
 
     await new Promise((resolve, reject) => {
-
         socket.onopen = () => {
             console.log("WebSocket connected");
             resolve();
@@ -43,15 +46,15 @@ async function WSConnect() {
             console.error("WebSocket error:", err);
             reject(err);
         };
-
     });
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        let first_name = data.author_name.split(' ')[0];
-        let last_name = data.author_name.split(' ')[2];
 
-        addMessage(first_name,last_name,data.content);
+        let first_name = data.author_name.split(' ')[0];
+        let last_name = data.author_name.split(' ')[1];
+
+        addMessage(first_name, last_name, data.content);
     };
 
     socket.onclose = () => {
@@ -70,41 +73,59 @@ async function sendMessage(message) {
 
     if (socket.readyState === WebSocket.OPEN) {
         socket.send(text);
+    } else {
+        console.log("socket not ready");
     }
-    else console.log("socket not ready");
 }
 
-function addMessage(first_name,last_name, text) {
+function addMessage(first_name, last_name, text) {
+    const messageNode = messageTemplate.content.cloneNode(true);
 
-  const messageNode = messageTemplate.content.cloneNode(true);
+    messageNode.querySelector(".msg-avatar").textContent = `${first_name[0]}${last_name[0]}`;
+    messageNode.querySelector(".msg-user").textContent = `${first_name} ${last_name}`;
+    messageNode.querySelector(".bubble").textContent = text;
 
-  messageNode.querySelector(".msg-avatar").textContent = `${first_name[0]}${last_name[0]}`;
-  messageNode.querySelector(".msg-user").textContent = `${first_name} ${last_name}`;
-  messageNode.querySelector(".bubble").textContent = text;
-  if(first_name==profileData.first_name && last_name==profileData.last_name)messageNode.classList.add("me");
+    if (first_name === profileData.first_name && last_name === profileData.last_name) {
+        messageNode.querySelector(".message-row").classList.add("me");
+    }
 
-  chat.appendChild(messageNode);
+    chat.appendChild(messageNode);
+
+    chat.scrollTop = chat.scrollHeight;
 }
 
 async function LoadMessages() {
     const res = await fetch(`https://uniconnect.pixilie.net/api/groups/${group_id}/messages`, {
         method: "GET",
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok)console.log("Issue with getting all messages");
-    else{
-        let data= await res.json();
+
+    if (!res.ok) {
+        console.log("Issue with getting all messages");
+    } else {
+        let data = await res.json();
         data.forEach(element => {
-            let first_name=element.author.first_name;
-            let last_name=element.author.last_name;
-            addMessage(first_name,last_name,element.content);
+            let first_name = element.author.first_name;
+            let last_name = element.author.last_name;
+            addMessage(first_name, last_name, element.content);
         });
     }
-
 }
+
+sendBtn.addEventListener("click", () => {
+    sendMessage(input.value);
+    input.value = "";
+});
+
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        sendMessage(input.value);
+        input.value = "";
+    }
+});
 
 (async () => {
     await WSConnect();
