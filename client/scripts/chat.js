@@ -1,3 +1,7 @@
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
+const WS_BASE_URL = isLocal ? "ws://localhost:8000/ws" : "wss://uniconnect.pixilie.net/ws";
+
 const chat = document.getElementById("chatBox");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -12,7 +16,7 @@ let username = "";
 let socket;
 
 async function WSConnect() {
-    const res = await fetch("https://uniconnect.pixilie.net/api/users/me", {
+    const res = await fetch(`${API_BASE_URL}/users/me`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -27,14 +31,22 @@ async function WSConnect() {
 
     profileData = await res.json();
 
-    group_id = profileData.group_id;
+    if (profileData.groups && profileData.groups.length > 0) {
+        console.log(profileData.groups[0].id)
+        group_id = profileData.groups[0].id;
+    } else {
+        console.error("User has no groups!");
+        window.location.href = "no_group.html";
+        return;
+    }
+
     username = `${profileData.first_name} ${profileData.last_name}`;
     profileName.textContent = username;
     profileAvatar.textContent = `${profileData.first_name.charAt(0)}${profileData.last_name.charAt(0)}`;
     profileRole.textContent = profileData.role;
 
     const token = localStorage.getItem("token");
-    socket = new WebSocket(`wss://uniconnect.pixilie.net/ws/groups/${group_id}?token=${token}`);
+    socket = new WebSocket(`${WS_BASE_URL}/groups/${group_id}?token=${token}`);
 
     await new Promise((resolve, reject) => {
         socket.onopen = () => {
@@ -95,7 +107,7 @@ function addMessage(first_name, last_name, text) {
 }
 
 async function LoadMessages() {
-    const res = await fetch(`https://uniconnect.pixilie.net/api/groups/${group_id}/messages`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${group_id}/messages`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

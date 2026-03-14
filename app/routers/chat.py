@@ -46,17 +46,12 @@ async def websocket_endpoint(
     try:
         while True:
             data = await websocket.receive_text()
-            try:
-                data_json = json.loads(data)
-                content = data_json.get("content")
-            except:
-                continue
 
-            if not content:
+            if not data:
                 continue
 
             new_message = models.Message(
-                content=content,
+                content=data,
                 user_id=user.id,
                 group_id=group_id,
                 sent_at=datetime.now(timezone.utc)

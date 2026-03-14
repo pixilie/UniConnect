@@ -24,7 +24,7 @@
     </p>
 
     <div class="btn-container">
-      <button class="btn btn-filled" onclick="window.location.reload();">
+      <button class="btn btn-filled" onclick="reload()">
         <span class="material-icons-outlined"
           style="font-size: 18px; margin-right: 8px; vertical-align: middle;">refresh</span>
         Refresh Status
@@ -36,12 +36,7 @@
     </div>
   </div>
 
-  <script>
-    function logout() {
-      localStorage.removeItem("token");
-      window.location.href = "/login.html";
-    }
-  </script>
+  <script src="../scripts/no_group.js"></script>
 </body>
 
 </html>
