@@ -1,8 +1,15 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
+
+class CreatorInfo(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 class Event(BaseModel):
     id: int
@@ -13,7 +20,7 @@ class Event(BaseModel):
     location: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
-    creator_id: int
+    creator: CreatorInfo
     group_id: int
 
 class NewEvent(BaseModel):

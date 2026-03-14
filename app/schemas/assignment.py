@@ -1,8 +1,15 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
+
+class CreatorInfo(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 class Assignment(BaseModel):
     id: int
@@ -11,7 +18,7 @@ class Assignment(BaseModel):
     due_date: datetime
     created_at: datetime
     group_id: int
-    creator_id: int
+    creator: CreatorInfo
 
     class Config:
             from_attributes = True
