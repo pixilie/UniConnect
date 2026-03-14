@@ -11,7 +11,7 @@ class User(BaseModel):
     first_name: str
     last_name: str
     role: str
-    group_id: int
+    group_id: int | None
 
     class Config:
         from_attributes = True
