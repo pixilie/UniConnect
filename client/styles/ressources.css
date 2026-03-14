@@ -1,0 +1,111 @@
+/* General Layout */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 280px;
+    background-color: #f3effb;
+    border-right: 1px solid #d1d1d1;
+    padding: 20px;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #5b4a9b;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#menu-list {
+    list-style: none;
+}
+
+.menu-item {
+    display: block;
+    text-decoration: none;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+    color: #444;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    border-color: #5b4a9b;
+    background-color: #f9f7ff;
+    transform: translateY(-2px);
+}
+
+.menu-item.active {
+    background-color: #6c59b4;
+    color: white;
+    border-color: #5b4a9b;
+}
+
+/* Resources Content Specifics */
+.content-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.window-header {
+    padding: 20px 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.resources-display {
+    flex: 1;
+    padding: 30px;
+    background-color: #fafafa;
+    overflow-y: auto;
+}
+
+.resource-section {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.file-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-item {
+    padding: 15px;
+    background-color: #f3effb;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    color: #5b4a9b;
+    font-weight: 500;
+}
+
+.link-to-announcement {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 25px;
+    background-color: #6c59b4;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
