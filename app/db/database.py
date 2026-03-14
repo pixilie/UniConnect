@@ -1,8 +1,9 @@
 import time
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+
 from psycopg2 import OperationalError as Psycopg2OpError
+from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.core.config import settings
 
@@ -21,16 +22,13 @@ for i in range(MAX_RETRIES):
     try:
         time.sleep(RETRY_DELAY)
         with engine.connect() as connection:
-            print("🟢 Connection to DB established")
+            print("Connection to DB established")
+            break
     except (OperationalError, Psycopg2OpError):
-        print(
-            f"🟡 DB not ready... Retry in {RETRY_DELAY} seconds ({i + 1}/{MAX_RETRIES})"
-        )
+        print(f"DB not ready... Retry in {RETRY_DELAY} seconds ({i + 1}/{MAX_RETRIES})")
         time.sleep(RETRY_DELAY)
 else:
-    print(
-        "🔴 Impossible to connect to DB"
-    )
+    print("Impossible to connect to DB")
 
 def get_db():
     db = SessionLocal()
