@@ -62,35 +62,39 @@ def change_password(
     return {"message": "Password succesfuly updated"}
 
 
-@user_router.patch("/users/{user_id}/teacher-group/{group_id}")
-def update_teacher_group(
+@user_router.patch("/users/{user_id}/groups/{group_id}", response_model=schemas.User)
+def toggle_user_group(
     user_id: int,
     group_id: int,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administrators can update teacher's teaching groups")
+        raise HTTPException(status_code=403, detail="Only administrators can assign groups")
 
-    user_to_change = db.query(models.User).filter(models.User.id == user_id).first()
+    target_user = db.query(models.User).filter(models.User.id == user_id).first()
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
-    if not user_to_change:
+    if not target_user:
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
-    elif not group:
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
+    if not group:
+         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if user_to_change.role != models.UserRole.TEACHER:
-         raise HTTPException(status_code=400, detail=f"User {user_to_change.first_name} {user_to_change.last_name} ({user_id}) is not a teacher")
-
-    if group not in user_to_change.groups:
-        user_to_change.groups.append(group)
-    else:
-        user_to_change.groups.remove(group)
+    if target_user.role in [models.UserRole.STUDENT, models.UserRole.DELEGATE]:
+        if group in target_user.groups:
+            target_user.groups = []
+        else:
+            target_user.groups = [group]
+    elif target_user.role == models.UserRole.TEACHER:
+        if group in target_user.groups:
+            target_user.groups.remove(group)
+        else:
+            target_user.groups.append(group)
 
     db.commit()
+    db.refresh(target_user)
 
-    return {"message": "Succesfuly added group"}
+    return target_user
 
 
 @user_router.patch("/users/me", response_model=schemas.User)
@@ -135,33 +139,6 @@ def update_user_role(
              raise HTTPException(status_code=403, detail="Only administrators/teachers can modify user's roles")
 
     target_user.role = role_data.role
-
-    db.commit()
-    db.refresh(target_user)
-    return target_user
-
-
-@user_router.patch("/users/{user_id}/student-group/{group_id}", response_model=schemas.User)
-def update_user_student_group(
-    user_id: int,
-    group_id: Optional[int],
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    target_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not target_user:
-        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
-
-    if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administators can assign groups")
-
-    if group_id is not None:
-        group = db.query(models.Group).filter(models.Group.id == group_id).first()
-        if not group:
-             raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
-        target_user.groups = [group]
-    else:
-        target_user.groups = []
 
     db.commit()
     db.refresh(target_user)

@@ -2,8 +2,15 @@ from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
-from app.models.models import Group, UserRole
+from app.models.models import UserRole
 
+
+class Group(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        from_attributes = True
 
 class User(BaseModel):
     id: int
