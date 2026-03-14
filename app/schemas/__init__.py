@@ -1,5 +1,5 @@
 from .assignment import Assignment, NewAssignment, UpdateAssignment
-from .auth import RegistrationRequest, User
+from .auth import NewUser, RegistrationRequest
 from .event import Event, NewEvent, UpdateEvent
 from .group import Group, NewGroup, UpdateGroup
 from .message import Message

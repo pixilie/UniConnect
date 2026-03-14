@@ -8,7 +8,7 @@ from app.db.database import get_db
 
 auth_router = APIRouter()
 
-@auth_router.post("/register", response_model=schemas.User)
+@auth_router.post("/register", response_model=schemas.NewUser)
 def register_user(user: schemas.RegistrationRequest, db: Session = Depends(get_db)):
     query = db.query(models.User)
 
