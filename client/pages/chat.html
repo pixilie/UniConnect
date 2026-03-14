@@ -1,60 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniConnect - Chat</title>
-    <link rel="stylesheet" href="../styles/chat.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect - Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/chat.css">
 </head>
+
 <body>
-    <template id="leftMessage">
-        <div class="message-container incoming">
-            <div class="avatar">JD</div>
-            <div class="message-content">
-                <span class="sender-name">John Doe</span>
-                <p class="text">Hey! Does anyone have the notes for the last Physics lecture?</p>
-                <span class="time">10:15 AM</span>
-            </div>
-        </div>
-    </template>
 
-    <template id="rightMessage">
-        <div class="message-container outgoing">
-            <div class="message-content">
-                <p class="text">Yeah, I just uploaded them to the Resources section. Check it out!</p>
-                <span class="time">10:17 AM</span>
-            </div>
-        </div>
-    </template>
-
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo">UniConnect</div>
-            <nav>
-                <ul id="menu-list">
-                    <li><a href="../resources.html" class="menu-item">Resources</a></li>
-                    <li><a href="announcements.html" class="menu-item">Announcements</a></li>
-                    <li><a href="chat.html" class="menu-item active">Chat</a></li>
-                    <li><a href="" class="menu-item">Events Planning</a></li>
-                    <li><a href="" class="menu-item">Timetables</a></li>
-                    <li><a href="" class="menu-item">Elections</a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="content-window">
-            <header class="window-header">
-                <h2>General Student Chat</h2>
-            </header>
-
-            <div class="chat-display">
-                </div>
-
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="Write your message...">
-                <button id="send-btn">Send</button>
-            </div>
-        </main>
+  <aside class="sidebar">
+    <div class="class-header">
+      <span class="material-icons-outlined">school</span> UniConnect
     </div>
+
+    <div class="channel-list">
+      <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span> Resources</a>
+      <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span> Announcements</a>
+      <a href="#" class="nav-item active"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
+      <a href="events.html" class="nav-item"><span class="material-icons-outlined icon">event_available</span> Events Planning</a>
+      <a href="timetable.html" class="nav-item"><span class="material-icons-outlined icon">calendar_month</span> Timetables</a>
+      <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span> Polls</a>
+    </div>
+
+    <div class="user-panel">
+      <div class="user-avatar" id="currentUserAvatar"></div>
+      <div class="user-info">
+        <span class="user-name" id="currentUserName"></span>
+        <span class="user-role" id="currentUserRole"></span>
+      </div>
+      <span class="material-icons-outlined" style="cursor:pointer; color:#666;">settings</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <span class="material-icons-outlined" style="color:#666;">chat_bubble</span> Chat
+    </div>
+
+    <div class="chat-container" id="chatBox">
+    </div>
+
+    <template id="messageTemplate">
+      <div class="message-row">
+        <div class="msg-avatar"></div>
+        <div class="msg-content">
+          <span class="msg-user"></span>
+          <div class="bubble"></div>
+        </div>
+      </div>
+    </template>
+
+    <div class="input-area">
+      <input type="text" id="messageInput" class="chat-input" placeholder="Type a message...">
+      <button class="send-btn" id="sendBtn">
+        <span class="material-icons-outlined">send</span>
+      </button>
+    </div>
+
+  </main>
+
+  <script src="../scripts/chat.js"></script>
 </body>
+
 </html>
