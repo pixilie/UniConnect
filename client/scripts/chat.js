@@ -1,7 +1,9 @@
-const chat=document.getElementById("chat");
-const input=document.getElementById("input");
-const sendTemplate=document.getElementById("SendTemplate");
-const receiveTemplate=document.getElementById("ReceiveTemplate");
+const chat=document.getElementById("chatBox");
+const input=document.getElementById("messageInput");
+const messageTemplate=document.getElementById("messageTemplate");
+const profileName=document.getElementById("currentUserName");
+const profileAvatar=document.getElementById("currentUserAvatar");
+const profileRole=document.getElementById("currentUserRole");
 let profileData;
 let group_id=0;
 let username="";
@@ -24,6 +26,9 @@ async function WSConnect() {
     profileData = await res.json();
     group_id = profileData.id;
     username = `${profileData.first_name} ${profileData.last_name}`;
+    profileName.textContent=username;
+    profileAvatar.textContent=`${profileData.first_name.charAt(0)}${profileData.last_name.charAt(0)}`;
+    profileRole.textContent=profileData.role;
 
     socket = new WebSocket(`wss://uniconnect.pixilie.net/ws/groups/${group_id}`);
 
@@ -43,10 +48,10 @@ async function WSConnect() {
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        let user = data.author_name;
+        let first_name = data.author_name.split(' ')[0];
+        let last_name = data.author_name.split(' ')[2];
 
-        if (user == username) addMessageMe(user, data.content);
-        else addMessageOther(user, data.content);
+        addMessage(first_name,last_name,data.content);
     };
 
     socket.onclose = () => {
@@ -69,22 +74,14 @@ async function sendMessage(message) {
     else console.log("socket not ready");
 }
 
-function addMessageMe(username, text) {
+function addMessage(first_name,last_name, text) {
 
-  const messageNode = sendTemplate.content.cloneNode(true);
+  const messageNode = messageTemplate.content.cloneNode(true);
 
-  messageNode.querySelector(".username").textContent = username;
-  messageNode.querySelector(".text").textContent = text;
-
-  chat.appendChild(messageNode);
-}
-
-function addMessageOther(username, text) {
-
-  const messageNode = receiveTemplate.content.cloneNode(true);
-
-  messageNode.querySelector(".username").textContent = username;
-  messageNode.querySelector(".text").textContent = text;
+  messageNode.querySelector(".msg-avatar").textContent = `${first_name[0]}${last_name[0]}`;
+  messageNode.querySelector(".msg-user").textContent = `${first_name} ${last_name}`;
+  messageNode.querySelector(".bubble").textContent = text;
+  if(first_name==profileData.first_name && last_name==profileData.last_name)messageNode.classList.add("me");
 
   chat.appendChild(messageNode);
 }
@@ -101,9 +98,9 @@ async function LoadMessages() {
     else{
         let data= await res.json();
         data.forEach(element => {
-            let user = element.username;
-            if(user=username)addMessageMe(user,element.content);
-            else addMessageOther(user,element.content);
+            let first_name=element.author.first_name;
+            let last_name=element.author.last_name;
+            addMessage(first_name,last_name,element.content);
         });
     }
 
