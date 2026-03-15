@@ -49,7 +49,7 @@ def get_group_members(
 def get_messages(
     group_id: int,
     skip: int = 0,
-    limit: int = 20,
+    limit: int = 999999,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

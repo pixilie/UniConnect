@@ -120,7 +120,7 @@ function addMessage(first_name, last_name, sent_at, text) {
 }
 
 async function LoadMessages() {
-    const res = await fetch(`${API_BASE_URL}/groups/${group_id}/messages?skip=0&limit=-1`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${group_id}/messages`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
