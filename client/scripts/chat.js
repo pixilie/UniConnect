@@ -129,7 +129,7 @@ async function LoadMessages() {
     });
 
     if (!res.ok) {
-        console.log("Issue with getting all messages");
+        console.log(`Error while fetching past messages: ${res}`);
     } else {
         let data = await res.json();
         data.forEach(element => {
