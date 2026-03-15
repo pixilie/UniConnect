@@ -1,7 +1,8 @@
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
-
+let errorMessage="Registration failed. Email might already exist.";
 async function register(firstName, lastName, email, password) {
+    errorMessage="Registration failed. Email might already exist.";
     try {
         const res = await fetch(`${API_BASE_URL}/register`, {
             method: "POST",
@@ -21,6 +22,7 @@ async function register(firstName, lastName, email, password) {
 
     } catch (err) {
         console.log(err);
+        errorMessage=err;
         return false;
     }
 }
@@ -46,6 +48,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }
     else {
         message.style.color = "red";
-        message.innerText = "Registration failed. Email might already exist.";
+        message.innerText = errorMessage;
     }
 });
