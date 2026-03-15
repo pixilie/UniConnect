@@ -1,13 +1,14 @@
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
-let errorMessage="Invalid email or password";
+
+let errorMessage = "Invalid email or password";
 
 async function login(username, password) {
     const params = new URLSearchParams();
     params.append("grant_type", "password");
     params.append("username", username);
     params.append("password", password);
-    errorMessage="Invalid email or password";
+    errorMessage = "Invalid email or password";
 
     try {
         const res = await fetch(`${API_BASE_URL}/login`, {
@@ -24,7 +25,7 @@ async function login(username, password) {
 
     } catch (err) {
         console.log(err);
-        errorMessage=err;
+        errorMessage = err;
         return false;
     }
 }
