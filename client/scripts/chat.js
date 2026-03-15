@@ -120,7 +120,7 @@ function addMessage(first_name, last_name, sent_at, text) {
 }
 
 async function LoadMessages() {
-    const res = await fetch(`${API_BASE_URL}/groups/${group_id}/messages`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${group_id}/messages?skip=0&limit=-1`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -135,7 +135,7 @@ async function LoadMessages() {
         data.forEach(element => {
             let first_name = element.author.first_name;
             let last_name = element.author.last_name;
-            addMessage(first_name, last_name, element.content);
+            addMessage(first_name, last_name, element.sent_at, element.content);
         });
     }
 }
