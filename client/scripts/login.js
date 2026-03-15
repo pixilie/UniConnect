@@ -71,3 +71,38 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         message.innerText = "Invalid email or password";
     }
 });
+
+async function checkLoginStatus() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (res.ok) {
+            const userData = await res.json();
+
+            if (userData.groups && userData.groups.length > 0) {
+                window.location.href = "chat.html";
+            } else {
+                window.location.href = "no_group.html";
+            }
+
+        } else if (res.status === 401) {
+            localStorage.removeItem("token");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+checkLoginStatus();
