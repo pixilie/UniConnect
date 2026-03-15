@@ -15,6 +15,19 @@ let group_id = 0;
 let username = "";
 let socket;
 
+function formatMessageTime(rawDateString) {
+    if (!rawDateString) return "";
+
+    let safeString = rawDateString.replace(" ", "T");
+    if (!safeString.endsWith("Z") && !safeString.includes("+")) {
+        safeString += "Z";
+    }
+
+    const date = new Date(safeString);
+
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 async function WSConnect() {
     const res = await fetch(`${API_BASE_URL}/users/me`, {
         method: "GET",
@@ -66,7 +79,7 @@ async function WSConnect() {
         let first_name = data.author_name.split(' ')[0];
         let last_name = data.author_name.split(' ')[1];
 
-        addMessage(first_name, last_name, data.content);
+        addMessage(first_name, last_name, data.sent_at, data.content);
     };
 
     socket.onclose = () => {
@@ -90,11 +103,11 @@ async function sendMessage(message) {
     }
 }
 
-function addMessage(first_name, last_name, text) {
+function addMessage(first_name, last_name, sent_at, text) {
     const messageNode = messageTemplate.content.cloneNode(true);
 
     messageNode.querySelector(".msg-avatar").textContent = `${first_name[0]}${last_name[0]}`;
-    messageNode.querySelector(".msg-user").textContent = `${first_name} ${last_name}`;
+    messageNode.querySelector(".msg-user").textContent = `${first_name} ${last_name} - ${formatMessageTime(sent_at)}`;
     messageNode.querySelector(".bubble").textContent = text;
 
     if (first_name === profileData.first_name && last_name === profileData.last_name) {
