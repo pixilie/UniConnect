@@ -6,8 +6,6 @@ The goal of the application is to facilitate communication and organization with
 The platform allows users to create and join class groups, exchange messages, publish official announcements, access class schedules, organize study events, and elect class delegates through an integrated voting system.  
 By combining messaging features with academic-specific tools, the application aims to provide a structured and reliable alternative to generic chat applications for educational use.
 
-The project focuses on collaborative software development, clean architecture, and the implementation of role-based access and real-world use cases.
-
 ---
 
 ## Features
@@ -16,9 +14,10 @@ The project focuses on collaborative software development, clean architecture, a
 - Class-based group messaging
 - Official announcements posted by professors and delegates
 - Access to class schedules
-- Creation and management of study events
-- Delegate election system with integrated voting
+- Creation and management of study events / fun activities
+- Polls system
 - Role-based permissions and access control
+- Ressources uploding system so teacher can share course related documents easily
 
 ---
 
@@ -37,11 +36,7 @@ The project focuses on collaborative software development, clean architecture, a
 ### Tools
 - Git & GitHub
 - Markdown documentation
-
----
-
-## Project Structure
-TODO
+- Trello
 
 ---
 
@@ -51,42 +46,22 @@ The application follows a client-server architecture with a clear separation bet
 
 - The **frontend** is a static web application built using vanilla web technologies and communicates with the backend through HTTP requests.
 - The **backend** exposes a REST API responsible for authentication, business logic, and database access.
-- The **database** stores users, classes, messages, events, schedules, and voting data.
+- The **database** stores users, classes, messages, annoucements, events, schedules, and voting data.
 
 This modular architecture ensures maintainability, scalability, and ease of collaboration within the development team.
-
 More details can be found in the `docs/` directory.
 
 ---
 
 ## Installation & Setup
 
-### Backend (UV)
+### Installation (UV)
 1. Navigate to the `server/` directory
-2. Run ``uv run uvicorn app.main:app --reload`` (You need to have ``uv`` installed, see [here](https://docs.astral.sh/uv/getting-started/installation/) for more)
+2. Run ``uv sync`` (You need to have ``uv`` installed, see [here](https://docs.astral.sh/uv/getting-started/installation/) for more or type `direnv allow` if you're using Nix)
 
-### Backend (Nix)
-1. Navigate to the `server/` directory
-2. Run ``direnv allow``
-2. Run ``uvicorn app.main:app --reload``
-
-### Frontend
-1. Navigate to the `website/` directory
-2. Open `index.html` in a web browser
-3. Ensure the backend server is running for full functionality
-
-Detailed setup instructions will be provided in the documentation.
-
----
-
-## Usage
-
-- Users can register and log in to the platform
-- Join or create class groups
-- Communicate via group chats
-- View announcements and schedules
-- Organize or participate in study events
-- Vote in delegate elections
+### Running
+1. Navigate to the project directory
+2. Run ``uv run uvicorn app.main:app --reload`` and open the url ``127.0.0.1:8000`` in your browser.
 
 ---
 
