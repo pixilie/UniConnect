@@ -47,15 +47,16 @@ async def websocket_endpoint(
         while True:
             data = await websocket.receive_text()
 
-            if not data:
+            if not data or data.strip() == "":
                 continue
 
             new_message = models.Message(
-                content=data,
-                user_id=user.id,
-                group_id=group_id,
-                sent_at=datetime.now(timezone.utc)
+                content = data,
+                user_id = user.id,
+                group_id = group_id,
+                sent_at = datetime.now(timezone.utc)
             )
+
             db.add(new_message)
             db.commit()
             db.refresh(new_message)
