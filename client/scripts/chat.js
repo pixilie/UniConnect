@@ -1,6 +1,4 @@
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
-const WS_BASE_URL = isLocal ? "ws://localhost:8000/ws" : "wss://uniconnect.pixilie.net/ws";
+requireAuth();
 
 const chat = document.getElementById("chatBox");
 const input = document.getElementById("messageInput");
