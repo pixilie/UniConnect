@@ -55,6 +55,7 @@ class Group(Base):
     assignments = relationship("Assignment", back_populates="group")
     resources = relationship("Resource", back_populates="group")
     polls = relationship("Poll", back_populates="group")
+    announcement = relationship("Announcement", back_populates="group")
 
 
 class User(Base):
@@ -74,6 +75,7 @@ class User(Base):
     created_assignments = relationship("Assignment", back_populates="creator")
     uploaded_resources = relationship("Resource", back_populates="uploader")
     votes = relationship("Vote", back_populates="voter")
+    announcement = relationship("Announcement", back_populates="author")
 
 
 class Message(Base):
@@ -194,5 +196,5 @@ class Announcement(Base):
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
     urgent: Mapped[bool] = mapped_column(Boolean)
 
-    author = relationship("User", back_populates="announcements")
-    group = relationship("Group", back_populates="announcements")
+    author = relationship("User", back_populates="announcement")
+    group = relationship("Group", back_populates="announcement")

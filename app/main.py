@@ -1,9 +1,12 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app import routers
+from app.db.database import get_db
 
 from .db.database import Base, engine
 
@@ -37,5 +40,9 @@ app.mount("/assets", StaticFiles(directory="client/assets"), name="assets")
 @app.get("/")
 def read_root():
     return RedirectResponse(url="/home.html")
+
+@app.get("/favicon.ico")
+def get_favicon():
+    return FileResponse("client/assets/favicon.ico")
 
 app.mount("/", StaticFiles(directory="client/pages", html=True), name="pages")
