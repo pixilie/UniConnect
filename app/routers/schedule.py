@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -37,7 +37,7 @@ def get_schedule(
     return group.schedule_path
 
 
-@schedule_router.post("/groups/{group_id}/schedules")
+@schedule_router.post("/groups/{group_id}/schedules", status_code=status.HTTP_201_CREATED)
 def upload_schedule(
     group_id: int,
     file: UploadFile = File(...),
@@ -68,10 +68,10 @@ def upload_schedule(
     db.commit()
     db.refresh(group)
 
-    return {"message": "Schedule succesfuly uploaded"}
+    return None
 
 
-@schedule_router.delete("/groups/{group_id}/schedules")
+@schedule_router.delete("/groups/{group_id}/schedules", status_code=status.HTTP_204_NO_CONTENT)
 def remove_schedule(
     group_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -91,4 +91,4 @@ def remove_schedule(
     db.commit()
     db.refresh(group)
 
-    return {"message": "Schedule succesfuly removed"}
+    return None

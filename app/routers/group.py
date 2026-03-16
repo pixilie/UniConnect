@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -106,7 +106,7 @@ def update_group_name(
     return group
 
 
-@group_router.delete("/groups/{group_id}")
+@group_router.delete("/groups/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_group(
     group_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -130,4 +130,4 @@ def delete_group(
     db.delete(group)
     db.commit()
 
-    return {"message": "Group succesfuly deleted"}
+    return None

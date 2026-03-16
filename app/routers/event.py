@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -110,7 +110,7 @@ def update_event(
     return event
 
 
-@events_router.delete("/events/{event_id}")
+@events_router.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_event(
     event_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -127,4 +127,4 @@ def delete_event(
     db.delete(event)
     db.commit()
 
-    return {"message": "Event succesfully deleted"}
+    return None

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -107,7 +107,7 @@ def update_assignment(
     return assignment
 
 
-@assignment_router.delete("/assignments/{assignment_id}")
+@assignment_router.delete("/assignments/{assignment_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_assignment(
     assignment_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -127,4 +127,4 @@ def remove_assignment(
     db.delete(assignment)
     db.commit()
 
-    return {"message": "Assignment succesfuly deleted"}
+    return None
