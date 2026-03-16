@@ -66,7 +66,6 @@ async def websocket_endpoint(
                 "user_id": user.id,
                 "author_name": f"{user.first_name} {user.last_name}",
                 "sent_at": str(new_message.sent_at),
-                "type": "message"
             }
 
             await manager.broadcast(response_data, group_id)
