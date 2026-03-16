@@ -13,7 +13,6 @@ class AuthorInfo(BaseModel):
 class Message(BaseModel):
     id: int
     content: str
-    message_type: str
     sent_at: datetime
     group_id: int
     author: AuthorInfo
