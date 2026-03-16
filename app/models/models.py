@@ -2,9 +2,11 @@ import enum
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    Boolean,
     Column,
     ForeignKey,
     Integer,
+    String,
     Table,
     Text,
     UniqueConstraint,
@@ -20,10 +22,6 @@ class UserRole(str, enum.Enum):
     TEACHER = "teacher"
     DELEGATE = "delegate"
     STUDENT = "student"
-
-class MessageType(str, enum.Enum):
-    STANDARD = "standard"
-    ANNOUNCEMENT = "announcement"
 
 class EventType(str, enum.Enum):
     STUDY = "study_session"
@@ -83,7 +81,6 @@ class Message(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     content: Mapped[str] = mapped_column(Text)
-    message_type: Mapped[MessageType] = mapped_column(default=MessageType.STANDARD)
     sent_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
@@ -185,3 +182,17 @@ class Vote(Base):
     __table_args__ = (
         UniqueConstraint('user_id', 'poll_id', name='unique_user_vote_per_poll'),
     )
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String)
+    content: Mapped[str] = mapped_column(Text)
+    sent_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
+    urgent: Mapped[bool] = mapped_column(Boolean)
+
+    author = relationship("User", back_populates="announcements")
+    group = relationship("Group", back_populates="announcements")

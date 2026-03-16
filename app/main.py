@@ -27,6 +27,7 @@ app.include_router(routers.events_router, prefix="/api", tags=["Events"])
 app.include_router(routers.resource_router, prefix="/api", tags=["Resources"])
 app.include_router(routers.schedule_router, prefix="/api", tags=["Schedules"])
 app.include_router(routers.poll_router, prefix="/api", tags=["Polls"])
+app.include_router(routers.announcement_router, prefix="/api", tags=["Announcements"])
 app.include_router(routers.ws_router, prefix="/ws", tags=["Websockets"])
 
 app.mount("/styles", StaticFiles(directory="client/styles"), name="styles")

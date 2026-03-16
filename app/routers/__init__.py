@@ -1,3 +1,4 @@
+from .announcement import announcement_router
 from .assignment import assignment_router
 from .auth import auth_router
 from .chat import ws_router

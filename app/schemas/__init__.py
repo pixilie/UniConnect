@@ -1,3 +1,4 @@
+from .announcement import Announcement, NewAnnoucement
 from .assignment import Assignment, NewAssignment, UpdateAssignment
 from .auth import NewUser, RegistrationRequest
 from .event import Event, NewEvent, UpdateEvent

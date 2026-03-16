@@ -1,11 +1,11 @@
 from .models import (
+    Announcement,
     Assignment,
     Choice,
     Event,
     EventType,
     Group,
     Message,
-    MessageType,
     Poll,
     Resource,
     ResourceCategory,
