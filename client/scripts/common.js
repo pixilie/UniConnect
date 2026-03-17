@@ -3,6 +3,16 @@ const isLocal = window.location.hostname === "localhost" || window.location.host
 const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
 const WS_BASE_URL = isLocal ? "ws://localhost:8000/ws" : "wss://uniconnect.pixilie.net/ws";
 
+const profileName = document.getElementById("currentUserName");
+const profileAvatar = document.getElementById("currentUserAvatar");
+const profileRole = document.getElementById("currentUserRole");
+
+const groupList=document.getElementById("groupList");
+
+let profileData;
+let username = "";
+let groupID=null;
+
 function logout() {
     localStorage.removeItem("token");
     window.location.href = "login.html";
@@ -120,3 +130,62 @@ async function checkLoginStatus() {
         console.error(error);
     }
 }
+
+async function getCurrentGroup() {
+    if(!localStorage.getItem("groupID"))localStorage.setItem("groupID",profileData.groups[0].id);
+    groupID= localStorage.getItem("groupID");
+}
+
+async function getProfileData() {
+    const res = await fetch(`${API_BASE_URL}/users/me`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        console.log("Issue with getting profile data");
+        return;
+    }
+
+    profileData = await res.json();
+
+    username = `${profileData.first_name} ${profileData.last_name}`;
+    profileName.textContent = username;
+    profileAvatar.textContent = `${profileData.first_name.charAt(0).toUpperCase()}${profileData.last_name.charAt(0).toUpperCase()}`;
+    profileRole.textContent = profileData.role;
+}
+
+async function setGroupList() {
+    if(profileData.role="Student")groupList.disable=true;
+    for (const group of profileData.groups){
+
+        let name=group.name;
+        let id=group.id;
+
+        const option=new Option(name,id);
+        groupList.add(option);
+    };
+    if(localStorage.getItem("groupID")!=null)groupList.value=localStorage.getItem("groupID");
+}
+
+groupList.addEventListener("change",function(event){
+    console.log(`new group id: ${event.target.value}`)
+    localStorage.setItem("groupID",event.target.value);
+    groupID=localStorage.getItem("groupID");
+    loadPage();
+});
+
+window.dataReady = (async () => {
+    await getProfileData();
+    await getCurrentGroup();
+    await setGroupList();
+})();
+/*
+(async () => {
+    await getProfileData();
+    await getCurrentGroup();
+    await setGroupList();
+})();*/
