@@ -4,12 +4,13 @@ services:
   web:
     build: .
     container_name: uniconnect-api
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      # URL format : postgresql://[USER]:[PASSWORD]@db:5432/[DB_NAME] | Please changer PASSWORD and SECRET_KEY
-      - DATABASE_URL=postgresql://user:to_change@db:5432/uniconnect
-      - SECRET_KEY=to_change
+      # URL format : postgresql://[USER]:[PASSWORD]@db:5432/[DB_NAME]
+      - DATABASE_URL=postgresql://TO_CHANGE:TO_CHANGE@db:5432/uniconnect
+      - SECRET_KEY=TO_CHANGE
       - SCHEDULES_PATH=app/db/schedules
       - RESOURCES_PATH=app/db/resources
       - ALGORITHM=HS256
@@ -20,15 +21,28 @@ services:
   db:
     image: postgres:15-alpine
     container_name: uniconnect-postgres
+    restart: unless-stopped
     environment:
       # Values here must match with the values above
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=to_change
+      - POSTGRES_USER=TO_CHANGE
+      - POSTGRES_PASSWORD=TO_CHANGE
       - POSTGRES_DB=uniconnect
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: uniconnect_pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=TO_CHANGE
+      - PGADMIN_DEFAULT_PASSWORD=TO_CHANGE
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
