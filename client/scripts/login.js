@@ -17,9 +17,10 @@ async function login(username, password) {
         if (!res.ok) return false;
 
         const data = await res.json();
-        localStorage.setItem("token", data.access_token);
-        return true;
 
+        localStorage.setItem("token", data.access_token);
+
+        return true;
     } catch (err) {
         console.log(err);
         errorMessage = err;
@@ -60,6 +61,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
         const token = localStorage.getItem("token");
         const userData = await getUserProfile(token);
+        AppState.userProfile = userData;
 
         if (userData && userData.groups && userData.groups.length > 0) {
             window.location.href = "chat.html";
