@@ -46,6 +46,7 @@ function setGroupList(profileData) {
 
     for (const group of profileData.groups) {
         const option = new Option(group.name, group.id);
+        option.className+=" groupOption";
         groupList.add(option);
     }
 
