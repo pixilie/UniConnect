@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect - Announcements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/announcements.css">
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="class-header">
+      <span class="material-icons-outlined">school</span> UniConnect
+    </div>
+
+    <div class="channel-list">
+      <select name="" id="groupList"></select>
+      <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span> Resources</a>
+      <a href="#" class="nav-item active"><span class="material-icons-outlined icon">campaign</span> Announcements</a>
+      <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
+      <a href="events.html" class="nav-item"><span class="material-icons-outlined icon">event_available</span> Events Planning</a>
+      <a href="timetables.html" class="nav-item"><span class="material-icons-outlined icon">calendar_month</span> Timetables</a>
+      <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span> Polls</a>
+    </div>
+
+    <div class="user-panel">
+      <div class="user-avatar" id="currentUserAvatar"></div>
+      <div class="user-info">
+        <span class="user-name" id="currentUserName"></span>
+        <span class="user-role" id="currentUserRole"></span>
+      </div>
+      <span class="material-icons-outlined" style="cursor:pointer; color:#666;">settings</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <span class="material-icons-outlined" style="color:#666;">campaign</span> Official Announcements
+    </div>
+
+    <div class="announcement-container" id="chatBox">
+    </div>
+
+    <template id="AnnouncementTemplate">
+      <div class="announcement-row">
+        <div class="bubble">
+          <div style="padding: 10px;">
+            <div class="urgency" id="urgency"><span class="material-icons-outlined" style="position: relative;top: 1px;margin-right: 5px;color:#B3261E;font-size:medium;">error</span>
+              URGENT</div>
+            <div style="display: flex;justify-content: space-between;">
+              <div class="user-display">
+                <div class="announcement-avatar">AV</div>
+                <span class="announcement-user">Name</span>
+                <div class="announcement-role">Role</div>
+              </div>
+              <div class="announcement-date">
+                Date
+              </div>
+            </div>
+            <div class="annoucement-title">This is the title</div>
+            <div class="announcement-content">
+              This is the annoucements content
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <button class="send-btn" id="sendBtn">
+        <span class="material-icons-outlined">add</span>
+    </button>
+
+    
+  </main>
+
+  <div class="annoucement-form-back">
+    <div class="annoucement-form">
+      <div class="form-title">Create Announcement</div>
+      <label for="title-input">Title</label>
+      <input class="title-input" id="title-input" type="text" placeholder="E.g., Room change for Friday">
+      <label for="message-input">Message</label>
+      <textarea class="message-input" id="message-input" type="text" placeholder="Type your annoucement here..."></textarea>
+      <div style="display: flex;flex-direction: row;">
+        <input class="urgency-input" type="checkbox" name="urgency-input" id="urgency-input">
+        <label class="urgency-input" for="urgency-input">Mark as URGENT</label>
+      </div>
+      <br>
+      <div style="display: flex;flex-direction: row-reverse;">
+        <button class="post-form">Post Announcement</button>
+        <button class="cancel-form">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/navbar.js"></script>
+  <script src="../scripts/annoucements.js"></script>
+</body>
+
+</html>
