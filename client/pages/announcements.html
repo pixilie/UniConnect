@@ -42,10 +42,10 @@
       <span class="material-icons-outlined" style="color:#666;">campaign</span> Official Announcements
     </div>
 
-    <div class="announcement-container" id="chatBox">
+    <div class="announcement-container" id="displayBox">
     </div>
 
-    <template id="AnnouncementTemplate">
+    <template id="announcementTemplate">
       <div class="announcement-row">
         <div class="bubble">
           <div style="padding: 10px;">
@@ -77,7 +77,7 @@
     
   </main>
 
-  <div class="annoucement-form-back">
+  <div class="annoucement-form-back" id="form">
     <div class="annoucement-form">
       <div class="form-title">Create Announcement</div>
       <label for="title-input">Title</label>
@@ -90,8 +90,8 @@
       </div>
       <br>
       <div style="display: flex;flex-direction: row-reverse;">
-        <button class="post-form">Post Announcement</button>
-        <button class="cancel-form">Cancel</button>
+        <button class="post-form" id="postBtn">Post Announcement</button>
+        <button class="cancel-form" id="cancelBtn">Cancel</button>
       </div>
     </div>
   </div>
