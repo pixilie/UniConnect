@@ -2,13 +2,14 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models import models
+from app.models import ResourceCategory, UserRole
 
 
 class AuthorInfo(BaseModel):
     id: int
     first_name: str
     last_name: str
+    role: UserRole
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -17,7 +18,7 @@ class ResourceResponse(BaseModel):
     title: str
     file_path: str
     file_type: str | None
-    category: models.ResourceCategory
+    category: ResourceCategory
     uploaded_at: datetime
     author: AuthorInfo
     group_id: int

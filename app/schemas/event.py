@@ -3,11 +3,14 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from app.models import UserRole
+
 
 class CreatorInfo(BaseModel):
     id: int
     first_name: str
     last_name: str
+    role: UserRole
 
     model_config = ConfigDict(from_attributes=True)
 
