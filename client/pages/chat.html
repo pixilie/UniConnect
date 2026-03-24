@@ -18,8 +18,21 @@
       <span class="material-icons-outlined">school</span> UniConnect
     </div>
 
+    <div class="group-selector-container">
+          <button class="group-selector-btn" id="groupSelectorBtn">
+            <span id="currentGroupName">Select a group...</span>
+            <span class="material-icons-outlined" style="font-size: 20px; color: #666;">unfold_more</span>
+          </button>
+
+        <div class="group-dropdown-menu" id="groupDropdown">
+            <div class="group-search-box">
+              <span class="material-icons-outlined" style="font-size: 18px; color: #666;">search</span>
+              <input type="text" class="group-search-input" id="groupSearchInput" placeholder="Search a group...">
+            </div>
+        </div>
+    </div>
+
     <div class="channel-list">
-      <select class="groupList nav-item" id="groupList"></select>
       <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span> Resources</a>
       <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span> Announcements</a>
       <a href="#" class="nav-item active"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
