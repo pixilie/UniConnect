@@ -17,14 +17,12 @@ class Announcement(BaseModel):
     id: int
     title: str
     content: str
-    due_date: datetime
-    created_at: datetime
+    sent_at: datetime
     urgent: bool
     group_id: int
-    creator: CreatorInfo
+    author: CreatorInfo
 
-    class Config:
-            from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class NewAnnoucement(BaseModel):
     title: str
