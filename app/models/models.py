@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy import (
     Boolean,
     Column,
+    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -97,7 +98,7 @@ class Event(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column()
     description: Mapped[str | None] = mapped_column(Text)
-    date: Mapped[datetime] = mapped_column()
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     location: Mapped[str | None] = mapped_column()
     latitude: Mapped[float | None] = mapped_column()
     longitude: Mapped[float | None] = mapped_column()
@@ -115,8 +116,8 @@ class Assignment(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column()
     description: Mapped[str | None] = mapped_column(Text)
-    due_date: Mapped[datetime] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    due_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
@@ -132,7 +133,7 @@ class Resource(Base):
     file_path: Mapped[str] = mapped_column()
     file_type: Mapped[str | None] = mapped_column()
     category: Mapped[ResourceCategory] = mapped_column(default=ResourceCategory.OTHER)
-    uploaded_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
@@ -146,7 +147,7 @@ class Poll(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column()
     is_active: Mapped[bool] = mapped_column(default=True)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
     group = relationship("Group", back_populates="polls")
@@ -161,7 +162,6 @@ class Choice(Base):
     text: Mapped[str] = mapped_column()
     manifesto: Mapped[str | None] = mapped_column(Text)
     photo_url: Mapped[str | None] = mapped_column()
-
     poll_id: Mapped[int | None] = mapped_column(ForeignKey("polls.id"))
 
     poll = relationship("Poll", back_populates="choices")
@@ -191,7 +191,7 @@ class Announcement(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String)
     content: Mapped[str] = mapped_column(Text)
-    sent_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
     urgent: Mapped[bool] = mapped_column(Boolean)
