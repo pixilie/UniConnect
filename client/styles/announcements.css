@@ -226,7 +226,7 @@ body {
     padding-bottom: 5px;
 }
 
-.bubble.urgent{
+.announcement-row.urgent .bubble{
     border-color: #B3261E;
 }
 
@@ -234,7 +234,7 @@ body {
     display: none;
 }
 
-.bubble.urgent .urgency{
+.announcement-row.urgent .urgency{
     display:flex;
     padding-right: 10px;
     padding-left: 10px;
