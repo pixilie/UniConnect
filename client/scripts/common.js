@@ -3,6 +3,12 @@ const isLocal = window.location.hostname === "localhost" || window.location.host
 const API_BASE_URL = isLocal ? "http://localhost:8000/api" : "https://uniconnect.pixilie.net/api";
 const WS_BASE_URL = isLocal ? "ws://localhost:8000/ws" : "wss://uniconnect.pixilie.net/ws";
 
+const AppState = {
+    currentGroupId: localStorage.getItem("groupID") || null,
+    currentGroupName: "",
+    userProfile: null
+};
+
 function logout() {
     localStorage.removeItem("token");
     window.location.href = "login.html";

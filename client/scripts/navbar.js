@@ -7,12 +7,6 @@ const dropdown = document.getElementById('groupDropdown');
 const searchInput = document.getElementById('groupSearchInput');
 const currentGroupNameLabel = document.getElementById('currentGroupName');
 
-const AppState = {
-    currentGroupId: localStorage.getItem("groupID") || null,
-    currentGroupName: "",
-    userProfile: null
-};
-
 btn.addEventListener('click', () => {
     if (btn.classList.contains('disabled')) return;
 
