@@ -1,70 +1,47 @@
 requireAuth();
 
 const CATEGORY_CONFIG = {
-    "lecture": {
-        title: "Lectures & Slides",
-        icon: "description",
-        color: "#6750A4"
-    },
-    "exercise": {
-        title: "Exercises & Assignments",
-        icon: "assignment",
-        color: "#1976D2"
-    },
-    "student": {
-        title: "Shared by Students",
-        icon: "group",
-        color: "#388E3C"
-    },
-    "other": {
-        title: "Other Resources",
-        icon: "folder_open",
-        color: "#F57C00"
-    }
+    "lecture": { title: "Lectures & Slides", icon: "description", color: "#6750A4" },
+    "exercise": { title: "Exercises & Assignments", icon: "assignment", color: "#1976D2" },
+    "student": { title: "Shared by Students", icon: "group", color: "#388E3C" },
+    "other": { title: "Other Resources", icon: "folder_open", color: "#F57C00" }
 };
 
-const uploadBtn= document.getElementById("confirmUploadBtn");
+const uploadBtn = document.getElementById("confirmUploadBtn");
 const openModalBtn = document.getElementById('openUploadModalBtn');
 const uploadModal = document.getElementById('uploadModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const cancelUploadBtn = document.getElementById('cancelUploadBtn');
-const ressourceTemplate=document.getElementById(`resourceCardTemplate`);
-const categoryTemplate=document.getElementById(`categoryTemplate`);
-const ressourcesContainer=document.getElementById(`resourcesList`);
+const ressourceTemplate = document.getElementById('resourceCardTemplate');
+const categoryTemplate = document.getElementById('categoryTemplate');
+const ressourcesContainer = document.getElementById('resourcesList');
 
-const formTitle=document.getElementById("uploadTitle");
-const formCategory=document.getElementById("uploadCategory");
-const formFile=document.getElementById("uploadFile");
+const formTitle = document.getElementById("uploadTitle");
+const formCategory = document.getElementById("uploadCategory");
+const formFile = document.getElementById("uploadFile");
 
-openModalBtn.addEventListener('click', () => {
-    uploadModal.classList.add('active');
-});
-
-closeModalBtn.addEventListener('click', () => {
-    uploadModal.classList.remove('active');
-});
-
-cancelUploadBtn.addEventListener('click', () => {
-    uploadModal.classList.remove('active');
-});
+openModalBtn.addEventListener('click', () => uploadModal.classList.add('active'));
+closeModalBtn.addEventListener('click', () => uploadModal.classList.remove('active'));
+cancelUploadBtn.addEventListener('click', () => uploadModal.classList.remove('active'));
 
 uploadModal.addEventListener('click', (e) => {
-    if (e.target === uploadModal) {
-        uploadModal.classList.remove('active');
-    }
+    if (e.target === uploadModal) uploadModal.classList.remove('active');
 });
 
-uploadBtn.addEventListener(`click`, ()=>{
-    uploadRessource();
-    uploadModal.classList.remove('active');
-})
+uploadBtn.addEventListener('click', async () => {
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Uploading...";
+    await uploadRessource();
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload";
+});
 
 async function loadRessources() {
     const currentGroupId = AppState.currentGroupId;
-
     if (!currentGroupId) return;
 
     ressourcesContainer.innerHTML = "";
+
     const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/resources`, {
         method: "GET",
         headers: {
@@ -79,78 +56,144 @@ async function loadRessources() {
         let data = await res.json();
 
         data.forEach(element => {
-            let link = element.file_path;
-            let title= element.title;
-            let name=element.author.first_name+" "+element.author.last_name;
-            let category=element.category;
+            let resourceId = element.id;
+            let title = element.title;
+            let name = element.uploader.first_name + " " + element.uploader.last_name;
+            let category = element.category;
 
-            addRessource(link,title,name,category);
+            addRessource(resourceId, title, name, category);
         });
     }
-    
 }
 
-function addRessource(link,title,name,category){
-    const ressourceNode = ressourceTemplate.content.cloneNode(true);
-    
-    let categoryDiv= document.getElementById(category);
-    if(!categoryDiv){
-        const categoryDiv= categoryTemplate.content.cloneNode(true);
-        categoryDiv.querySelector(`.category-name`).content=CATEGORY_CONFIG[category].title;
-        ressourcesContainer.appendChild(categoryDiv);
+function addRessource(resourceId, title, name, category) {
+    let categorySection = document.getElementById(`category-${category}`);
+
+    if (!categorySection) {
+        categorySection = categoryTemplate.content.cloneNode(true).firstElementChild;
+        categorySection.id = `category-${category}`;
+
+        categorySection.querySelector('.category-name').textContent = CATEGORY_CONFIG[category].title;
+        categorySection.querySelector('.category-icon').textContent = CATEGORY_CONFIG[category].icon;
+
+        ressourcesContainer.appendChild(categorySection);
     }
-    ressourceNode.querySelector(`.file-icon`).querySelector(`.material-icons-outlined`).content=CATEGORY_CONFIG[category].icon;
-    ressourceNode.querySelector(`.file-icon`).querySelector(`.material-icons-outlined`).style.color=CATEGORY_CONFIG[category].color;
-    ressourceNode.querySelector(`.file-name`).content=title;
-    ressourceNode.querySelector(`.file-meta`).content=name;
-    ressourceNode.querySelector(`.download-btn`).value=link;
-    categoryDiv.appendChild(ressourceNode);
+
+    const ressourceNode = ressourceTemplate.content.cloneNode(true).firstElementChild;
+    const iconSpan = ressourceNode.querySelector('.file-icon .material-icons-outlined');
+
+    iconSpan.textContent = CATEGORY_CONFIG[category].icon;
+    ressourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
+    ressourceNode.querySelector('.file-name').textContent = title;
+    ressourceNode.querySelector('.file-meta').textContent = name;
+
+    const downloadBtn = ressourceNode.querySelector('.download-btn');
+    downloadBtn.value = `${API_BASE_URL}/resources/${resourceId}/download`;
+
+    downloadBtn.addEventListener('click', function () {
+        downloadFile(this, title);
+    });
+
+    const filesGrid = categorySection.querySelector('.files-grid');
+    filesGrid.appendChild(ressourceNode);
 }
 
+async function downloadFile(btn, fileName) {
+    if (btn.disabled) return;
 
+    const icon = btn.querySelector('.material-icons-outlined');
 
-function downloadFile(btn) {
-    const a = document.createElement("a");
-    a.href = btn.value;
-    a.download = "";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    btn.disabled = true;
+    icon.textContent = "hourglass_empty";
+
+    try {
+        const res = await fetch(btn.value, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (!res.ok) throw new Error("Download failed");
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+    } catch (error) {
+        console.error("Erreur lors du téléchargement:", error);
+        alert("Failed to download the file.");
+    } finally {
+        icon.textContent = "download";
+        btn.disabled = false;
+    }
 }
 
 async function uploadRessource() {
-    const file = formFile.files[0];
+    const currentGroupId = AppState.currentGroupId;
+    if (!currentGroupId) return;
 
+    const file = formFile.files[0];
     if (!file) {
-        alert("Select a file first");
+        alert("Please select a file first");
         return;
     }
 
     const formData = new FormData();
     formData.append("title", formTitle.value);
-    formData.append("category", category.value);
+    formData.append("category", formCategory.value);
     formData.append("file", file);
-    formTitle.value="";
-    formCategory.value="";
-    formFile.value="";
 
-    const res = await fetch(`/api/groups/${currentGroupId}/resources`, {
-        method: "POST",
-        body: formData
-    });
+    const token = localStorage.getItem("token");
 
-    if(!res.ok){
-        console.log("issue uploading file");
-        return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/resources`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (!res.ok) {
+            console.error("Issue uploading file");
+            alert("Failed to upload resource");
+            return;
+        }
+
+        const data = await res.json();
+
+        formTitle.value = "";
+        formCategory.value = "lecture";
+        formFile.value = "";
+        uploadModal.classList.remove('active');
+
+        let resourceId = data.id;
+        let title = data.title;
+        let name = data.uploader.first_name + " " + data.uploader.last_name;
+        let categoryLabel = data.category;
+
+        addRessource(resourceId, title, name, categoryLabel);
+
+    } catch (error) {
+        console.error("Network error:", error);
     }
-    const data = await res.json();
-
-    let link = data.file_path;
-    let title= data.title;
-    let name=data.author.first_name+" "+data.author.last_name;
-    let category=data.category;
-
-    addRessource(link,title,name,category);
 }
 
-loadRessources();
+document.addEventListener("groupChanged", () => {
+    loadRessources();
+});
+
+if (AppState.currentGroupId) {
+    setTimeout(() => {
+        loadRessources();
+    }, 100);
+}
