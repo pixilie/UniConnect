@@ -5,9 +5,9 @@ const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
 const cancelPollBtn = document.getElementById('cancelPollBtn');
 
-const pollTemplate=document.getElementById(`pollTemplate`);
-const optionTemplate=document.getElementById(`pollOptionTemplate`);
-    const pollsContainer = document.getElementById('pollsContainer');
+const pollTemplate = document.getElementById(`pollTemplate`);
+const optionTemplate = document.getElementById(`pollOptionTemplate`);
+const pollsContainer = document.getElementById('pollsContainer');
 
 openModalBtn.addEventListener('click', () => {
     createModal.classList.add('active');
@@ -42,8 +42,8 @@ function selectOption(card) {
     pollContainer.querySelector('.confirm-btn').disabled = false;
 }
 
-function addPoll(){
-    const pollNode=pollTemplate.cloneNode(true);
+function addPoll() {
+    const pollNode = pollTemplate.cloneNode(true);
 }
 
 function submitVote(btn) {
@@ -55,43 +55,41 @@ function submitVote(btn) {
     successView.style.display = 'flex';
 }
 
-function addPoll(title,options,pollID) {
+function addPoll(title, options, pollID) {
 
     const pollNode = pollTemplate.content.cloneNode(true).firstElementChild;
     pollNode.querySelector('.poll-title').textContent = title;
-    pollNode.dataset.id=pollID;
+    pollNode.dataset.id = pollID;
 
     const optionsList = pollNode.querySelector('.options-list');
 
     options.forEach(optionText => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
         optionNode.querySelector('.option-title').textContent = optionText;
-        
-        optionNode.addEventListener('click', function() {
+
+        optionNode.addEventListener('click', function () {
             selectOption(this);
         });
 
         optionsList.appendChild(optionNode);
     });
 
-    pollNode.querySelector('.confirm-btn').addEventListener('click', function() {
+    pollNode.querySelector('.confirm-btn').addEventListener('click', function () {
         submitVote(this);
     });
 
     pollsContainer.appendChild(pollNode);
 }
 
-async function sendVote(pollID,choiceID) {
-    let res= await fetch(`/api/polls/${pollID}/vote?choice_id=${choiceID}`, {
+async function sendVote(pollID, choiceID) {
+    let res = await fetch(`/api/polls/${pollID}/vote?choice_id=${choiceID}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         }
     });
-    if(!res.ok){
+    if (!res.ok) {
         console.log("issue when submitting vote");
         return;
     }
-    
-    
 }

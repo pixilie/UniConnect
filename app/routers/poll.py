@@ -7,6 +7,18 @@ from app.db.database import get_db
 
 poll_router = APIRouter(tags=["Polls"])
 
+@poll_router.get("/groups/{group_id}/polls", response_model=schemas.PollResponse)
+def get_polls(
+    group_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if current_user.role != models.UserRole.ADMIN:
+        current_group_ids = [g.id for g in current_user.groups]
+        if group_id not in current_group_ids:
+            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+
+    return db.query(models.Poll).filter(models.Poll.group_id == group_id).all()
 
 @poll_router.post("/groups/{group_id}/polls", response_model=schemas.PollResponse)
 def create_poll(
