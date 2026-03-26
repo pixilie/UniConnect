@@ -1,1 +1,289 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #FFFFFF;
+    color: #1C1B1F;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
 
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #F4F4F7;
+    overflow-y: auto;
+}
+
+.top-bar {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    font-size: 20px;
+    font-weight: 500;
+    gap: 12px;
+}
+
+.resources-container {
+    padding: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.category-section {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6750A4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.file-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.file-card:hover {
+    border-color: #6750A4;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.file-icon {
+    width: 48px;
+    height: 48px;
+    background: #F1F3F4;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6750A4;
+}
+
+.file-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.file-name {
+    font-weight: 500;
+    font-size: 14px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    color: #666;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background: #eee;
+    color: #6750A4;
+}
+
+.fab-upload {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background-color: #6750A4;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.upload-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    /* Caché par défaut */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.upload-modal-overlay.active {
+    display: flex;
+}
+
+.upload-modal {
+    background: white;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1C1B1F;
+}
+
+.close-modal {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #1C1B1F;
+}
+
+.modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #49454F;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    padding: 10px 14px;
+    border: 1px solid #CAC4D0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+    border-color: #6750A4;
+}
+
+.file-input {
+    font-size: 14px;
+    color: #49454F;
+}
+
+.file-input::file-selector-button {
+    background: #EADDFF;
+    color: #6750A4;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 12px;
+    transition: background 0.2s;
+}
+
+.file-input::file-selector-button:hover {
+    background: #D0BCFF;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    background: #F4F4F7;
+    border-top: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: none;
+    color: #49454F;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.btn-cancel:hover {
+    background: #E0E0E0;
+}
+
+.btn-upload {
+    background: #6750A4;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-upload:hover {
+    background: #543E8A;
+}

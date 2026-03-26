@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect - Resources</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/navbar.css">
+  <link rel="stylesheet" href="../styles/resources.css">
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="class-header">
+      <span class="material-icons-outlined">school</span> UniConnect
+    </div>
+
+    <div class="group-selector-container">
+      <button class="group-selector-btn" id="groupSelectorBtn">
+        <span id="currentGroupName">Select a group...</span>
+        <span class="material-icons-outlined" style="font-size: 20px; color: #666;">unfold_more</span>
+      </button>
+
+      <div class="group-dropdown-menu" id="groupDropdown">
+        <div class="group-search-box">
+          <span class="material-icons-outlined" style="font-size: 18px; color: #666;">search</span>
+          <input type="text" class="group-search-input" id="groupSearchInput" placeholder="Search a group..." autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <div class="channel-list">
+      <a href="#" class="nav-item active"><span class="material-icons-outlined icon">folder</span> Resources</a>
+      <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span> Announcements</a>
+      <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
+      <a href="events.html" class="nav-item"><span class="material-icons-outlined icon">event_available</span> Events Planning</a>
+      <a href="timetables.html" class="nav-item"><span class="material-icons-outlined icon">calendar_month</span> Timetables</a>
+      <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span> Polls</a>
+    </div>
+
+    <div class="user-panel">
+      <div class="user-avatar" id="currentUserAvatar"></div>
+      <div class="user-info">
+        <span class="user-name" id="currentUserName"></span>
+        <span class="user-role" id="currentUserRole"></span>
+      </div>
+      <span class="material-icons-outlined" style="cursor:pointer; color:#666;">settings</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+      <div class="top-bar">
+        <span class="material-icons-outlined" style="color:#666;">folder</span>
+        Class Resources
+      </div>
+
+      <div class="resources-container" id="resourcesList">
+      </div>
+
+      <template id="categoryTemplate">
+        <section class="category-section">
+          <div class="category-title">
+            <span class="material-icons-outlined category-icon" style="font-size: 18px;"></span>
+            <span class="category-name"></span>
+          </div>
+          <div class="files-grid"></div>
+        </section>
+      </template>
+
+      <template id="resourceCardTemplate">
+        <div class="file-card">
+          <div class="file-icon" style="color: #6750A4;"><span class="material-icons-outlined"></span></div>
+          <div class="file-info">
+            <span class="file-name"></span>
+            <span class="file-meta"></span>
+          </div>
+          <div class="file-actions">
+            <button class="action-btn download-btn"><span class="material-icons-outlined" style="font-size: 20px;">download</span></button>
+          </div>
+        </div>
+      </template>
+
+      <button class="fab-upload" id="openUploadModalBtn">
+        <span class="material-icons-outlined">upload</span>
+        Upload Resource
+      </button>
+
+      <div class="upload-modal-overlay" id="uploadModal">
+        <div class="upload-modal">
+          <div class="modal-header">
+            <h3>Upload a Resource</h3>
+            <span class="material-icons-outlined close-modal" id="closeModalBtn">close</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Resource Title</label>
+              <input type="text" id="uploadTitle" placeholder="e.g., Chapter 3 Notes" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="uploadCategory">
+                    <option value="lecture">Lectures & Slides</option>
+                    <option value="exercise">Exercises & Assignments</option>
+                    <option value="student">Shared by Students</option>
+                    <option value="other">Other Resources</option>
+                </select>
+            </div>
+            <div class="form-group">
+              <label>File</label>
+              <input type="file" id="uploadFile" class="file-input">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelUploadBtn">Cancel</button>
+            <button class="btn-upload" id="confirmUploadBtn">Upload</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/navbar.js"></script>
+  <script src="../scripts/resources.js"></script>
+  </body>
+
+</html>
