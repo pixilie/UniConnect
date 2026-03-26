@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <link rel="stylesheet" href="../styles/chat.css">
+  <link rel="stylesheet" href="../styles/navbar.css">
 </head>
 
 <body>
@@ -15,6 +16,20 @@
   <aside class="sidebar">
     <div class="class-header">
       <span class="material-icons-outlined">school</span> UniConnect
+    </div>
+
+    <div class="group-selector-container">
+          <button class="group-selector-btn" id="groupSelectorBtn">
+            <span id="currentGroupName">Select a group...</span>
+            <span class="material-icons-outlined" style="font-size: 20px; color: #666;">unfold_more</span>
+          </button>
+
+        <div class="group-dropdown-menu" id="groupDropdown">
+            <div class="group-search-box">
+              <span class="material-icons-outlined" style="font-size: 18px; color: #666;">search</span>
+              <input type="text" class="group-search-input" id="groupSearchInput" placeholder="Search a group...">
+            </div>
+        </div>
     </div>
 
     <div class="channel-list">
