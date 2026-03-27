@@ -37,7 +37,7 @@ uploadBtn.addEventListener('click', async () => {
 });
 
 async function loadRessources() {
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     ressourcesContainer.innerHTML = "";
 
@@ -137,7 +137,7 @@ async function downloadFile(btn, fileName) {
 }
 
 async function uploadRessource() {
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     const file = formFile.files[0];
     if (!file) {

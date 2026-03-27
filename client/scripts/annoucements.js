@@ -12,7 +12,7 @@ const sendBtn = document.getElementById("postBtn");
 async function LoadAnnoucements() {
     displayBox.innerHTML = "";
 
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     displayBox.innerHTML = "";
     const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
