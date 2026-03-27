@@ -33,7 +33,7 @@ class EventType(str, enum.Enum):
 class ResourceCategory(str, enum.Enum):
     LECTURE = "lecture"
     EXERCISE = "exercise"
-    PROJECT = "project"
+    STUDENT = "student"
     OTHER = "other"
 
 

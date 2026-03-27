@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 from app.models import ResourceCategory, UserRole
 
 
-class AuthorInfo(BaseModel):
+class UploaderInfo(BaseModel):
     id: int
     first_name: str
     last_name: str
@@ -20,7 +20,7 @@ class ResourceResponse(BaseModel):
     file_type: str | None
     category: ResourceCategory
     uploaded_at: datetime
-    author: AuthorInfo
+    uploader: UploaderInfo
     group_id: int
 
     model_config = ConfigDict(from_attributes=True)
