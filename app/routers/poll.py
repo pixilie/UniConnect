@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List
 
 from app import models, schemas
 from app.core.security import get_current_user
@@ -7,7 +8,7 @@ from app.db.database import get_db
 
 poll_router = APIRouter(tags=["Polls"])
 
-@poll_router.get("/groups/{group_id}/polls", response_model=schemas.PollResponse)
+@poll_router.get("/groups/{group_id}/polls", response_model=List[schemas.PollResponse])
 def get_polls(
     group_id: int,
     db: Session = Depends(get_db),

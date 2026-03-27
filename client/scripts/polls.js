@@ -1,9 +1,13 @@
 requireAuth();
 
+let currentGroupId=AppState.currentGroupId;
 const openModalBtn = document.getElementById('openCreatePollModalBtn');
 const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
 const cancelPollBtn = document.getElementById('cancelPollBtn');
+const postNewPollBtn=document.getElementById("confirmCreatePollBtn");
+const formQuestion=document.getElementById("pollQuestion");
+const formOptions=document.getElementById("pollOptions");
 
 const pollTemplate = document.getElementById(`pollTemplate`);
 const optionTemplate = document.getElementById(`pollOptionTemplate`);
@@ -12,6 +16,51 @@ const pollsContainer = document.getElementById('pollsContainer');
 openModalBtn.addEventListener('click', () => {
     createModal.classList.add('active');
 });
+
+postNewPollBtn.addEventListener("click",async()=>{
+    let title=formQuestion.value;
+    formQuestion.value="";
+    let options=formOptions.value.split(',');
+    formOptions.value="";
+    if(title=="" || options.length<=1)return;
+    let res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/polls`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            title: title
+        })
+    });
+    if (!res.ok) {
+        console.log("issue when creating new poll");
+        return;
+    }
+    let pollData = await res.json();
+    let pollID=pollData.id;
+    options.forEach(async(option) =>{
+        let res = await fetch(`${API_BASE_URL}/polls/${pollID}/choices`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({
+                text: option,
+                manifesto: "",
+                photo_url: ""
+            })
+        });
+        if (!res.ok) {
+            console.log("issue when adding a new option");
+            return;
+        }
+    })
+
+    await getPolls();
+    closeModal();
+})
 
 const closeModal = () => {
     createModal.classList.remove('active');
@@ -42,10 +91,6 @@ function selectOption(card) {
     pollContainer.querySelector('.confirm-btn').disabled = false;
 }
 
-function addPoll() {
-    const pollNode = pollTemplate.cloneNode(true);
-}
-
 function submitVote(btn) {
     const pollContainer = btn.closest('.poll-container');
     const pollsList = document.getElementById('pollsContainer');
@@ -65,7 +110,8 @@ function addPoll(title, options, pollID) {
 
     options.forEach(optionText => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
-        optionNode.querySelector('.option-title').textContent = optionText;
+        optionNode.querySelector('.option-title').textContent = optionText.text;
+        //jsp si faut stocker l'id quelque part
 
         optionNode.addEventListener('click', function () {
             selectOption(this);
@@ -82,14 +128,42 @@ function addPoll(title, options, pollID) {
 }
 
 async function sendVote(pollID, choiceID) {
-    let res = await fetch(`/api/polls/${pollID}/vote?choice_id=${choiceID}`, {
+    console.log(" starting vote submitted");
+    let res = await fetch(`${API_BASE_URL}/polls/${pollID}/vote?choice_id=${choiceID}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
     if (!res.ok) {
         console.log("issue when submitting vote");
         return;
     }
+    console.log("vote submitted");
+}
+
+async function getPolls() {
+    pollsContainer.innerHTML="";
+    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/polls`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.log("issue with getting polls");
+        return;
+    }
+    let data = await res.json();
+    data.forEach(poll =>{
+        if(poll.is_active)addPoll(poll.title,poll.choices,poll.id);
+    })
+}
+
+if (AppState.currentGroupId) {
+    setTimeout(async() => {
+        await getPolls();
+    }, 100);
 }
