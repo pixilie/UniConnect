@@ -133,7 +133,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         location: location
     };
 
-    let res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/events`, {
+    let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/events`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -142,7 +142,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         body: JSON.stringify(newEvent)
     });
 
-    if(!res.ok){
+    if (!res.ok) {
         console.log("issue posting new event");
         return;
     }
@@ -155,65 +155,64 @@ confirmCreateBtn.addEventListener('click', async () => {
 });
 
 async function fetchEvents() {
-    const currentGroupId = AppState.currentGroupId;
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     // TODO: API FASTAPI - GET ALL EVENTS => Events + Schedules (.ics) donc 2 appels a faire
 
-    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/schedules`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
+    if (!res.ok) {
         console.log("issue with getting schedule");
         return;
     }
-    const scheduleData= await res.json();
+    const scheduleData = await res.json();
     scheduleData.forEach(element => {
-        let title=element.title;
-        let type=element.type;
-        let start=element.date;
+        let title = element.title;
+        let type = element.type;
+        let start = element.date;
         //let end = element.end;
-        let location=element.location;                  //TODO : CHANGE ACCORDING to BACKEND
-        let newElement={
+        let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
+        let newElement = {
             title: title,
             type: type,
             start: start,
             end: end,
             location: location
         }
-        allEvents.push(newElement);                
+        allEvents.push(newElement);
     })
 
-    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${currentGroupId}&skip=0&limit=20`, {
+    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${AppState.currentGroupId}&skip=0&limit=20`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
+    if (!res.ok) {
         console.log("issue with getting events");
         return;
     }
-    const eventsData= await res2.json();
+    const eventsData = await res2.json();
     eventsData.forEach(element => {
-        let title=element.title;
-        let type=element.type;
-        let start=element.date;
+        let title = element.title;
+        let type = element.type;
+        let start = element.date;
         //let end = element.end;
-        let location=element.location;                  //TODO : CHANGE ACCORDING to BACKEND
-        let newElement={
+        let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
+        let newElement = {
             title: title,
             type: type,
             start: start,
             end: end,
             location: location
         }
-        allEvents.push(newElement);                
+        allEvents.push(newElement);
     })
 
     refreshWeekView();
