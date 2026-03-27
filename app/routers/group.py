@@ -63,7 +63,7 @@ def get_messages(
 
 @group_router.post("/groups/", response_model=schemas.Group)
 def create_group(
-    group_data: schemas.NewGroup,
+    group_name: str,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -71,8 +71,8 @@ def create_group(
         raise HTTPException(status_code=403, detail="Only administrators can create groups")
 
     new_group = models.Group (
-        name = group_data.name,
-        schedule_path = group_data.schedule_path if group_data.schedule_path else None
+        name = group_name,
+        schedule_path = None
     )
 
     db.add(new_group)
