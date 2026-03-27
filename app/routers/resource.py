@@ -95,6 +95,7 @@ def download_resource(
             raise HTTPException(status_code=403, detail="Not authorized to access this resource")
 
     if not os.path.exists(resource.file_path):
+        print("caca")
         raise HTTPException(status_code=404, detail="File missing on the server")
 
     return FileResponse(

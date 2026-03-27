@@ -11,12 +11,12 @@ const sendBtn = document.getElementById("postBtn");
 
 
 async function LoadAnnoucements() {
-    const currentGroupId = AppState.currentGroupId;
+    displayBox.innerHTML = "";
 
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     displayBox.innerHTML = "";
-    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/announcement`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -77,16 +77,16 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
 }
 
 async function createAnnoucement() {
-    const currentGroupId = AppState.currentGroupId;
-
     let title = formTitle.value;
     formTitle.value = "";
+
     let content = formContent.value;
     formContent.value = "";
+
     let urgency = formUrgent.checked;
     formUrgent.checked = false;
 
-    await fetch(`${API_BASE_URL}/groups/${currentGroupId}/announcement`, {
+    await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -111,7 +111,6 @@ cancelBtn.addEventListener("click", () => {
 sendBtn.addEventListener("click", async () => {
     await createAnnoucement();
     createForm.classList.remove("form-active");
-    displayBox.innerHTML = "";
     LoadAnnoucements();
 });
 
