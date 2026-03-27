@@ -1,14 +1,13 @@
 requireAuth();
 
-let currentGroupId=AppState.currentGroupId;
+let currentGroupId = AppState.currentGroupId;
 const openModalBtn = document.getElementById('openCreatePollModalBtn');
 const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
 const cancelPollBtn = document.getElementById('cancelPollBtn');
-const postNewPollBtn=document.getElementById("confirmCreatePollBtn");
-const formQuestion=document.getElementById("pollQuestion");
-const formOptions=document.getElementById("pollOptions");
-
+const postNewPollBtn = document.getElementById("confirmCreatePollBtn");
+const formQuestion = document.getElementById("pollQuestion");
+const formOptions = document.getElementById("pollOptions");
 const pollTemplate = document.getElementById(`pollTemplate`);
 const optionTemplate = document.getElementById(`pollOptionTemplate`);
 const pollsContainer = document.getElementById('pollsContainer');
@@ -17,13 +16,16 @@ openModalBtn.addEventListener('click', () => {
     createModal.classList.add('active');
 });
 
-postNewPollBtn.addEventListener("click",async()=>{
-    let title=formQuestion.value;
-    formQuestion.value="";
-    let options=formOptions.value.split(',');
-    formOptions.value="";
-    if(title=="" || options.length<=1)return;
-    let res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/polls`, {
+postNewPollBtn.addEventListener("click", async () => {
+    let title = formQuestion.value;
+    formQuestion.value = "";
+
+    let options = formOptions.value.split(',');
+    formOptions.value = "";
+
+    if (title == "" || options.length <= 1) return;
+
+    let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -33,13 +35,16 @@ postNewPollBtn.addEventListener("click",async()=>{
             title: title
         })
     });
+
     if (!res.ok) {
         console.log("issue when creating new poll");
         return;
     }
+
     let pollData = await res.json();
-    let pollID=pollData.id;
-    options.forEach(async(option) =>{
+    let pollID = pollData.id;
+
+    options.forEach(async (option) => {
         let res = await fetch(`${API_BASE_URL}/polls/${pollID}/choices`, {
             method: 'POST',
             headers: {
@@ -52,6 +57,7 @@ postNewPollBtn.addEventListener("click",async()=>{
                 photo_url: ""
             })
         });
+
         if (!res.ok) {
             console.log("issue when adding a new option");
             return;
@@ -95,15 +101,17 @@ async function submitVote(btn) {
     const pollContainer = btn.closest('.poll-container');
     const pollsList = document.getElementById('pollsContainer');
     const successView = document.getElementById('successView');
-    const selected=pollContainer.querySelector(".selected");
-    await sendVote(pollContainer.dataset.id,selected.dataset.id);
+    const selected = pollContainer.querySelector(".selected");
+
+    await sendVote(pollContainer.dataset.id, selected.dataset.id);
+
     pollsList.style.display = 'none';
     successView.style.display = 'flex';
 }
 
 function addPoll(title, options, pollID) {
-
     const pollNode = pollTemplate.content.cloneNode(true).firstElementChild;
+
     pollNode.querySelector('.poll-title').textContent = title;
     pollNode.dataset.id = pollID;
 
@@ -112,7 +120,7 @@ function addPoll(title, options, pollID) {
     options.forEach(option => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
         optionNode.querySelector('.option-title').textContent = option.text;
-        optionNode.dataset.id=option.id;
+        optionNode.dataset.id = option.id;
 
         optionNode.addEventListener('click', function () {
             selectOption(this);
@@ -143,26 +151,34 @@ async function sendVote(pollID, choiceID) {
 }
 
 async function getPolls() {
-    pollsContainer.innerHTML="";
-    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/polls`, {
+    pollsContainer.innerHTML = "";
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.log("issue with getting polls");
         return;
     }
+
     let data = await res.json();
-    data.forEach(poll =>{
-        if(poll.is_active)addPoll(poll.title,poll.choices,poll.id);
+
+    data.forEach(poll => {
+        if (poll.is_active) addPoll(poll.title, poll.choices, poll.id);
     })
 }
 
+document.addEventListener("groupChanged", async (e) => {
+    console.log("test");
+    await getPolls();
+});
+
 if (AppState.currentGroupId) {
-    setTimeout(async() => {
+    setTimeout(async () => {
         await getPolls();
     }, 100);
 }

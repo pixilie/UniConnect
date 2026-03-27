@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta, timezone
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 
 from app import models, schemas
 from app.core.security import get_current_user
@@ -19,7 +21,34 @@ def get_polls(
         if group_id not in current_group_ids:
             raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
-    return db.query(models.Poll).filter(models.Poll.group_id == group_id).all()
+    polls = db.query(models.Poll).filter(models.Poll.group_id == group_id).all()
+
+    if not polls:
+        return []
+
+    poll_ids = [poll.id for poll in polls]
+    user_votes = db.query(models.Vote.poll_id).filter(
+        models.Vote.user_id == current_user.id,
+        models.Vote.poll_id.in_(poll_ids)
+    ).all()
+
+    voted_poll_ids = {vote[0] for vote in user_votes}
+
+    response_polls = []
+    for poll in polls:
+        poll_dict = {
+            "id": poll.id,
+            "title": poll.title,
+            "is_active": poll.is_active,
+            "choices": poll.choices,
+            "expires_at": poll.expires_at,
+            "created_at": poll.created_at,
+            "group_id": poll.group_id,
+            "has_voted": poll.id in voted_poll_ids
+        }
+        response_polls.append(poll_dict)
+
+    return response_polls
 
 @poll_router.post("/groups/{group_id}/polls", response_model=schemas.PollResponse)
 def create_poll(
@@ -29,7 +58,7 @@ def create_poll(
     current_user: models.User = Depends(get_current_user)
 ):
     if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER, models.UserRole.DELEGATE]:
-        raise HTTPException(status_code=403, detail="Only administrators can update teacher's teaching groups")
+        raise HTTPException(status_code=403, detail="You're not allowed to create polls")
 
     if current_user.role != models.UserRole.ADMIN:
         current_group_ids = [g.id for g in current_user.groups]
@@ -40,7 +69,8 @@ def create_poll(
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    new_poll = models.Poll(title=poll_in.title, group_id=group_id)
+    new_poll = models.Poll(title=poll_in.title, group_id=group_id, user_id=current_user.id, expires_at=datetime.now(timezone.utc) + timedelta(minutes=1))
+
     db.add(new_poll)
     db.commit()
     db.refresh(new_poll)
