@@ -91,11 +91,12 @@ function selectOption(card) {
     pollContainer.querySelector('.confirm-btn').disabled = false;
 }
 
-function submitVote(btn) {
+async function submitVote(btn) {
     const pollContainer = btn.closest('.poll-container');
     const pollsList = document.getElementById('pollsContainer');
     const successView = document.getElementById('successView');
-
+    const selected=pollContainer.querySelector(".selected");
+    await sendVote(pollContainer.dataset.id,selected.dataset.id);
     pollsList.style.display = 'none';
     successView.style.display = 'flex';
 }
@@ -108,10 +109,10 @@ function addPoll(title, options, pollID) {
 
     const optionsList = pollNode.querySelector('.options-list');
 
-    options.forEach(optionText => {
+    options.forEach(option => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
-        optionNode.querySelector('.option-title').textContent = optionText.text;
-        //jsp si faut stocker l'id quelque part
+        optionNode.querySelector('.option-title').textContent = option.text;
+        optionNode.dataset.id=option.id;
 
         optionNode.addEventListener('click', function () {
             selectOption(this);
@@ -128,7 +129,6 @@ function addPoll(title, options, pollID) {
 }
 
 async function sendVote(pollID, choiceID) {
-    console.log(" starting vote submitted");
     let res = await fetch(`${API_BASE_URL}/polls/${pollID}/vote?choice_id=${choiceID}`, {
         method: 'POST',
         headers: {
@@ -140,7 +140,6 @@ async function sendVote(pollID, choiceID) {
         console.log("issue when submitting vote");
         return;
     }
-    console.log("vote submitted");
 }
 
 async function getPolls() {
