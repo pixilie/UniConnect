@@ -1,0 +1,332 @@
+/* --- GLOBALS --- */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #FFFFFF;
+    color: #1C1B1F;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: white;
+}
+
+.top-bar {
+    height: 60px;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #1C1B1F;
+    gap: 12px;
+}
+
+/* --- CALENDAR WRAPPER & HEADER --- */
+.timetable-wrapper {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background-color: #F4F4F7;
+}
+
+.timetable-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #E0E0E0;
+    min-width: 800px;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.calendar-controls h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.icon-btn:hover {
+    background: #f0f0f0;
+    color: #1C1B1F;
+}
+
+/* --- CSS GRID CALENDAR --- */
+.week-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(5, 1fr);
+    grid-template-rows: 55px repeat(10, 80px);
+    /* 55px pour l'entête des jours */
+    gap: 1px;
+    background-color: #E0E0E0;
+}
+
+.cell {
+    background-color: white;
+    position: relative;
+}
+
+.header-day {
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+}
+
+.date-sub {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.header-time {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    padding-top: 10px;
+    border-right: 1px solid #eee;
+}
+
+/* --- EVENT CARDS --- */
+.event-card {
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    border-left-width: 4px;
+    border-left-style: solid;
+    cursor: pointer;
+    margin: 2px;
+    /* Espacement intérieur de la cellule */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.event-time {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-bottom: 2px;
+}
+
+.event-title {
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.event-meta {
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+/* EVENT COLORS (Variables forcées avec !important pour éviter les conflits CSS Grid) */
+.type-course {
+    background-color: #E8DEF8 !important;
+    color: #1D192B !important;
+    border-left-color: #6750A4 !important;
+}
+
+.type-study {
+    background-color: #C8E6C9 !important;
+    color: #052109 !important;
+    border-left-color: #2E7D32 !important;
+}
+
+.type-exam {
+    background-color: #FFCDD2 !important;
+    color: #B71C1C !important;
+    border-left-color: #C62828 !important;
+}
+
+.type-activity {
+    background-color: #FFF9C4 !important;
+    color: #F57F17 !important;
+    border-left-color: #F9A825 !important;
+}
+
+/* --- FAB BUTTON --- */
+.fab-create {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background-color: #6750A4;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    z-index: 100;
+}
+
+.fab-create:hover {
+    background-color: #523E85;
+}
+
+/* --- MODAL --- */
+.create-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.create-modal-overlay.active {
+    display: flex;
+}
+
+.create-modal {
+    background: white;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1C1B1F;
+}
+
+.close-modal {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #1C1B1F;
+}
+
+.modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #49454F;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 14px;
+    border: 1px solid #CAC4D0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #6750A4;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    background: #F4F4F7;
+    border-top: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: none;
+    color: #49454F;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.btn-cancel:hover {
+    background: #E0E0E0;
+}
+
+.btn-create {
+    background: #6750A4;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-create:hover {
+    background: #523E85;
+}

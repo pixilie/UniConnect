@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniConnect - Timetable</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/navbar.css">
+  <link rel="stylesheet" href="../styles/timetables.css">
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="class-header">
+      <span class="material-icons-outlined">school</span> UniConnect
+    </div>
+
+    <div class="group-selector-container">
+      <button class="group-selector-btn" id="groupSelectorBtn">
+        <span id="currentGroupName">Select a group...</span>
+        <span class="material-icons-outlined" style="font-size: 20px; color: #666;">unfold_more</span>
+      </button>
+
+      <div class="group-dropdown-menu" id="groupDropdown">
+        <div class="group-search-box">
+          <span class="material-icons-outlined" style="font-size: 18px; color: #666;">search</span>
+          <input type="text" class="group-search-input" id="groupSearchInput" placeholder="Search a group..." autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <div class="channel-list">
+      <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span> Resources</a>
+      <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span> Announcements</a>
+      <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
+      <a href="events.html" class="nav-item"><span class="material-icons-outlined icon">event_available</span> Events Planning</a>
+      <a href="#" class="nav-item active"><span class="material-icons-outlined icon">calendar_month</span> Timetables</a>
+      <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span> Polls</a>
+    </div>
+
+    <div class="user-panel">
+      <div class="user-avatar" id="currentUserAvatar"></div>
+      <div class="user-info">
+        <span class="user-name" id="currentUserName"></span>
+        <span class="user-role" id="currentUserRole"></span>
+      </div>
+      <span class="material-icons-outlined" style="cursor:pointer; color:#666;">settings</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <span class="material-icons-outlined" style="color:#666;">calendar_month</span>
+      Timetable
+    </div>
+
+    <div class="timetable-wrapper">
+      <div class="timetable-container">
+
+        <div class="calendar-controls">
+          <button id="prevWeekBtn" class="icon-btn">
+            <span class="material-icons-outlined">chevron_left</span>
+          </button>
+          <h2 id="currentWeekLabel">Loading dates...</h2>
+          <button id="nextWeekBtn" class="icon-btn">
+            <span class="material-icons-outlined">chevron_right</span>
+          </button>
+        </div>
+
+        <div class="week-grid" id="calendarGrid">
+
+          <div class="cell header-time"></div>
+          <div class="cell header-day">Mon <span class="date-sub" id="date-mon"></span></div>
+          <div class="cell header-day">Tue <span class="date-sub" id="date-tue"></span></div>
+          <div class="cell header-day">Wed <span class="date-sub" id="date-wed"></span></div>
+          <div class="cell header-day">Thu <span class="date-sub" id="date-thu"></span></div>
+          <div class="cell header-day">Fri <span class="date-sub" id="date-fri"></span></div>
+
+          <div class="cell header-time" style="grid-row: 2;">08:00</div>
+          <div class="cell header-time" style="grid-row: 3;">09:00</div>
+          <div class="cell header-time" style="grid-row: 4;">10:00</div>
+          <div class="cell header-time" style="grid-row: 5;">11:00</div>
+          <div class="cell header-time" style="grid-row: 6;">12:00</div>
+          <div class="cell header-time" style="grid-row: 7;">13:00</div>
+          <div class="cell header-time" style="grid-row: 8;">14:00</div>
+          <div class="cell header-time" style="grid-row: 9;">15:00</div>
+          <div class="cell header-time" style="grid-row: 10;">16:00</div>
+          <div class="cell header-time" style="grid-row: 11;">17:00</div>
+
+          <div class="cell" style="grid-column: 2; grid-row: 2 / 12;"></div>
+          <div class="cell" style="grid-column: 3; grid-row: 2 / 12;"></div>
+          <div class="cell" style="grid-column: 4; grid-row: 2 / 12;"></div>
+          <div class="cell" style="grid-column: 5; grid-row: 2 / 12;"></div>
+          <div class="cell" style="grid-column: 6; grid-row: 2 / 12;"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <template id="eventTemplate">
+      <div class="event-card">
+        <span class="event-time"></span>
+        <span class="event-title"></span>
+        <span class="event-meta">
+          <span class="material-icons-outlined" style="font-size:12px">place</span>
+          <span class="event-location"></span>
+        </span>
+      </div>
+    </template>
+
+    <button class="fab-create" id="openCreateEventModalBtn">
+      <span class="material-icons-outlined">add</span>
+      Add Event
+    </button>
+
+    <div class="create-modal-overlay" id="createEventModal">
+      <div class="create-modal">
+        <div class="modal-header">
+          <h3>Create an Event</h3>
+          <span class="material-icons-outlined close-modal" id="closeEventModalBtn">close</span>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="eventTitle" placeholder="e.g., Study Session" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="eventLocation" placeholder="e.g., Library" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="eventType">
+              <option value="course">Course</option>
+              <option value="study">Study</option>
+              <option value="exam">Exam</option>
+              <option value="activity">Activity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Start</label>
+            <input type="datetime-local" id="eventStart">
+          </div>
+          <div class="form-group">
+            <label>End</label>
+            <input type="datetime-local" id="eventEnd">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" id="cancelEventBtn">Cancel</button>
+          <button class="btn-create" id="confirmCreateEventBtn">Create</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/navbar.js"></script>
+  <script src="../scripts/timetables.js"></script>
+</body>
+
+</html>

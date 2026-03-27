@@ -25,8 +25,10 @@ class UserRole(str, enum.Enum):
     STUDENT = "student"
 
 class EventType(str, enum.Enum):
-    STUDY = "study_session"
+    STUDY = "study"
     ACTIVITY = "activity"
+    EXAM = "examen"
+    COURSE = "course"
 
 class ResourceCategory(str, enum.Enum):
     LECTURE = "lecture"
