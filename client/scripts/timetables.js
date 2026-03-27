@@ -123,7 +123,7 @@ confirmCreateBtn.addEventListener('click', async () => {
 
     confirmCreateBtn.disabled = true;
 
-    // TODO: API FASTAPI - POST NEW EVENT
+    // TODO: MATCH JS WITH BACKEND
 
     const newEvent = {
         title: title,
@@ -132,6 +132,20 @@ confirmCreateBtn.addEventListener('click', async () => {
         end: endInput,
         location: location
     };
+
+    let res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/events`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(newEvent)
+    });
+
+    if(!res.ok){
+        console.log("issue posting new event");
+        return;
+    }
 
     allEvents.push(newEvent);
     currentDisplayedMonday = getMonday(startDate);
@@ -146,12 +160,61 @@ async function fetchEvents() {
 
     // TODO: API FASTAPI - GET ALL EVENTS => Events + Schedules (.ics) donc 2 appels a faire
 
-    // Remplacer ces données "en dur" par le résultat du fetch API
-    allEvents = [
-        { title: "Graph Theory", type: "course", start: "2026-03-30T08:00:00", end: "2026-03-30T10:00:00", location: "Amphi B" },
-        { title: "Linear Algebra", type: "course", start: "2026-03-31T10:00:00", end: "2026-03-31T12:00:00", location: "Room 204" },
-        { title: "Algebra Revision", type: "study", start: "2026-03-31T14:00:00", end: "2026-03-31T16:00:00", location: "Cafeteria" }
-    ];
+    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/schedules`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.log("issue with getting schedule");
+        return;
+    }
+    const scheduleData= await res.json();
+    scheduleData.forEach(element => {
+        let title=element.title;
+        let type=element.type;
+        let start=element.date;
+        //let end = element.end;
+        let location=element.location;                  //TODO : CHANGE ACCORDING to BACKEND
+        let newElement={
+            title: title,
+            type: type,
+            start: start,
+            end: end,
+            location: location
+        }
+        allEvents.push(newElement);                
+    })
+
+    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${currentGroupId}&skip=0&limit=20`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.log("issue with getting events");
+        return;
+    }
+    const eventsData= await res2.json();
+    eventsData.forEach(element => {
+        let title=element.title;
+        let type=element.type;
+        let start=element.date;
+        //let end = element.end;
+        let location=element.location;                  //TODO : CHANGE ACCORDING to BACKEND
+        let newElement={
+            title: title,
+            type: type,
+            start: start,
+            end: end,
+            location: location
+        }
+        allEvents.push(newElement);                
+    })
 
     refreshWeekView();
 }
