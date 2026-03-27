@@ -37,12 +37,11 @@ uploadBtn.addEventListener('click', async () => {
 });
 
 async function loadRessources() {
-    const currentGroupId = AppState.currentGroupId;
     if (!currentGroupId) return;
 
     ressourcesContainer.innerHTML = "";
 
-    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/resources`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/resources`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -138,7 +137,6 @@ async function downloadFile(btn, fileName) {
 }
 
 async function uploadRessource() {
-    const currentGroupId = AppState.currentGroupId;
     if (!currentGroupId) return;
 
     const file = formFile.files[0];
@@ -155,7 +153,7 @@ async function uploadRessource() {
     const token = localStorage.getItem("token");
 
     try {
-        const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/resources`, {
+        const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/resources`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`
