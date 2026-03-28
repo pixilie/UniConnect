@@ -28,7 +28,7 @@ def get_schedule(
     if current_user.role not in [models.UserRole.ADMIN] and group not in current_user.groups:
         raise HTTPException(status_code=403, detail="You do not have access to this group's schedule")
 
-    if not group.schedule_path == "":
+    if group.schedule_path == "" or not group.schedule_path:
         raise HTTPException(status_code=404, detail=f"No schedule saved for the group {group_id}")
 
     if not os.path.exists(group.schedule_path):
