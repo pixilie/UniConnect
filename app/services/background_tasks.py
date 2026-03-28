@@ -29,14 +29,14 @@ async def deactivate_expired_polls():
                     for choice in poll.choices:
                         vote_count = db.query(models.Vote).filter(models.Vote.choice_id == choice.id).count()
                         percentage = (vote_count / total_votes * 100) if total_votes > 0 else 0
-                        results_text.append(f"- **{choice.text}**: {vote_count} vote(s) ({percentage:.1f}%)")
+                        results_text.append(f"- <strong>{choice.text}</strong>: {vote_count} vote(s) ({percentage:.1f}%)")
 
-                    choices_formatted = "\n".join(results_text)
+                    choices_formatted = "<br>".join(results_text)
 
                     content_str = (
-                        f"The poll '{poll.title}' is now closed.\n\n"
-                        f"**Total Votes:** {total_votes}\n\n"
-                        f"**Results:**\n"
+                        f"The poll '{poll.title}' is now closed.<br><br>"
+                        f"<strong>Total Votes:</strong> {total_votes}<br><br>"
+                        f"<strong>Results:</strong><br>"
                         f"{choices_formatted}"
                     )
 
