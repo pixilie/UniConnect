@@ -86,6 +86,7 @@ function populateAdminGroups(groups) {
             const groupChangeEvent = new CustomEvent("groupChanged", {
                 detail: { newId: group.id.toString() }
             });
+
             document.dispatchEvent(groupChangeEvent);
         });
 
@@ -106,23 +107,25 @@ async function loadStudents() {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.error(`Error while fetching group members: ${res.status}`);
     }
-    else{
-        let data=await res.json();
-        data.forEach(member =>{
-            let newMember={
+    else {
+        let data = await res.json();
+
+        data.forEach(member => {
+            let newMember = {
                 id: member.id,
                 first_name: member.first_name,
                 last_name: member.last_name,
                 email: member.email,
-                role:member.role,
-                color: "#6750A4"               //api call doesnt get color
+                role: member.role,
             }
-            members.push(newMember);           
+            members.push(newMember);
         });
     }
+
     members.forEach(member => renderStudent(member));
 }
 
@@ -132,7 +135,7 @@ function renderStudent(member) {
     const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`.toUpperCase();
     const avatar = studentNode.querySelector('.mini-avatar');
     avatar.textContent = initials;
-    avatar.style.background = member.color || "#6750A4";
+    avatar.style.background = "#6750A4";
 
     const nameSpan = studentNode.querySelector('.student-name');
     nameSpan.textContent = `${member.first_name} ${member.last_name}`;
@@ -146,12 +149,14 @@ function renderStudent(member) {
         nameSpan.after(badge);
 
         const btnRemove = document.createElement('button');
+
         btnRemove.className = "btn-ghost-error";
         btnRemove.textContent = "Remove Delegate";
         btnRemove.onclick = () => promoteToDelegate(member.id, false);
         actionsContainer.appendChild(btnRemove);
     } else {
         const btnPromote = document.createElement('button');
+
         btnPromote.className = "btn-action btn-outline";
         btnPromote.style.fontSize = "11px";
         btnPromote.textContent = "Set Delegate";
@@ -160,13 +165,13 @@ function renderStudent(member) {
     }
 
     const btnKick = document.createElement('button');
+
     btnKick.className = "btn-ghost-error";
     btnKick.style.fontWeight = "bold";
     btnKick.style.marginLeft = "12px";
     btnKick.textContent = "Kick";
     btnKick.onclick = () => kickStudent(member.id);
     actionsContainer.appendChild(btnKick);
-
     studentListContainer.appendChild(studentNode);
 }
 
@@ -248,7 +253,6 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
     btn.disabled = true;
     btn.textContent = "Creating...";
 
-    // TODO: API FASTAPI - POST /groups
     const res = await fetch(`${API_BASE_URL}/groups/`, {
         method: "POST",
         headers: {
@@ -256,14 +260,14 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({
-            name: groupName,
-            schedule_path: ""
+            name: groupName
         })
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.log("issue when creating the new group");
     }
-    else{
+    else {
         closeAllAdminModals();
         btn.disabled = false;
         btn.textContent = "Create";
@@ -277,7 +281,7 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
     btn.disabled = true;
     btn.textContent = "Adding...";
-    // TODO: API FASTAPI - POST /groups/{currentGroupId}/members
+
     const res = await fetch(`${API_BASE_URL}/users?search=${studentEmail}&skip=0&limit=1`, {
         method: "GET",
         headers: {
@@ -285,22 +289,25 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.log("issue with finding the member profile");
         return;
     }
-    let memberID=(await res.json())[0].id;
+
+    let memberID = (await res.json())[0].id;
 
     //get new group id (here assuming we are in the new group)
 
-    const res2= await fetch(`${API_BASE_URL}/users/${memberID}/groups/${AppState.currentGroupId}`,{
+    const res2 = await fetch(`${API_BASE_URL}/users/${memberID}/groups/${AppState.currentGroupId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res2.ok){
+
+    if (!res2.ok) {
         console.log(`issue with adding the member to the group ${(await res2).status}`);
         return;
     }
@@ -323,8 +330,7 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     btn.disabled = true;
     btn.textContent = "Posting...";
 
-    // TODO: API FASTAPI - POST /groups/{currentGroupId}/announcements
-    const res=await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -336,7 +342,8 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
             urgent: isUrgent
         })
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.log("issue creating new annoucement");
         return;
     }
@@ -345,8 +352,10 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     document.getElementById('announcementTitle').value = '';
     document.getElementById('announcementText').value = '';
     document.getElementById('announcementUrgent').checked = false;
+
     btn.disabled = false;
     btn.textContent = "Post to Class";
+
     alert("Announcement posted successfully!");
 });
 
@@ -361,7 +370,6 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
     const formData = new FormData();
     formData.append("file", fileInput);
 
-    // TODO: API FASTAPI - POST /groups/{currentGroupId}/timetable
     await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
         method: "POST",
         headers: {
@@ -370,7 +378,8 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
         },
         body: formData
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         console.log("issue with uploading new schedule");
         return;
     }
@@ -393,9 +402,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
     btn.disabled = true;
     btn.textContent = "Creating...";
 
-    console.log(start);
-    // TODO: API FASTAPI - POST /groups/{currentGroupId}/events
-    const res=await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/events`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/events`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -410,7 +417,8 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
             location: location
         })
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         const error = await res.json();
         console.log("FULL ERROR:", error);
         return;
@@ -433,7 +441,6 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     btn.disabled = true;
     btn.textContent = "Starting...";
 
-    // TODO: API FASTAPI - POST /groups/{currentGroupId}/polls
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
         headers: {
@@ -482,25 +489,20 @@ async function promoteToDelegate(studentId, isPromoting) {
     const actionText = isPromoting ? "promote this student to Delegate" : "remove Delegate status";
     if (!confirm(`Are you sure you want to ${actionText}?`)) return;
 
-    // TODO: API FASTAPI - PATCH /groups/{currentGroupId}/members/{studentId}/role
-
     const newRole = isPromoting ? "delegate" : "student";
-    const res= await fetch(`${API_BASE_URL}/users/${studentId}/role`,{
+    const res = await fetch(`${API_BASE_URL}/users/${studentId}/role?role=${newRole}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: JSON.stringify({
-            role: newRole
-        })
+        }
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         const error = await res.json();
         console.log("FULL ERROR:", error);
         return;
     }
-
 
     loadStudents();
 }
@@ -508,16 +510,15 @@ async function promoteToDelegate(studentId, isPromoting) {
 async function kickStudent(studentId) {
     if (!confirm("Are you sure you want to kick this student from the group?")) return;
 
-    // TODO: API FASTAPI - DELETE /groups/{currentGroupId}/members/{studentId}
-    const res= await fetch(`${API_BASE_URL}/users/${studentId}`,{
+    const res = await fetch(`${API_BASE_URL}/users/${studentId}/groups/${AppState.currentGroupId}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     });
-    if(!res.ok){
-        console.log("issue when changing role");
+    if (!res.ok) {
+        console.log("issue when kicking user");
         return;
     }
 
