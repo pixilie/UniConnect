@@ -96,10 +96,33 @@ function populateAdminGroups(groups) {
 async function loadStudents() {
     if (!AppState.currentGroupId) return;
 
-    studentListContainer.innerHTML = '';
-
-    // TODO: API FASTAPI - GET /groups/{AppState.currentGroupId}/members
     const members = [];
+
+    studentListContainer.innerHTML = '';
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/members`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.error(`Error while fetching group members: ${res.status}`);
+    }
+    else{
+        let data=await res.json();
+        data.forEach(member =>{
+            let newMember={
+                id: member.id,
+                first_name: member.first_name,
+                last_name: member.last_name,
+                email: member.email,
+                role:member.role,
+                color: "#6750A4"               //api call doesnt get color
+            }
+            members.push(newMember);           
+        });
+    }
     members.forEach(member => renderStudent(member));
 }
 
@@ -226,10 +249,25 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
     btn.textContent = "Creating...";
 
     // TODO: API FASTAPI - POST /groups
-
-    closeAllAdminModals();
-    btn.disabled = false;
-    btn.textContent = "Create";
+    const res = await fetch(`${API_BASE_URL}/groups/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            name: groupName,
+            schedule_path: ""
+        })
+    });
+    if(!res.ok){
+        console.log("issue when creating the new group");
+    }
+    else{
+        closeAllAdminModals();
+        btn.disabled = false;
+        btn.textContent = "Create";
+    }
 });
 
 document.getElementById('confirmAddStudentBtn').addEventListener('click', async () => {
@@ -239,8 +277,33 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
     btn.disabled = true;
     btn.textContent = "Adding...";
-
     // TODO: API FASTAPI - POST /groups/{currentGroupId}/members
+    const res = await fetch(`${API_BASE_URL}/users?search=${studentEmail}&skip=0&limit=1`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.log("issue with finding the member profile");
+        return;
+    }
+    let memberID=(await res.json())[0].id;
+
+    //get new group id (here assuming we are in the new group)
+
+    const res2= await fetch(`${API_BASE_URL}/users/${memberID}/groups/${AppState.currentGroupId}`,{
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res2.ok){
+        console.log(`issue with adding the member to the group ${(await res2).status}`);
+        return;
+    }
 
     closeAllAdminModals();
     btn.disabled = false;
@@ -261,6 +324,23 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     btn.textContent = "Posting...";
 
     // TODO: API FASTAPI - POST /groups/{currentGroupId}/announcements
+    const res=await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            title: title,
+            content: message,
+            urgent: isUrgent
+        })
+    });
+    if(!res.ok){
+        console.log("issue creating new annoucement");
+        return;
+    }
+
 
     document.getElementById('announcementTitle').value = '';
     document.getElementById('announcementText').value = '';
@@ -282,6 +362,18 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
     formData.append("file", fileInput);
 
     // TODO: API FASTAPI - POST /groups/{currentGroupId}/timetable
+    await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: formData
+    });
+    if(!res.ok){
+        console.log("issue with uploading new schedule");
+        return;
+    }
 
     closeAllAdminModals();
     btn.disabled = false;
@@ -301,7 +393,29 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
     btn.disabled = true;
     btn.textContent = "Creating...";
 
+    console.log(start);
     // TODO: API FASTAPI - POST /groups/{currentGroupId}/events
+    const res=await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/events`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            title: title,
+            description: "",
+            start: new Date(start).toISOString(),
+            end: new Date(end).toISOString(),
+            type: type,
+            location: location
+        })
+    });
+    if(!res.ok){
+        const error = await res.json();
+        console.log("FULL ERROR:", error);
+        return;
+    }
+
 
     closeAllAdminModals();
     btn.disabled = false;
@@ -320,6 +434,44 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     btn.textContent = "Starting...";
 
     // TODO: API FASTAPI - POST /groups/{currentGroupId}/polls
+    let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            title: title
+        })
+    });
+
+    if (!res.ok) {
+        console.log("issue when creating new poll");
+        return;
+    }
+
+    let pollData = await res.json();
+    let pollID = pollData.id;
+
+    optionsArray.forEach(async (option) => {
+        let res = await fetch(`${API_BASE_URL}/polls/${pollID}/choices`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({
+                text: option,
+                manifesto: "",
+                photo_url: ""
+            })
+        });
+
+        if (!res.ok) {
+            console.log("issue when adding a new option");
+            return;
+        }
+    })
 
     closeAllAdminModals();
     btn.disabled = false;
@@ -332,6 +484,24 @@ async function promoteToDelegate(studentId, isPromoting) {
 
     // TODO: API FASTAPI - PATCH /groups/{currentGroupId}/members/{studentId}/role
 
+    const newRole = isPromoting ? "delegate" : "student";
+    const res= await fetch(`${API_BASE_URL}/users/${studentId}/role`,{
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+            role: newRole
+        })
+    });
+    if(!res.ok){
+        const error = await res.json();
+        console.log("FULL ERROR:", error);
+        return;
+    }
+
+
     loadStudents();
 }
 
@@ -339,6 +509,17 @@ async function kickStudent(studentId) {
     if (!confirm("Are you sure you want to kick this student from the group?")) return;
 
     // TODO: API FASTAPI - DELETE /groups/{currentGroupId}/members/{studentId}
+    const res= await fetch(`${API_BASE_URL}/users/${studentId}`,{
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+    if(!res.ok){
+        console.log("issue when changing role");
+        return;
+    }
 
     loadStudents();
 }
