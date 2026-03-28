@@ -125,6 +125,7 @@ function addPoll(title, options, pollID, voted, votedID) {
 
     const optionsList = pollNode.querySelector('.options-list');
 
+    let selectedOptionObject=null;
     options.forEach(option => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
         optionNode.querySelector('.option-title').textContent = option.text;
@@ -137,11 +138,12 @@ function addPoll(title, options, pollID, voted, votedID) {
         }
         else {
             if (option.id == votedID) {
-                let selectedOptionObject = optionNode;
+                selectedOptionObject = optionNode;
             }
         }
         optionsList.appendChild(optionNode);
     });
+    if(selectedOptionObject)selectOption(selectedOptionObject);
 
     pollNode.querySelector('.confirm-btn').addEventListener('click', function () {
         submitVote(this);
@@ -186,7 +188,7 @@ async function getPolls() {
     let data = await res.json();
 
     data.forEach(poll => {
-        if (poll.is_active) addPoll(poll.title, poll.choices, poll.id, poll.has_voted, 0);
+        if (poll.is_active) addPoll(poll.title, poll.choices, poll.id, poll.has_voted, poll.choice_selected);
     })
 }
 
