@@ -2,8 +2,6 @@ from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
-from app.models.models import UserRole
-
 
 class Group(BaseModel):
     id: int
@@ -31,6 +29,3 @@ class UserUpdateProfile(BaseModel):
 class UserUpdatePassword(BaseModel):
     old_password: str
     new_password: str
-
-class UserRoleUpdate(BaseModel):
-    role: UserRole

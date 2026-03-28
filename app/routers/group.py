@@ -67,15 +67,20 @@ def create_group(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != models.UserRole.ADMIN.value:
+    if current_user.role != models.UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only administrators can create groups")
 
-    new_group = models.Group (
-        name = group_name,
-        schedule_path = None
+    new_group = models.Group(
+        name=group_name,
+        schedule_path=None
     )
-
     db.add(new_group)
+
+    admins = db.query(models.User).filter(models.User.role == models.UserRole.ADMIN).all()
+
+    for admin in admins:
+        admin.groups.append(new_group)
+
     db.commit()
     db.refresh(new_group)
 
