@@ -23,6 +23,7 @@ postNewPollBtn.addEventListener("click", async () => {
     if (!title || !formOptions.value) return alert("Please fill in the title and options.");
     const options = formOptions.value.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
     formOptions.value = "";
+
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
         headers: {
@@ -62,7 +63,10 @@ postNewPollBtn.addEventListener("click", async () => {
         }
     })
 
-    await getPolls();
+    setTimeout(async () => {
+        await getPolls();
+    }, 100);
+
     closeModal();
 })
 
@@ -107,15 +111,16 @@ async function submitVote(btn) {
     successView.style.display = 'flex';
 }
 
-function addPoll(title, options, pollID, voted,votedID) {
+function addPoll(title, options, pollID, voted, votedID) {
     const pollNode = pollTemplate.content.cloneNode(true).firstElementChild;
 
     pollNode.querySelector('.poll-title').textContent = title;
     pollNode.dataset.id = pollID;
-    if(voted){
-        pollNode.querySelector(`.timer-badge`).textContent="Voted";
-        pollNode.querySelector(`.timer-badge`).style.color="green";
-        pollNode.querySelector(`.timer-badge`).style.backgroundColor="#79ff58";
+
+    if (voted) {
+        pollNode.querySelector(`.timer-badge`).textContent = "Voted";
+        pollNode.querySelector(`.timer-badge`).style.color = "green";
+        pollNode.querySelector(`.timer-badge`).style.backgroundColor = "#79ff58";
     }
 
     const optionsList = pollNode.querySelector('.options-list');
@@ -125,24 +130,24 @@ function addPoll(title, options, pollID, voted,votedID) {
         optionNode.querySelector('.option-title').textContent = option.text;
         optionNode.dataset.id = option.id;
 
-        if(!voted){
+        if (!voted) {
             optionNode.addEventListener('click', function () {
                 selectOption(this);
             });
         }
-        else{
-            if(option.id==votedID){
-                let selectedOptionObject=optionNode;
+        else {
+            if (option.id == votedID) {
+                let selectedOptionObject = optionNode;
             }
         }
         optionsList.appendChild(optionNode);
-
     });
 
     pollNode.querySelector('.confirm-btn').addEventListener('click', function () {
         submitVote(this);
     });
-    if(voted){
+
+    if (voted) {
         pollNode.querySelector('.confirm-btn').remove();
     }
     //selectOption(selectedOptionObject); // pas sur si ca marche
@@ -181,7 +186,7 @@ async function getPolls() {
     let data = await res.json();
 
     data.forEach(poll => {
-        if (poll.is_active) addPoll(poll.title, poll.choices, poll.id,poll.has_voted,0);
+        if (poll.is_active) addPoll(poll.title, poll.choices, poll.id, poll.has_voted, 0);
     })
 }
 

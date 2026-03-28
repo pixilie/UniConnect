@@ -27,12 +27,13 @@ def get_polls(
         return []
 
     poll_ids = [poll.id for poll in polls]
-    user_votes = db.query(models.Vote.poll_id).filter(
+
+    user_votes = db.query(models.Vote.poll_id, models.Vote.choice_id).filter(
         models.Vote.user_id == current_user.id,
         models.Vote.poll_id.in_(poll_ids)
     ).all()
 
-    voted_poll_ids = {vote[0] for vote in user_votes}
+    voted_polls_map = {vote[0]: vote[1] for vote in user_votes}
 
     response_polls = []
     for poll in polls:
@@ -44,7 +45,8 @@ def get_polls(
             "expires_at": poll.expires_at,
             "created_at": poll.created_at,
             "group_id": poll.group_id,
-            "has_voted": poll.id in voted_poll_ids
+            "has_voted": poll.id in voted_polls_map,
+            "choice_selected": voted_polls_map.get(poll.id, -1)
         }
         response_polls.append(poll_dict)
 
@@ -74,6 +76,10 @@ def create_poll(
     db.add(new_poll)
     db.commit()
     db.refresh(new_poll)
+
+    new_poll.has_voted = False
+    new_poll.choice_selected = -1
+
     return new_poll
 
 
