@@ -27,15 +27,13 @@ def get_event(
 
     if event_id:
         query = query.filter(models.Event.id == event_id)
-
-    if not query.first():
-        raise HTTPException(status_code=404, detail=f"Event {event_id} not found")
+        if not query.first():
+            raise HTTPException(status_code=404, detail=f"Event {event_id} not found")
 
     if group_id:
-        query = query.filter(models.Group.id == group_id)
-
-    if not query.first():
-        raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
+        query = query.filter(models.Event.group_id == group_id)
+        if not query.first() and not event_id:
+            pass
 
     return query.offset(skip).limit(limit).all()
 
@@ -53,16 +51,19 @@ def create_event(
             raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
-
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    (address, latitude, longitude) = get_coordinates(event_data.location) if event_data.location else None, None, None
+    if event_data.location:
+        address, latitude, longitude = get_coordinates(event_data.location)
+    else:
+        address, latitude, longitude = None, None, None
 
     new_event = models.Event(
         title = event_data.title,
-        description = event_data.description,
-        date = event_data.date,
+        description = getattr(event_data, 'description', None),
+        start = event_data.start,
+        end = event_data.end,
         location = address,
         latitude = latitude,
         longitude = longitude,
@@ -95,10 +96,11 @@ def update_event(
 
     updated_data = event_data.model_dump(exclude_unset=True)
     for key, value in updated_data.items():
-        setattr(event, key, value)
+        if key != "location":
+            setattr(event, key, value)
 
     if event_data.location:
-        (address, latitude, longitude) = get_coordinates(event_data.location)
+        address, latitude, longitude = get_coordinates(event_data.location)
         if address and latitude and longitude:
             event.location = address
             event.latitude = latitude

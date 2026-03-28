@@ -18,7 +18,8 @@ class Event(BaseModel):
     id: int
     title: str
     description: str
-    date: datetime
+    start: datetime
+    end: datetime
     type: str
     location: Optional[str] = None
     latitude: Optional[float] = None
@@ -29,13 +30,15 @@ class Event(BaseModel):
 class NewEvent(BaseModel):
     title: str
     description: str
-    date: datetime
+    start: datetime
+    end: datetime
     type: str
     location: Optional[str] = None
 
 class UpdateEvent(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    date: Optional[datetime] = None
+    start: Optional[datetime] = None
+    end: datetime
     type: Optional[str] = None
     location: Optional[str] = None
