@@ -27,12 +27,12 @@ function formatShortDate(date) {
 }
 
 function updateCalendarHeaders() {
-    let friday = new Date(currentDisplayedMonday);
-    friday.setDate(currentDisplayedMonday.getDate() + 4);
+    let sunday = new Date(currentDisplayedMonday);
+    sunday.setDate(currentDisplayedMonday.getDate() + 6);
 
-    currentWeekLabel.textContent = `${formatShortDate(currentDisplayedMonday)} - ${formatShortDate(friday)}, ${currentDisplayedMonday.getFullYear()}`;
+    currentWeekLabel.textContent = `${formatShortDate(currentDisplayedMonday)} - ${formatShortDate(sunday)}, ${currentDisplayedMonday.getFullYear()}`;
 
-    const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     days.forEach((dayId, index) => {
         let d = new Date(currentDisplayedMonday);
         d.setDate(currentDisplayedMonday.getDate() + index);
@@ -53,21 +53,20 @@ function renderEventCard(evt) {
     if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) return;
 
     const dayIndex = startDate.getDay();
-    if (dayIndex === 0 || dayIndex === 6) return;
-    const gridColumn = dayIndex + 1;
+    const gridColumn = (dayIndex === 0) ? 8 : dayIndex + 1;
 
     const startHour = startDate.getHours();
-    if (startHour < 8 || startHour >= 18) return;
-    const gridRowStart = startHour - 6;
+
+    const gridRowStart = startHour + 2;
 
     let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
     if (durationHours < 1) durationHours = 1;
 
     let gridRowEnd = gridRowStart + durationHours;
-    if (gridRowEnd > 12) gridRowEnd = 12;
+    if (gridRowEnd > 26) gridRowEnd = 26;
 
     const eventNode = eventTemplate.content.cloneNode(true).firstElementChild;
-    eventNode.classList.add(`type-${evt.type}`);
+    eventNode.classList.add(`type-${evt.type.toLowerCase()}`);
 
     eventNode.style.gridColumn = gridColumn;
     eventNode.style.gridRow = `${gridRowStart} / ${gridRowEnd}`;
@@ -75,6 +74,16 @@ function renderEventCard(evt) {
     eventNode.querySelector('.event-time').textContent = `${startHour}:00 - ${startHour + durationHours}:00`;
     eventNode.querySelector('.event-title').textContent = evt.title;
     eventNode.querySelector('.event-location').textContent = evt.location || "TBD";
+
+    eventNode.addEventListener('click', () => {
+        document.getElementById('viewEventTitle').textContent = evt.title;
+        document.getElementById('viewEventTime').textContent = `${formatShortDate(startDate)} • ${startHour}:00 - ${startHour + durationHours}:00`;
+        document.getElementById('viewEventLocation').textContent = evt.location || "No location";
+        document.getElementById('viewEventType').textContent = evt.type;
+        document.getElementById('viewEventDescription').textContent = evt.description || "No description provided.";
+
+        document.getElementById('viewEventModal').classList.add('active');
+    });
 
     calendarGrid.appendChild(eventNode);
 }
@@ -95,9 +104,23 @@ nextWeekBtn.addEventListener('click', () => {
     refreshWeekView();
 });
 
+const closeViewModalBtn = document.getElementById('closeViewEventModalBtn');
+const viewEventModal = document.getElementById('viewEventModal');
+
+closeViewModalBtn.addEventListener('click', () => {
+    viewEventModal.classList.remove('active');
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('create-modal-overlay')) {
+        viewEventModal.classList.remove('active');
+    }
+});
+
 const closeModal = () => {
     createModal.classList.remove('active');
     document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDescription').value = '';
     document.getElementById('eventLocation').value = '';
     document.getElementById('eventStart').value = '';
     document.getElementById('eventEnd').value = '';
@@ -109,6 +132,7 @@ cancelEventBtn.addEventListener('click', closeModal);
 
 confirmCreateBtn.addEventListener('click', async () => {
     const title = document.getElementById('eventTitle').value.trim();
+    const description = document.getElementById('eventDescription').value.trim();
     const startInput = document.getElementById('eventStart').value;
     const endInput = document.getElementById('eventEnd').value;
     const type = document.getElementById('eventType').value;
@@ -123,11 +147,9 @@ confirmCreateBtn.addEventListener('click', async () => {
 
     confirmCreateBtn.disabled = true;
 
-    // TODO: MATCH JS WITH BACKEND
-
     const newEvent = {
         title: title,
-        description: "",
+        description: description,
         start: startInput,
         end: endInput,
         type: type,
@@ -158,63 +180,52 @@ confirmCreateBtn.addEventListener('click', async () => {
 async function fetchEvents() {
     if (!AppState.currentGroupId) return;
 
-    // TODO: API FASTAPI - GET ALL EVENTS => Events + Schedules (.ics) donc 2 appels a faire
+    allEvents = [];
 
-    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
-    });
-    if (!res.ok) {
-        console.log("issue with getting schedule");
-        return;
-    }
-    const scheduleData = await res.json();
-    scheduleData.forEach(element => {
-        let title = element.title;
-        let type = element.type;
-        let start = element.date;
-        let end = element.end;
-        let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
-        let newElement = {
-            title: title,
-            type: type,
-            start: start,
-            end: end,
-            location: location
-        }
-        allEvents.push(newElement);
-    })
+    try {
+        const resIcs = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+        });
 
-    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${AppState.currentGroupId}&skip=0&limit=100`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        if (resIcs.ok) {
+            const scheduleData = await resIcs.text();
+            // TODO: Parser l'ICS
+        } else {
+            console.log("No schedule saved for this group yet.");
         }
-    });
-    if (!res.ok) {
-        console.log("issue with getting events");
-        return;
+    } catch (error) {
+        console.error("Failed to fetch schedule:", error);
     }
-    const eventsData = await res2.json();
-    eventsData.forEach(element => {
-        let title = element.title;
-        let type = element.type;
-        let start = element.date;
-        let end = element.end;
-        let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
-        let newElement = {
-            title: title,
-            type: type,
-            start: start,
-            end: end,
-            location: location
+
+    try {
+        const resDb = await fetch(`${API_BASE_URL}/events?group_id=${AppState.currentGroupId}&skip=0&limit=100`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (resDb.ok) {
+            const eventsData = await resDb.json();
+            eventsData.forEach(element => {
+                let newElement = {
+                    title: element.title,
+                    description: element.description,
+                    type: element.type,
+                    start: element.start,
+                    end: element.end,
+                    location: element.location
+                }
+                allEvents.push(newElement);
+            });
+        } else {
+            console.log("Issue with getting events from DB.");
         }
-        allEvents.push(newElement);
-    })
+    } catch (error) {
+        console.error("Failed to fetch events from DB:", error);
+    }
 
     refreshWeekView();
 }

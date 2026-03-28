@@ -10,7 +10,7 @@ from app.services.geocoding import get_coordinates
 
 events_router = APIRouter()
 
-@events_router.get("/events/", response_model=List[schemas.Event])
+@events_router.get("/events", response_model=List[schemas.Event])
 def get_event(
     event_id: Optional[int] = None,
     group_id: Optional[int] = None,
