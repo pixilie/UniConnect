@@ -370,10 +370,9 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
     const formData = new FormData();
     formData.append("file", fileInput);
 
-    await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: formData
@@ -511,7 +510,7 @@ async function kickStudent(studentId) {
     if (!confirm("Are you sure you want to kick this student from the group?")) return;
 
     const res = await fetch(`${API_BASE_URL}/users/${studentId}/groups/${AppState.currentGroupId}`, {
-        method: "DELETE",
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`

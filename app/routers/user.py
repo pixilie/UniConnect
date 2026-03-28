@@ -73,6 +73,10 @@ def toggle_user_group(
         raise HTTPException(status_code=403, detail="Only administrators can assign groups")
 
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if target_user == current_user:
+        raise HTTPException(status_code=403, detail="You can't kick yourself")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not target_user:
