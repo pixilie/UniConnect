@@ -20,11 +20,9 @@ postNewPollBtn.addEventListener("click", async () => {
     let title = formQuestion.value;
     formQuestion.value = "";
 
-    let options = formOptions.value.split(',');
+    if (!title || !formOptions.value) return alert("Please fill in the title and options.");
+    const options = formOptions.value.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
     formOptions.value = "";
-
-    if (title == "" || options.length <= 1) return;
-
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
         headers: {
