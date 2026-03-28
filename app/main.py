@@ -1,18 +1,28 @@
-from fastapi import Depends, FastAPI, HTTPException
+import asyncio
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import text
-from sqlalchemy.orm import Session
 
 from app import routers
-from app.db.database import get_db
+from app.services import deactivate_expired_polls
 
 from .db.database import Base, engine
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting background tasks...")
+    task = asyncio.create_task(deactivate_expired_polls())
+    yield
+    print("Shutting down background tasks...")
+    task.cancel()
+
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan, title="UniConnect API")
 
 app.add_middleware(
     CORSMiddleware,

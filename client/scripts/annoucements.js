@@ -9,6 +9,7 @@ const formContent = document.getElementById("message-input");
 const formUrgent = document.getElementById("urgency-input");
 const sendBtn = document.getElementById("postBtn");
 
+
 async function LoadAnnoucements() {
     displayBox.innerHTML = "";
 
@@ -66,7 +67,7 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
     annoucementsNode.querySelector(".announcement-user").textContent = `${first_name} ${last_name}`;
     annoucementsNode.querySelector(".announcement-date").textContent = formattedDate;
     annoucementsNode.querySelector(".annoucement-title").textContent = title;
-    annoucementsNode.querySelector(".announcement-content").textContent = content;
+    annoucementsNode.querySelector(".announcement-content").innerHTML = content;
     annoucementsNode.querySelector(".announcement-role").textContent = role.toUpperCase();
 
     if (urgent) annoucementsNode.classList.add("urgent");
