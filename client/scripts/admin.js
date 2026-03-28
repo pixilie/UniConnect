@@ -46,10 +46,9 @@ async function loadAdminData() {
 
         adminUserName.textContent = `${profileData.first_name} ${profileData.last_name}`;
         adminUserAvatar.textContent = `${profileData.first_name.charAt(0)}${profileData.last_name.charAt(0)}`.toUpperCase();
-        adminUserRole.textContent = profileData.role === "teacher" ? "Admin" : profileData.role;
+        adminUserRole.textContent = profileData.role === "teacher" ? "administrator" : profileData.role;
 
         populateAdminGroups(profileData.groups);
-
     } catch (error) {
         console.error("Error loading admin data:", error);
     }
@@ -100,13 +99,7 @@ async function loadStudents() {
     studentListContainer.innerHTML = '';
 
     // TODO: API FASTAPI - GET /groups/{AppState.currentGroupId}/members
-    // Remplace members par le tableau renvoyé par l'API
-    const members = [
-        { id: 1, first_name: "John", last_name: "Doe", email: "john@uni.edu", role: "delegate", color: "#6750A4" },
-        { id: 2, first_name: "Sophie", last_name: "Dubourg", email: "sophie@uni.edu", role: "student", color: "#FFB74D" },
-        { id: 3, first_name: "Marc", last_name: "Dupont", email: "marc@uni.edu", role: "student", color: "#4CAF50" }
-    ];
-
+    const members = [];
     members.forEach(member => renderStudent(member));
 }
 
@@ -158,16 +151,20 @@ function renderStudent(member) {
 const btnCreateGroup = document.getElementById('btnCreateGroup');
 const btnAddStudent = document.getElementById('btnAddStudentBtn');
 const btnUpdateTimetable = document.getElementById('btnUpdateTimetable');
+const btnAddEventBtn = document.getElementById('btnAddEventBtn');
 const btnStartElection = document.getElementById('btnStartElection');
+
 const createGroupModal = document.getElementById('createGroupModal');
 const addStudentModal = document.getElementById('addStudentModal');
 const updateTimetableModal = document.getElementById('updateTimetableModal');
+const addEventModal = document.getElementById('addEventModal');
 const startElectionModal = document.getElementById('startElectionModal');
 
 const closeAllAdminModals = () => {
     createGroupModal.classList.remove('active');
     addStudentModal.classList.remove('active');
     updateTimetableModal.classList.remove('active');
+    addEventModal.classList.remove('active');
     startElectionModal.classList.remove('active');
 
     document.getElementById('newGroupName').value = '';
@@ -175,6 +172,10 @@ const closeAllAdminModals = () => {
     document.getElementById('timetableFile').value = '';
     document.getElementById('electionTitle').value = '';
     document.getElementById('electionOptions').value = '';
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventLocation').value = '';
+    document.getElementById('eventStart').value = '';
+    document.getElementById('eventEnd').value = '';
 };
 
 btnCreateGroup.addEventListener('click', () => createGroupModal.classList.add('active'));
@@ -189,6 +190,11 @@ btnUpdateTimetable.addEventListener('click', () => {
     updateTimetableModal.classList.add('active');
 });
 
+btnAddEventBtn.addEventListener('click', () => {
+    if (!AppState.currentGroupId) return alert("Select a group first.");
+    addEventModal.classList.add('active');
+});
+
 btnStartElection.addEventListener('click', () => {
     if (!AppState.currentGroupId) return alert("Select a group first.");
     startElectionModal.classList.add('active');
@@ -200,6 +206,8 @@ document.getElementById('closeStudentModalBtn').addEventListener('click', closeA
 document.getElementById('cancelStudentBtn').addEventListener('click', closeAllAdminModals);
 document.getElementById('closeTimetableModalBtn').addEventListener('click', closeAllAdminModals);
 document.getElementById('cancelTimetableBtn').addEventListener('click', closeAllAdminModals);
+document.getElementById('closeEventModalBtn').addEventListener('click', closeAllAdminModals);
+document.getElementById('cancelEventBtn').addEventListener('click', closeAllAdminModals);
 document.getElementById('closeElectionModalBtn').addEventListener('click', closeAllAdminModals);
 document.getElementById('cancelElectionBtn').addEventListener('click', closeAllAdminModals);
 
@@ -226,14 +234,13 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
 
 document.getElementById('confirmAddStudentBtn').addEventListener('click', async () => {
     const studentEmail = document.getElementById('newStudentEmail').value.trim();
-    const role = document.getElementById('newStudentRole').value;
     if (!studentEmail) return alert("Please enter the student's email.");
     const btn = document.getElementById('confirmAddStudentBtn');
 
     btn.disabled = true;
     btn.textContent = "Adding...";
 
-    // TODO: API FASTAPI - POST
+    // TODO: API FASTAPI - POST /groups/{currentGroupId}/members
 
     closeAllAdminModals();
     btn.disabled = false;
@@ -242,19 +249,22 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 });
 
 document.getElementById('btnPostAnnouncement').addEventListener('click', async () => {
-    const textArea = document.getElementById('announcementText');
-    const message = textArea.value.trim();
+    const title = document.getElementById('announcementTitle').value.trim();
+    const message = document.getElementById('announcementText').value.trim();
+    const isUrgent = document.getElementById('announcementUrgent').checked;
     const btn = document.getElementById('btnPostAnnouncement');
 
-    if (!message) return alert("Please write a message before posting.");
+    if (!title || !message) return alert("Please write a title and a message.");
     if (!AppState.currentGroupId) return alert("Please select a group first.");
 
     btn.disabled = true;
     btn.textContent = "Posting...";
 
-    // TODO: API FASTAPI - POST
+    // TODO: API FASTAPI - POST /groups/{currentGroupId}/announcements
 
-    textArea.value = '';
+    document.getElementById('announcementTitle').value = '';
+    document.getElementById('announcementText').value = '';
+    document.getElementById('announcementUrgent').checked = false;
     btn.disabled = false;
     btn.textContent = "Post to Class";
     alert("Announcement posted successfully!");
@@ -271,11 +281,31 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
     const formData = new FormData();
     formData.append("file", fileInput);
 
-    // TODO: API FASTAPI - POST
+    // TODO: API FASTAPI - POST /groups/{currentGroupId}/timetable
 
     closeAllAdminModals();
     btn.disabled = false;
     btn.textContent = "Upload";
+});
+
+document.getElementById('confirmAddEventBtn').addEventListener('click', async () => {
+    const title = document.getElementById('eventTitle').value.trim();
+    const location = document.getElementById('eventLocation').value.trim();
+    const type = document.getElementById('eventType').value;
+    const start = document.getElementById('eventStart').value;
+    const end = document.getElementById('eventEnd').value;
+    const btn = document.getElementById('confirmAddEventBtn');
+
+    if (!title || !start || !end) return alert("Please fill in title, start, and end times.");
+
+    btn.disabled = true;
+    btn.textContent = "Creating...";
+
+    // TODO: API FASTAPI - POST /groups/{currentGroupId}/events
+
+    closeAllAdminModals();
+    btn.disabled = false;
+    btn.textContent = "Create Event";
 });
 
 document.getElementById('confirmStartElectionBtn').addEventListener('click', async () => {
@@ -289,10 +319,9 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     btn.disabled = true;
     btn.textContent = "Starting...";
 
-    // TODO: API FASTAPI - POST
+    // TODO: API FASTAPI - POST /groups/{currentGroupId}/polls
 
     closeAllAdminModals();
-
     btn.disabled = false;
     btn.textContent = "Start";
 });
@@ -301,7 +330,7 @@ async function promoteToDelegate(studentId, isPromoting) {
     const actionText = isPromoting ? "promote this student to Delegate" : "remove Delegate status";
     if (!confirm(`Are you sure you want to ${actionText}?`)) return;
 
-    // TODO: API FASTAPI - PATCH
+    // TODO: API FASTAPI - PATCH /groups/{currentGroupId}/members/{studentId}/role
 
     loadStudents();
 }
@@ -309,7 +338,7 @@ async function promoteToDelegate(studentId, isPromoting) {
 async function kickStudent(studentId) {
     if (!confirm("Are you sure you want to kick this student from the group?")) return;
 
-    // TODO: API FASTAPI
+    // TODO: API FASTAPI - DELETE /groups/{currentGroupId}/members/{studentId}
 
     loadStudents();
 }

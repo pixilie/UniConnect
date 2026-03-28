@@ -49,8 +49,14 @@
         <div class="card-header">
           <span class="material-icons-outlined">campaign</span> Post Announcement
         </div>
+        <input type="text" id="announcementTitle" class="form-input" placeholder="Announcement Title" autocomplete="off">
         <textarea id="announcementText" placeholder="Write an update for this class..."></textarea>
-        <button class="btn-action btn-primary" id="btnPostAnnouncement">Post to Class</button>
+        <div class="announcement-footer">
+          <label class="urgent-label">
+            <input type="checkbox" id="announcementUrgent"> Urgent
+          </label>
+          <button class="btn-action btn-primary" id="btnPostAnnouncement">Post to Class</button>
+        </div>
       </div>
 
       <div class="teacher-card">
@@ -59,7 +65,8 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn-action btn-outline" id="btnUpdateTimetable"><span class="material-icons-outlined">upload_file</span> Update Timetable</button>
-          <button class="btn-action btn-outline" id="btnStartElection"><span class="material-icons-outlined">how_to_vote</span> Start Election / Poll</button>
+          <button class="btn-action btn-outline" id="btnAddEventBtn"><span class="material-icons-outlined">event</span> Add Event</button>
+          <button class="btn-action btn-outline" id="btnStartElection"><span class="material-icons-outlined">how_to_vote</span> Start Poll</button>
         </div>
       </div>
 
@@ -104,8 +111,6 @@
             <label>Student Email</label>
             <input type="email" id="newStudentEmail" placeholder="student@university.edu" autocomplete="off">
           </div>
-          <div class="form-group">
-          </div>
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" id="cancelStudentBtn">Cancel</button>
@@ -129,6 +134,46 @@
         <div class="modal-footer">
           <button class="btn-cancel" id="cancelTimetableBtn">Cancel</button>
           <button class="btn-create" id="confirmUpdateTimetableBtn">Upload</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="create-modal-overlay" id="addEventModal">
+      <div class="create-modal">
+        <div class="modal-header">
+          <h3>Add Event</h3>
+          <span class="material-icons-outlined close-modal" id="closeEventModalBtn">close</span>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="eventTitle" placeholder="e.g., Study Session" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="eventLocation" placeholder="e.g., Library" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="eventType">
+              <option value="course">Course</option>
+              <option value="study">Study</option>
+              <option value="exam">Exam</option>
+              <option value="activity">Activity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Start</label>
+            <input type="datetime-local" id="eventStart">
+          </div>
+          <div class="form-group">
+            <label>End</label>
+            <input type="datetime-local" id="eventEnd">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" id="cancelEventBtn">Cancel</button>
+          <button class="btn-create" id="confirmAddEventBtn">Create Event</button>
         </div>
       </div>
     </div>
