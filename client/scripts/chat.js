@@ -123,7 +123,6 @@ document.addEventListener("groupChanged", async (e) => {
     await LoadMessages();
 });
 
-// If user is currently in a group => load everything
 if (AppState.currentGroupId) {
     setTimeout(() => {
         WSConnect();

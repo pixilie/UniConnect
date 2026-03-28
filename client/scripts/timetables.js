@@ -1,1 +1,260 @@
 requireAuth();
+
+let currentDisplayedMonday = getMonday(new Date());
+let allEvents = [];
+
+const calendarGrid = document.getElementById('calendarGrid');
+const eventTemplate = document.getElementById('eventTemplate');
+const currentWeekLabel = document.getElementById('currentWeekLabel');
+const prevWeekBtn = document.getElementById('prevWeekBtn');
+const nextWeekBtn = document.getElementById('nextWeekBtn');
+
+const openModalBtn = document.getElementById('openCreateEventModalBtn');
+const createModal = document.getElementById('createEventModal');
+const closeModalBtn = document.getElementById('closeEventModalBtn');
+const cancelEventBtn = document.getElementById('cancelEventBtn');
+const confirmCreateBtn = document.getElementById('confirmCreateEventBtn');
+
+function getMonday(d) {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(date.getFullYear(), date.getMonth(), diff, 0, 0, 0, 0);
+}
+
+function formatShortDate(date) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function updateCalendarHeaders() {
+    let sunday = new Date(currentDisplayedMonday);
+    sunday.setDate(currentDisplayedMonday.getDate() + 6);
+
+    currentWeekLabel.textContent = `${formatShortDate(currentDisplayedMonday)} - ${formatShortDate(sunday)}, ${currentDisplayedMonday.getFullYear()}`;
+
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    days.forEach((dayId, index) => {
+        let d = new Date(currentDisplayedMonday);
+        d.setDate(currentDisplayedMonday.getDate() + index);
+        document.getElementById(`date-${dayId}`).textContent = d.getDate();
+    });
+}
+
+function clearGrid() {
+    const cards = calendarGrid.querySelectorAll('.event-card');
+    cards.forEach(card => card.remove());
+}
+
+function renderEventCard(evt) {
+    const startDate = new Date(evt.start);
+    const endDate = new Date(evt.end);
+
+    const eventMonday = getMonday(startDate);
+    if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) return;
+
+    const dayIndex = startDate.getDay();
+    const gridColumn = (dayIndex === 0) ? 8 : dayIndex + 1;
+
+    const startHour = startDate.getHours();
+
+    const gridRowStart = startHour + 2;
+
+    let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
+    if (durationHours < 1) durationHours = 1;
+
+    let gridRowEnd = gridRowStart + durationHours;
+    if (gridRowEnd > 26) gridRowEnd = 26;
+
+    const eventNode = eventTemplate.content.cloneNode(true).firstElementChild;
+    eventNode.classList.add(`type-${evt.type.toLowerCase()}`);
+
+    eventNode.style.gridColumn = gridColumn;
+    eventNode.style.gridRow = `${gridRowStart} / ${gridRowEnd}`;
+
+    eventNode.querySelector('.event-time').textContent = `${startHour}:00 - ${startHour + durationHours}:00`;
+    eventNode.querySelector('.event-title').textContent = evt.title;
+    eventNode.querySelector('.event-location').textContent = evt.location || "TBD";
+
+    eventNode.addEventListener('click', () => {
+        document.getElementById('viewEventTitle').textContent = evt.title;
+        document.getElementById('viewEventTime').textContent = `${formatShortDate(startDate)} • ${startHour}:00 - ${startHour + durationHours}:00`;
+        document.getElementById('viewEventLocation').textContent = evt.location || "No location";
+        document.getElementById('viewEventType').textContent = evt.type;
+        document.getElementById('viewEventDescription').textContent = evt.description || "No description provided.";
+
+        document.getElementById('viewEventModal').classList.add('active');
+    });
+
+    calendarGrid.appendChild(eventNode);
+}
+
+function refreshWeekView() {
+    clearGrid();
+    updateCalendarHeaders();
+    allEvents.forEach(evt => renderEventCard(evt));
+}
+
+prevWeekBtn.addEventListener('click', () => {
+    currentDisplayedMonday.setDate(currentDisplayedMonday.getDate() - 7);
+    refreshWeekView();
+});
+
+nextWeekBtn.addEventListener('click', () => {
+    currentDisplayedMonday.setDate(currentDisplayedMonday.getDate() + 7);
+    refreshWeekView();
+});
+
+const closeViewModalBtn = document.getElementById('closeViewEventModalBtn');
+const viewEventModal = document.getElementById('viewEventModal');
+
+closeViewModalBtn.addEventListener('click', () => {
+    viewEventModal.classList.remove('active');
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('create-modal-overlay')) {
+        viewEventModal.classList.remove('active');
+    }
+});
+
+const closeModal = () => {
+    createModal.classList.remove('active');
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDescription').value = '';
+    document.getElementById('eventLocation').value = '';
+    document.getElementById('eventStart').value = '';
+    document.getElementById('eventEnd').value = '';
+};
+
+openModalBtn.addEventListener('click', () => createModal.classList.add('active'));
+closeModalBtn.addEventListener('click', closeModal);
+cancelEventBtn.addEventListener('click', closeModal);
+
+confirmCreateBtn.addEventListener('click', async () => {
+    const title = document.getElementById('eventTitle').value.trim();
+    const description = document.getElementById('eventDescription').value.trim();
+    const startInput = document.getElementById('eventStart').value;
+    const endInput = document.getElementById('eventEnd').value;
+    const type = document.getElementById('eventType').value;
+    const location = document.getElementById('eventLocation').value.trim();
+
+    if (!title || !startInput || !endInput) return alert("Fill all required fields");
+
+    const startDate = new Date(startInput);
+    const endDate = new Date(endInput);
+
+    if (endDate <= startDate) return alert("End time must be after start time.");
+
+    confirmCreateBtn.disabled = true;
+
+    const newEvent = {
+        title: title,
+        description: description,
+        start: startInput,
+        end: endInput,
+        type: type,
+        location: location
+    };
+
+    let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/events`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(newEvent)
+    });
+
+    if (!res.ok) {
+        console.log("issue posting new event");
+        return;
+    }
+
+    allEvents.push(newEvent);
+    currentDisplayedMonday = getMonday(startDate);
+    refreshWeekView();
+    closeModal();
+    confirmCreateBtn.disabled = false;
+});
+
+async function fetchEvents() {
+    if (!AppState.currentGroupId) return;
+
+    allEvents = [];
+
+    try {
+        const resIcs = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+        });
+
+        if (resIcs.ok) {
+            const scheduleData = await resIcs.text();
+            allEvents=parseICSFromString(scheduleData);
+        } else {
+            console.log("No schedule saved for this group yet.");
+        }
+    } catch (error) {
+        console.error("Failed to fetch schedule:", error);
+    }
+
+    try {
+        const resDb = await fetch(`${API_BASE_URL}/events?group_id=${AppState.currentGroupId}&skip=0&limit=100`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (resDb.ok) {
+            const eventsData = await resDb.json();
+            eventsData.forEach(element => {
+                let newElement = {
+                    title: element.title,
+                    description: element.description,
+                    type: element.type,
+                    start: element.start,
+                    end: element.end,
+                    location: element.location
+                }
+                allEvents.push(newElement);
+            });
+        } else {
+            console.log("Issue with getting events from DB.");
+        }
+    } catch (error) {
+        console.error("Failed to fetch events from DB:", error);
+    }
+
+    refreshWeekView();
+}
+
+function parseICSFromString(icsString) {
+  const jcalData = ICAL.parse(icsString);
+  const comp = new ICAL.Component(jcalData);
+  const events = comp.getAllSubcomponents("vevent");
+
+  return events.map(event => {
+    const e = new ICAL.Event(event);
+
+    return {
+      title: e.summary,
+      description: e.description,
+      type: "COURSE",
+      start: e.startDate.toJSDate().toISOString(),
+      end: e.endDate.toJSDate().toISOString(),
+      location: e.location
+    };
+  });
+}
+
+document.addEventListener("groupChanged", () => {
+    fetchEvents();
+});
+
+if (AppState.currentGroupId) {
+    setTimeout(() => {
+        fetchEvents();
+    }, 100);
+}
