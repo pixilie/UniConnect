@@ -18,12 +18,11 @@ function formatMessageTime(rawDateString) {
 }
 
 async function WSConnect() {
-    const currentGroupId = AppState.currentGroupId;
     const token = localStorage.getItem("token");
 
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
-    socket = new WebSocket(`${WS_BASE_URL}/groups/${currentGroupId}?token=${token}`);
+    socket = new WebSocket(`${WS_BASE_URL}/groups/${AppState.currentGroupId}?token=${token}`);
 
     await new Promise((resolve, reject) => {
         socket.onopen = () => {
@@ -81,12 +80,10 @@ function addMessage(first_name, last_name, sent_at, text) {
 }
 
 async function LoadMessages() {
-    const currentGroupId = AppState.currentGroupId;
-
-    if (!currentGroupId) return;
+    if (!AppState.currentGroupId) return;
 
     chat.innerHTML = "";
-    const res = await fetch(`${API_BASE_URL}/groups/${currentGroupId}/messages`, {
+    const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/messages`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

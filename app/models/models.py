@@ -79,6 +79,7 @@ class User(Base):
     uploaded_resources = relationship("Resource", back_populates="uploader")
     votes = relationship("Vote", back_populates="voter")
     announcement = relationship("Announcement", back_populates="author")
+    poll = relationship("Poll", back_populates="author")
 
 
 class Message(Base):
@@ -151,11 +152,14 @@ class Poll(Base):
     title: Mapped[str] = mapped_column()
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
     group = relationship("Group", back_populates="polls")
     choices = relationship("Choice", back_populates="poll")
     votes = relationship("Vote", back_populates="poll")
+    author = relationship("User", back_populates="poll")
 
 
 class Choice(Base):

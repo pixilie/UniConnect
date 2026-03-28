@@ -23,6 +23,9 @@ class PollResponse(BaseModel):
     created_at: datetime
     group_id: int | None
     choices: list[ChoiceResponse] = []
+    has_voted: bool = False
+    expires_at: datetime
+    choice_selected: int
     model_config = ConfigDict(from_attributes=True)
 
 class ChoiceResult(ChoiceBase):
