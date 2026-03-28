@@ -190,7 +190,7 @@ async function fetchEvents() {
 
         if (resIcs.ok) {
             const scheduleData = await resIcs.text();
-            // TODO: Parser l'ICS
+            allEvents=parseICSFromString(scheduleData);
         } else {
             console.log("No schedule saved for this group yet.");
         }
@@ -228,6 +228,25 @@ async function fetchEvents() {
     }
 
     refreshWeekView();
+}
+
+function parseICSFromString(icsString) {
+  const jcalData = ICAL.parse(icsString);
+  const comp = new ICAL.Component(jcalData);
+  const events = comp.getAllSubcomponents("vevent");
+
+  return events.map(event => {
+    const e = new ICAL.Event(event);
+
+    return {
+      title: e.summary,
+      description: e.description,
+      type: "course",
+      start: e.startDate.toJSDate().toISOString(),
+      end: e.endDate.toJSDate().toISOString(),
+      location: e.location
+    };
+  });
 }
 
 document.addEventListener("groupChanged", () => {

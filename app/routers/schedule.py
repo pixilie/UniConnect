@@ -50,8 +50,8 @@ def upload_schedule(
     if not file.filename or file.filename.strip() == "":
         raise HTTPException(status_code=400, detail="No file selected")
 
-    file_ext = file.filename.split(".")[1]
-    if file_ext != ".ics":
+    file_ext = file.filename.split(".")[-1]
+    if file_ext != "ics":
         raise HTTPException(status_code=415, detail=f"Unsupported file extension ({file_ext}), should be .ics")
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
