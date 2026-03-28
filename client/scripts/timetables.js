@@ -241,7 +241,7 @@ function parseICSFromString(icsString) {
     return {
       title: e.summary,
       description: e.description,
-      type: "course",
+      type: "COURSE",
       start: e.startDate.toJSDate().toISOString(),
       end: e.endDate.toJSDate().toISOString(),
       location: e.location
