@@ -127,9 +127,10 @@ confirmCreateBtn.addEventListener('click', async () => {
 
     const newEvent = {
         title: title,
-        type: type,
+        description: "",
         start: startInput,
         end: endInput,
+        type: type,
         location: location
     };
 
@@ -175,7 +176,7 @@ async function fetchEvents() {
         let title = element.title;
         let type = element.type;
         let start = element.date;
-        //let end = element.end;
+        let end = element.end;
         let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
         let newElement = {
             title: title,
@@ -187,7 +188,7 @@ async function fetchEvents() {
         allEvents.push(newElement);
     })
 
-    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${AppState.currentGroupId}&skip=0&limit=20`, {
+    const res2 = await fetch(`${API_BASE_URL}/api/events?group_id=${AppState.currentGroupId}&skip=0&limit=100`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -203,7 +204,7 @@ async function fetchEvents() {
         let title = element.title;
         let type = element.type;
         let start = element.date;
-        //let end = element.end;
+        let end = element.end;
         let location = element.location;                  //TODO : CHANGE ACCORDING to BACKEND
         let newElement = {
             title: title,
