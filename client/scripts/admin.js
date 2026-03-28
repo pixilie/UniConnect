@@ -56,6 +56,7 @@ async function loadAdminData() {
 
 function populateAdminGroups(groups) {
     if (!groups || groups.length === 0) return;
+    groupListContainer.innerHTML="";
 
     let currentGroupId = localStorage.getItem("groupID") || groups[0].id.toString();
 
@@ -253,15 +254,12 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
     btn.disabled = true;
     btn.textContent = "Creating...";
 
-    const res = await fetch(`${API_BASE_URL}/groups/`, {
+    const res = await fetch(`${API_BASE_URL}/groups/?group_name=${groupName}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: JSON.stringify({
-            name: groupName
-        })
+        }
     });
 
     if (!res.ok) {
@@ -272,6 +270,8 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
         btn.disabled = false;
         btn.textContent = "Create";
     }
+
+    loadAdminData();
 });
 
 document.getElementById('confirmAddStudentBtn').addEventListener('click', async () => {
@@ -390,6 +390,8 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
 
 document.getElementById('confirmAddEventBtn').addEventListener('click', async () => {
     const title = document.getElementById('eventTitle').value.trim();
+    const description = document.getElementById(`eventDescription`).value.trim();
+    document.getElementById(`eventDescription`).value="";
     const location = document.getElementById('eventLocation').value.trim();
     const type = document.getElementById('eventType').value;
     const start = document.getElementById('eventStart').value;
@@ -409,7 +411,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
         },
         body: JSON.stringify({
             title: title,
-            description: "",
+            description: description,
             start: new Date(start).toISOString(),
             end: new Date(end).toISOString(),
             type: type,
