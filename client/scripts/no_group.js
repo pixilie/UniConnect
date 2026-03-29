@@ -26,7 +26,8 @@ async function reload() {
         } else if (res.status === 401) {
             logout();
         } else {
-            console.error("Error fetching status.");
+            const error = await res.json();
+            window.alert(`Error while getting status: ${error}`);
         }
     } catch (error) {
         console.error("Network error:", error);

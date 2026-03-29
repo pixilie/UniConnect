@@ -25,7 +25,9 @@ async function LoadAnnoucements() {
     });
 
     if (!res.ok) {
-        console.error(`Error while fetching past Annoucements: ${res.status}`);
+        const error = await res.json();
+        window.alert(`Error while fetching past annoucement: ${error}`);
+        return;
     } else {
         let data = await res.json();
 
@@ -40,6 +42,7 @@ async function LoadAnnoucements() {
             addAnnoucement(first_name, last_name, role, title, content, date, urgent);
         });
     }
+    if(AppState.userProfile.role=="student")createBtn.remove();
 }
 
 function addAnnoucement(first_name, last_name, role, title, content, date, urgent) {
@@ -86,7 +89,12 @@ async function createAnnoucement() {
     let urgency = formUrgent.checked;
     formUrgent.checked = false;
 
-    await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+    if(title=="" || content==""){
+        alert("Title and message fields must be filled");
+        return;
+    }
+    console.log("create annonce");
+        let res =await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -98,6 +106,11 @@ async function createAnnoucement() {
             urgent: urgency
         })
     });
+    if(!res.ok){
+        const error = await res.json();
+        window.alert(`Error while creating new annoucement: ${error}`);
+        return;
+    }
 }
 
 createBtn.addEventListener("click", () => {
