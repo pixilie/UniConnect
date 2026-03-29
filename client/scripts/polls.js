@@ -36,7 +36,8 @@ postNewPollBtn.addEventListener("click", async () => {
     });
 
     if (!res.ok) {
-        console.log("issue when creating new poll");
+        const error = await res.json();
+        window.alert(`Error while creating new poll: ${error}`);
         return;
     }
 
@@ -58,8 +59,9 @@ postNewPollBtn.addEventListener("click", async () => {
         });
 
         if (!res.ok) {
-            console.log("issue when adding a new option");
-            return;
+            const error = await res.json();
+            window.alert(`Error while creating new option: ${error}`);
+            return; 
         }
     })
 
@@ -165,7 +167,8 @@ async function sendVote(pollID, choiceID) {
         }
     });
     if (!res.ok) {
-        console.log("issue when submitting vote");
+        const error = await res.json();
+        window.alert(`Error while sending vote: ${error}`);
         return;
     }
 }
@@ -181,7 +184,8 @@ async function getPolls() {
     });
 
     if (!res.ok) {
-        console.log("issue with getting polls");
+        const error = await res.json();
+        window.alert(`Error while getting polls: ${error}`);
         return;
     }
 

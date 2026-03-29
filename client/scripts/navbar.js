@@ -48,7 +48,8 @@ async function getProfileData() {
     });
 
     if (!res.ok) {
-        console.error("Issue with getting profile data");
+        const error = await res.json();
+        window.alert(`Error while getting profile data: ${error}`);
         return;
     }
 
