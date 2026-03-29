@@ -13,4 +13,4 @@ from .poll import (
     PollResultResponse,
 )
 from .resource import ResourceResponse
-from .user import User, UserRoleUpdate, UserUpdatePassword, UserUpdateProfile
+from .user import User, UserUpdatePassword, UserUpdateProfile

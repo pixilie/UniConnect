@@ -80,10 +80,10 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
 }
 
 async function createAnnoucement() {
-    let title = formTitle.value.trim();
+    let title = formTitle.value;
     formTitle.value = "";
 
-    let content = formContent.value.trim();
+    let content = formContent.value;
     formContent.value = "";
 
     let urgency = formUrgent.checked;

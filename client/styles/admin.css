@@ -1,0 +1,375 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #FFFFFF;
+    color: #1C1B1F;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 260px;
+    background: #F3EDF7;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid #CAC4D0;
+}
+
+.sidebar-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid #CAC4D0;
+}
+
+.search-box {
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+.btn-create-group {
+    width: 100%;
+    background-color: #EADDFF;
+    color: #21005D;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 10px;
+}
+
+.btn-create-group:hover {
+    background-color: #E8DEF8;
+}
+
+.group-list {
+    padding: 8px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.category-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #777;
+    margin: 10px 8px;
+    text-transform: uppercase;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #49454F;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.group-item.active {
+    background: #EADDFF;
+    font-weight: bold;
+    color: #6750A4;
+}
+
+.group-item:hover:not(.active) {
+    background: #E8DEF8;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #F4F4F7;
+}
+
+.top-bar {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.dashboard-grid {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    overflow-y: auto;
+}
+
+.teacher-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: #6750A4;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.student-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mini-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #6750A4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #6750A4;
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #6750A4;
+    color: #6750A4;
+}
+
+.btn-ghost-error {
+    background: transparent;
+    color: #B3261E;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    resize: none;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.form-input:focus,
+textarea:focus {
+    border-color: #6750A4;
+}
+
+.announcement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.urgent-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #49454F;
+    cursor: pointer;
+}
+
+.user-panel {
+    background-color: #E7E0EC;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #CAC4D0;
+}
+
+.create-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.create-modal-overlay.active {
+    display: flex;
+}
+
+.create-modal {
+    background: white;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 10px;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1C1B1F;
+}
+
+.close-modal {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #1C1B1F;
+}
+
+.modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #49454F;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 5px;
+    border: 1px solid #CAC4D0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #6750A4;
+}
+
+.modal-footer {
+    padding: 5px 5px;
+    background: #F4F4F7;
+    border-top: 1px solid #E0E0E0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: none;
+    color: #49454F;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.btn-cancel:hover {
+    background: #E0E0E0;
+}
+
+.btn-create {
+    background: #6750A4;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.btn-create:hover {
+    background: #523E85;
+}

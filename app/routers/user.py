@@ -73,6 +73,10 @@ def toggle_user_group(
         raise HTTPException(status_code=403, detail="Only administrators can assign groups")
 
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if target_user == current_user:
+        raise HTTPException(status_code=403, detail="You can't kick yourself")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not target_user:
@@ -120,7 +124,7 @@ def update_my_profile(
 @user_router.patch("/users/{user_id}/role", response_model=schemas.User)
 def update_user_role(
     user_id: int,
-    role_data: schemas.UserRoleUpdate,
+    role: models.UserRole,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -129,16 +133,20 @@ def update_user_role(
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
     if current_user == target_user:
-        raise HTTPException(status_code=403, detail="You can't change your roles")
+        raise HTTPException(status_code=403, detail="You can't change your own role")
 
     if target_user.role in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
         if current_user.role != models.UserRole.ADMIN:
-            raise HTTPException(status_code=403, detail="Only administrators can modify administator/teacher user's role")
+            raise HTTPException(status_code=403, detail="Only administrators can modify administrator/teacher roles")
     else:
         if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
-             raise HTTPException(status_code=403, detail="Only administrators/teachers can modify user's roles")
+             raise HTTPException(status_code=403, detail="Only administrators/teachers can modify user roles")
 
-    target_user.role = role_data.role
+    target_user.role = role
+
+    if role == models.UserRole.ADMIN:
+        all_groups = db.query(models.Group).all()
+        target_user.groups = all_groups
 
     db.commit()
     db.refresh(target_user)
