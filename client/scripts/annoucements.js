@@ -80,16 +80,21 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
 }
 
 async function createAnnoucement() {
-    let title = formTitle.value;
+    let title = formTitle.value.trim();
     formTitle.value = "";
 
-    let content = formContent.value;
+    let content = formContent.value.trim();
     formContent.value = "";
 
     let urgency = formUrgent.checked;
     formUrgent.checked = false;
 
-    let res =await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+    if(title=="" || content==""){
+        alert("Title and message fields must be filled");
+        return;
+    }
+    console.log("create annonce");
+        let res =await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
