@@ -42,6 +42,7 @@ async function LoadAnnoucements() {
             addAnnoucement(first_name, last_name, role, title, content, date, urgent);
         });
     }
+    if(AppState.userProfile.role=="student")createBtn.remove();
 }
 
 function addAnnoucement(first_name, last_name, role, title, content, date, urgent) {
