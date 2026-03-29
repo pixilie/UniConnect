@@ -40,7 +40,11 @@ async function loadAdminData() {
             }
         });
 
-        if (!res.ok) throw new Error("Failed to fetch admin profile");
+        if (!res.ok){
+            const error = await res.json();
+            window.alert(`Error while loading admin data: ${error}`);
+            return;
+        }
 
         const profileData = await res.json();
 
@@ -110,7 +114,8 @@ async function loadStudents() {
     });
 
     if (!res.ok) {
-        console.error(`Error while fetching group members: ${res.status}`);
+        const error = await res.json();
+        window.alert(`Error while fetching group members: ${error}`);
     }
     else {
         let data = await res.json();
@@ -263,7 +268,8 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
     });
 
     if (!res.ok) {
-        console.log("issue when creating the new group");
+        const error = await res.json();
+        window.alert(`Error while creating new group: ${error}`);
     }
     else {
         closeAllAdminModals();
@@ -291,13 +297,12 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
     });
 
     if (!res.ok) {
-        console.log("issue with finding the member profile");
+        const error = await res.json();
+        window.alert(`Failed to add student: ${error}`);
         return;
     }
 
     let memberID = (await res.json())[0].id;
-
-    //get new group id (here assuming we are in the new group)
 
     const res2 = await fetch(`${API_BASE_URL}/users/${memberID}/groups/${AppState.currentGroupId}`, {
         method: "PATCH",
@@ -308,7 +313,8 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
     });
 
     if (!res2.ok) {
-        console.log(`issue with adding the member to the group ${(await res2).status}`);
+        const error = await res2.json();
+        window.alert(`Error while adding the member to the group: ${error}`);
         return;
     }
 
@@ -344,7 +350,8 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     });
 
     if (!res.ok) {
-        console.log("issue creating new annoucement");
+        const error = await res.json();
+        window.alert(`Error while creating new annoucement: ${error}`);
         return;
     }
 
@@ -379,7 +386,8 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
     });
 
     if (!res.ok) {
-        console.log("issue with uploading new schedule");
+        const error = await res.json();
+        window.alert(`Error while uploading new schedule: ${error}`);
         return;
     }
 
@@ -421,7 +429,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
 
     if (!res.ok) {
         const error = await res.json();
-        console.log("FULL ERROR:", error);
+        window.alert(`Error while creating new event: ${error}`);
         return;
     }
 
@@ -454,7 +462,8 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     });
 
     if (!res.ok) {
-        console.log("issue when creating new poll");
+        const error = await res.json();
+        window.alert(`Error while creating new poll: ${error}`);
         return;
     }
 
@@ -476,7 +485,8 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
         });
 
         if (!res.ok) {
-            console.log("issue when adding a new option");
+            const error = await res.json();
+            window.alert(`Error while adding new option: ${error}`);
             return;
         }
     })
@@ -501,7 +511,7 @@ async function promoteToDelegate(studentId, isPromoting) {
 
     if (!res.ok) {
         const error = await res.json();
-        console.log("FULL ERROR:", error);
+        window.alert(`Error while changing role: ${error}`);
         return;
     }
 
@@ -519,7 +529,8 @@ async function kickStudent(studentId) {
         }
     });
     if (!res.ok) {
-        console.log("issue when kicking user");
+        const error = await res.json();
+        window.alert(`Error while kicking user: ${error}`);
         return;
     }
 
