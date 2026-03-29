@@ -166,7 +166,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     });
 
     if (!res.ok) {
-        console.log("issue posting new event");
+        const error = await res.json();
+        window.alert(`Error while posting new event: ${error}`);
         return;
     }
 
@@ -192,7 +193,9 @@ async function fetchEvents() {
             const scheduleData = await resIcs.text();
             allEvents=parseICSFromString(scheduleData);
         } else {
-            console.log("No schedule saved for this group yet.");
+            const error = await res.json();
+            window.alert(`No schedule uploaded for this group yet: ${error}`);
+            return;
         }
     } catch (error) {
         console.error("Failed to fetch schedule:", error);
@@ -221,7 +224,9 @@ async function fetchEvents() {
                 allEvents.push(newElement);
             });
         } else {
-            window.alert(`Error while getting events from DB: ${res.status}`);
+            const error = await res.json();
+            window.alert(`Error while getting events from DB: ${error}`);
+            return;
         }
     } catch (error) {
         console.error("Failed to fetch events from DB:", error);

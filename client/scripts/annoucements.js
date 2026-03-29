@@ -25,7 +25,9 @@ async function LoadAnnoucements() {
     });
 
     if (!res.ok) {
-        console.error(`Error while fetching past Annoucements: ${res.status}`);
+        const error = await res.json();
+        window.alert(`Error while fetching past annoucement: ${error}`);
+        return;
     } else {
         let data = await res.json();
 
@@ -86,7 +88,7 @@ async function createAnnoucement() {
     let urgency = formUrgent.checked;
     formUrgent.checked = false;
 
-    await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+    let res =await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -98,6 +100,11 @@ async function createAnnoucement() {
             urgent: urgency
         })
     });
+    if(!res.ok){
+        const error = await res.json();
+        window.alert(`Error while creating new annoucement: ${error}`);
+        return;
+    }
 }
 
 createBtn.addEventListener("click", () => {

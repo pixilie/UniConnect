@@ -50,7 +50,9 @@ async function loadRessources() {
     });
 
     if (!res.ok) {
-        window.alert(`Error while fetching ressources: ${res.status}`);
+        const error = await res.json();
+        window.alert(`Error while fetching ressources: ${error}`);
+        return;
     } else {
         let data = await res.json();
 
@@ -114,7 +116,8 @@ async function downloadFile(btn, fileName) {
         });
 
         if (!res.ok){
-            window.alert(`Failed to download file: ${res.status}`);
+            const error = await res.json();
+            window.alert(`Failed to download file: ${error}`);
             return;
         }
 
@@ -165,9 +168,9 @@ async function uploadRessource() {
         });
 
         if (!res.ok) {
-            console.error("Issue uploading file");
-            alert("Failed to upload resource");
-            return;
+            const error = await res.json();
+            window.alert(`Error while uploading ressource: ${error}`);
+            return; 
         }
 
         const data = await res.json();
