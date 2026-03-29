@@ -36,7 +36,7 @@ postNewPollBtn.addEventListener("click", async () => {
     });
 
     if (!res.ok) {
-        console.log("issue when creating new poll");
+        window.alert(`Error while creating poll: ${res.status}`);
         return;
     }
 
@@ -165,7 +165,7 @@ async function sendVote(pollID, choiceID) {
         }
     });
     if (!res.ok) {
-        console.log("issue when submitting vote");
+        window.alert(`Error while sendin vote: ${res.status}`);
         return;
     }
 }
@@ -181,7 +181,7 @@ async function getPolls() {
     });
 
     if (!res.ok) {
-        console.log("issue with getting polls");
+        window.alert(`Error while getting polls: ${res.status}`);
         return;
     }
 

@@ -50,7 +50,7 @@ async function loadRessources() {
     });
 
     if (!res.ok) {
-        console.error(`Error while fetching Ressources: ${res.status}`);
+        window.alert(`Error while fetching ressources: ${res.status}`);
     } else {
         let data = await res.json();
 
@@ -113,7 +113,10 @@ async function downloadFile(btn, fileName) {
             }
         });
 
-        if (!res.ok) throw new Error("Download failed");
+        if (!res.ok){
+            window.alert(`Failed to download file: ${res.status}`);
+            return;
+        }
 
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);

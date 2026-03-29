@@ -221,7 +221,7 @@ async function fetchEvents() {
                 allEvents.push(newElement);
             });
         } else {
-            console.log("Issue with getting events from DB.");
+            window.alert(`Error while getting events from DB: ${res.status}`);
         }
     } catch (error) {
         console.error("Failed to fetch events from DB:", error);

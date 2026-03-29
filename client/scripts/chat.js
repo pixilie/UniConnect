@@ -92,7 +92,7 @@ async function LoadMessages() {
     });
 
     if (!res.ok) {
-        console.error(`Error while fetching past messages: ${res.status}`);
+        window.alert(`Error while fetching past messages: ${res.status}`);
     } else {
         let data = await res.json();
 

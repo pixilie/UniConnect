@@ -48,7 +48,7 @@ async function getProfileData() {
     });
 
     if (!res.ok) {
-        console.error("Issue with getting profile data");
+            window.alert(`Error while fetching past messages: ${res.status}`);
         return;
     }
 
