@@ -70,7 +70,6 @@ class User(Base):
     first_name: Mapped[str] = mapped_column()
     last_name: Mapped[str] = mapped_column()
     role: Mapped[UserRole] = mapped_column(default=UserRole.STUDENT)
-    student_group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id"))
 
     groups = relationship("Group", secondary=user_groups_association, back_populates="members")
     messages = relationship("Message", back_populates="author")
