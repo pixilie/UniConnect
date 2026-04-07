@@ -2,6 +2,7 @@ let errorMessage = "Registration failed. Email might already exist.";
 
 async function register(firstName, lastName, email, password) {
     errorMessage = "Registration failed. Email might already exist.";
+
     try {
         const res = await fetch(`${API_BASE_URL}/register`, {
             method: "POST",
@@ -18,9 +19,7 @@ async function register(firstName, lastName, email, password) {
 
         if (!res.ok) return false;
         return true;
-
     } catch (err) {
-        console.log(err);
         errorMessage = err;
         return false;
     }
@@ -29,23 +28,19 @@ async function register(firstName, lastName, email, password) {
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    let fullName = document.getElementById("fullname").value.trim();
+    let firstname = document.getElementById("firstname").value.trim();
+    let lastname = document.getElementById("lastname").value.trim();
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
 
-    let names = fullName.split(" ");
-    let firstName = names[0];
-    names.shift();
-    let lastName = names.join(" ") || "";
     let message = document.getElementById("message");
-    let success = await register(firstName, lastName, email, password);
+    let success = await register(firstname, lastname, email, password);
 
     if (success) {
         message.style.color = "green";
         message.innerText = "Registration Successful!";
         window.location.href = "login.html";
-    }
-    else {
+    } else {
         message.style.color = "red";
         message.innerText = errorMessage;
     }
