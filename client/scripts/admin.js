@@ -40,7 +40,7 @@ async function loadAdminData() {
             }
         });
 
-        if (!res.ok){
+        if (!res.ok) {
             const error = await res.json();
             window.alert(`Error while loading admin data: ${error}`);
             return;
@@ -60,7 +60,7 @@ async function loadAdminData() {
 
 function populateAdminGroups(groups) {
     if (!groups || groups.length === 0) return;
-    groupListContainer.innerHTML="";
+    groupListContainer.innerHTML = "";
 
     let currentGroupId = localStorage.getItem("groupID") || groups[0].id.toString();
 
@@ -298,7 +298,9 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`Failed to add student: ${error}`);
+        window.alert(`Failed to add student: ${error.detail}`);
+        btn.disabled = false;
+        btn.textContent = "Add";
         return;
     }
 
@@ -399,7 +401,7 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
 document.getElementById('confirmAddEventBtn').addEventListener('click', async () => {
     const title = document.getElementById('eventTitle').value.trim();
     const description = document.getElementById(`eventDescription`).value.trim();
-    document.getElementById(`eventDescription`).value="";
+    document.getElementById(`eventDescription`).value = "";
     const location = document.getElementById('eventLocation').value.trim();
     const type = document.getElementById('eventType').value;
     const start = document.getElementById('eventStart').value;
