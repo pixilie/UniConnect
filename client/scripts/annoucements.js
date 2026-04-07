@@ -1,4 +1,5 @@
 requireAuth();
+
 const annoucementTemplate = document.getElementById("announcementTemplate");
 const displayBox = document.getElementById("displayBox");
 const createBtn = document.getElementById("sendBtn");
@@ -7,8 +8,7 @@ const cancelBtn = document.getElementById("cancelBtn");
 const formTitle = document.getElementById("title-input");
 const formContent = document.getElementById("message-input");
 const formUrgent = document.getElementById("urgency-input");
-const sendBtn = document.getElementById("postBtn");
-
+const postBtn = document.getElementById("postBtn");
 
 async function LoadAnnoucements() {
     displayBox.innerHTML = "";
@@ -39,10 +39,12 @@ async function LoadAnnoucements() {
             let content = element.content;
             let urgent = element.urgent;
             let date = element.sent_at
+
             addAnnoucement(first_name, last_name, role, title, content, date, urgent);
         });
     }
-    if(AppState.userProfile.role=="student")createBtn.remove();
+
+    if (AppState.userProfile.role == "student") createBtn.remove();
 }
 
 function addAnnoucement(first_name, last_name, role, title, content, date, urgent) {
@@ -89,12 +91,12 @@ async function createAnnoucement() {
     let urgency = formUrgent.checked;
     formUrgent.checked = false;
 
-    if(title=="" || content==""){
+    if (title == "" || content == "") {
         alert("Title and message fields must be filled");
         return;
     }
-    console.log("create annonce");
-        let res =await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
+
+    let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -106,7 +108,8 @@ async function createAnnoucement() {
             urgent: urgency
         })
     });
-    if(!res.ok){
+
+    if (!res.ok) {
         const error = await res.json();
         window.alert(`Error while creating new annoucement: ${error}`);
         return;
@@ -121,7 +124,7 @@ cancelBtn.addEventListener("click", () => {
     createForm.classList.remove("form-active");
 });
 
-sendBtn.addEventListener("click", async () => {
+postBtn.addEventListener("click", async () => {
     await createAnnoucement();
     createForm.classList.remove("form-active");
     LoadAnnoucements();
