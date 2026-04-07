@@ -71,7 +71,7 @@ def create_poll(
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    new_poll = models.Poll(title=poll_in.title, group_id=group_id, user_id=current_user.id, expires_at=datetime.now(timezone.utc) + timedelta(minutes=1))
+    new_poll = models.Poll(title=poll_in.title, group_id=group_id, user_id=current_user.id, expires_at=datetime.now(timezone.utc) + timedelta(hours=2))
 
     db.add(new_poll)
     db.commit()
