@@ -55,7 +55,7 @@ def get_polls(
 @poll_router.post("/groups/{group_id}/polls", response_model=schemas.PollResponse)
 def create_poll(
     group_id: int,
-    poll_in: schemas.PollCreate,
+    poll_data: schemas.PollCreate,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
@@ -67,11 +67,14 @@ def create_poll(
         if group_id not in current_group_ids:
             raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
+    if poll_data.title.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't create a poll with an empty title")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    new_poll = models.Poll(title=poll_in.title, group_id=group_id, user_id=current_user.id, expires_at=datetime.now(timezone.utc) + timedelta(hours=2))
+    new_poll = models.Poll(title=poll_data.title, group_id=group_id, user_id=current_user.id, expires_at=datetime.now(timezone.utc) + timedelta(hours=2))
 
     db.add(new_poll)
     db.commit()
@@ -86,7 +89,7 @@ def create_poll(
 @poll_router.post("/polls/{poll_id}/choices", response_model=schemas.ChoiceResponse)
 def add_choice_to_poll(
     poll_id: int,
-    choice_in: schemas.ChoiceBase,
+    choice_data: schemas.ChoiceBase,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
@@ -102,7 +105,10 @@ def add_choice_to_poll(
     if not poll.is_active:
         raise HTTPException(status_code=400, detail="Cannot add choices to a closed poll")
 
-    new_choice = models.Choice(**choice_in.model_dump(), poll_id=poll_id)
+    if choice_data.text.strip() == "":
+        raise HTTPException(status_code=422, detail="Cannot add empty choice to a poll")
+
+    new_choice = models.Choice(**choice_data.model_dump(), poll_id=poll_id)
     db.add(new_choice)
     db.commit()
     db.refresh(new_choice)

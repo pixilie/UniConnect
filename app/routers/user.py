@@ -112,7 +112,6 @@ def update_my_profile(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
     if updates.first_name:
         current_user.first_name = updates.first_name
     if updates.last_name:

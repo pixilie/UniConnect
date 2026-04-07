@@ -70,6 +70,9 @@ def create_group(
     if current_user.role != models.UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only administrators can create groups")
 
+    if group_name.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't create a group with an empty name")
+
     new_group = models.Group(
         name=group_name,
         schedule_path=None

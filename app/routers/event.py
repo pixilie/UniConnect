@@ -50,6 +50,9 @@ def create_event(
         if group_id not in current_group_ids:
             raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
+    if event_data.title.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't create event with an empty title")
+
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
