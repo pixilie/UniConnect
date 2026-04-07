@@ -62,6 +62,9 @@ def new_assignments(
         if group_id not in current_group_ids:
             raise HTTPException(status_code=403, detail="Not authorized to access this group")
 
+    if assignment_data.title.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't create an assignment with an empty title")
+
     new_assignment = models.Assignment(
         title = assignment_data.title,
         description = assignment_data.description,

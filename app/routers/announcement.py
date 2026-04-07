@@ -45,6 +45,9 @@ def create_announcements(
     if group_id not in current_group_ids and current_user.role != models.UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="You can't create announcements in a group you're not part of")
 
+    if new_annoucement_data.title.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't create announcements with an empty title")
+
     group_exist = db.query(Group).filter(models.User.groups.any(models.Group.id.in_(current_group_ids))).first()
 
     if not group_exist:

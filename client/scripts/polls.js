@@ -1,6 +1,7 @@
 requireAuth();
 
 let currentGroupId = AppState.currentGroupId;
+
 const openModalBtn = document.getElementById('openCreatePollModalBtn');
 const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
@@ -61,7 +62,7 @@ postNewPollBtn.addEventListener("click", async () => {
         if (!res.ok) {
             const error = await res.json();
             window.alert(`Error while creating new option: ${error}`);
-            return; 
+            return;
         }
     })
 
@@ -126,8 +127,8 @@ function addPoll(title, options, pollID, voted, votedID) {
     }
 
     const optionsList = pollNode.querySelector('.options-list');
+    let selectedOptionObject = null;
 
-    let selectedOptionObject=null;
     options.forEach(option => {
         const optionNode = optionTemplate.content.cloneNode(true).firstElementChild;
         optionNode.querySelector('.option-title').textContent = option.text;
@@ -145,7 +146,8 @@ function addPoll(title, options, pollID, voted, votedID) {
         }
         optionsList.appendChild(optionNode);
     });
-    if(selectedOptionObject)selectOption(selectedOptionObject);
+
+    if (selectedOptionObject) selectOption(selectedOptionObject);
 
     pollNode.querySelector('.confirm-btn').addEventListener('click', function () {
         submitVote(this);
@@ -154,7 +156,7 @@ function addPoll(title, options, pollID, voted, votedID) {
     if (voted) {
         pollNode.querySelector('.confirm-btn').remove();
     }
-    //selectOption(selectedOptionObject); // pas sur si ca marche
+
     pollsContainer.appendChild(pollNode);
 }
 
@@ -174,7 +176,10 @@ async function sendVote(pollID, choiceID) {
 }
 
 async function getPolls() {
+    if (AppState.userProfile.role == "student") openModalBtn.remove();
+
     pollsContainer.innerHTML = "";
+
     const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: "GET",
         headers: {

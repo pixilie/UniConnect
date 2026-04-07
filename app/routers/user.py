@@ -35,7 +35,12 @@ def search_users(
         current_group_ids = [g.id for g in current_user.groups]
         query = query.filter(models.User.groups.any(models.Group.id.in_(current_group_ids)))
 
-    return query.offset(skip).limit(limit).all()
+    query = query.offset(skip).limit(limit).all()
+
+    if len(query) == 0:
+        raise HTTPException(status_code=404, detail=f"No user matching {search} found")
+    else:
+        return query
 
 
 @user_router.get("/users/me", response_model=schemas.User)
@@ -107,7 +112,6 @@ def update_my_profile(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-
     if updates.first_name:
         current_user.first_name = updates.first_name
     if updates.last_name:

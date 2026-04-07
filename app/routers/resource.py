@@ -38,6 +38,9 @@ async def upload_resource(
     else:
         raise HTTPException(status_code=500, detail=f"{file.filename} is not a valid filename")
 
+    if title.strip() == "":
+        raise HTTPException(status_code=422, detail="You can't upload a ressource with an empty title")
+
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
