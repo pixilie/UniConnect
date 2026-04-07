@@ -11,6 +11,8 @@ const formUrgent = document.getElementById("urgency-input");
 const postBtn = document.getElementById("postBtn");
 
 async function LoadAnnoucements() {
+    if (AppState.userProfile.role == "student") createBtn.remove();
+
     displayBox.innerHTML = "";
 
     if (!AppState.currentGroupId) return;
@@ -43,8 +45,6 @@ async function LoadAnnoucements() {
             addAnnoucement(first_name, last_name, role, title, content, date, urgent);
         });
     }
-
-    if (AppState.userProfile.role == "student") createBtn.remove();
 }
 
 function addAnnoucement(first_name, last_name, role, title, content, date, urgent) {
