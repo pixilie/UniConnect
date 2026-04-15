@@ -8,6 +8,7 @@ from app.db.database import get_db
 
 auth_router = APIRouter()
 
+
 @auth_router.post("/register", response_model=schemas.NewUser)
 def register_user(user: schemas.RegistrationRequest, db: Session = Depends(get_db)):
     query = db.query(models.User)
@@ -18,11 +19,13 @@ def register_user(user: schemas.RegistrationRequest, db: Session = Depends(get_d
     hashed_pw = get_password_hash(user.password)
 
     new_user = models.User(
-        email = user.email,
-        hashed_password = hashed_pw,
-        first_name = user.first_name,
-        last_name = user.last_name,
-        role = models.UserRole.ADMIN.value if query.count() == 0 else models.UserRole.STUDENT.value
+        email=user.email,
+        hashed_password=hashed_pw,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        role=models.UserRole.ADMIN.value
+        if query.count() == 0
+        else models.UserRole.STUDENT.value,
     )
 
     db.add(new_user)
@@ -33,7 +36,9 @@ def register_user(user: schemas.RegistrationRequest, db: Session = Depends(get_d
 
 
 @auth_router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
 
     if not user or not verify_password(form_data.password, user.hashed_password):
@@ -44,15 +49,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
 
     access_token = create_access_token(
-        data = {
-            "sub": str(user.id),
-            "role": str(user.role)
-        }
+        data={"sub": str(user.id), "role": str(user.role)}
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user_role": user.role,
-        "user_id": user.id
+        "user_id": user.id,
     }

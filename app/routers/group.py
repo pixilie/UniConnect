@@ -11,16 +11,19 @@ from app.db.database import get_db
 
 group_router = APIRouter()
 
+
 @group_router.get("/groups/", response_model=List[schemas.Group])
 def get_group(
     group_id: Optional[int] = None,
     skip: int = 0,
     limit: int = 20,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role not in [models.UserRole.ADMIN, models.UserRole.TEACHER]:
-        raise HTTPException(status_code=403, detail="Only administrators/teachers can browse groups")
+        raise HTTPException(
+            status_code=403, detail="Only administrators/teachers can browse groups"
+        )
 
     if group_id:
         return db.query(models.Group).filter(models.Group.id == group_id)
@@ -32,17 +35,23 @@ def get_group(
 def get_group_members(
     group_id: int,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN:
         current_group_ids = [g.id for g in current_user.groups]
         if group_id not in current_group_ids:
-            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to access this group"
+            )
 
     if not db.query(models.Group).filter(models.Group.id == group_id).first():
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    return db.query(models.User).filter(models.User.groups.any(models.Group.id == group_id)).all()
+    return (
+        db.query(models.User)
+        .filter(models.User.groups.any(models.Group.id == group_id))
+        .all()
+    )
 
 
 @group_router.get("/groups/{group_id}/messages", response_model=List[schemas.Message])
@@ -51,35 +60,46 @@ def get_messages(
     skip: int = 0,
     limit: int = 999999,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN:
         current_group_ids = [g.id for g in current_user.groups]
         if group_id not in current_group_ids:
-            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to access this group"
+            )
 
-    return db.query(models.Message).filter(models.Message.group_id == group_id).offset(skip).limit(limit).all()
+    return (
+        db.query(models.Message)
+        .filter(models.Message.group_id == group_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 @group_router.post("/groups/", response_model=schemas.Group)
 def create_group(
     group_name: str,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administrators can create groups")
+        raise HTTPException(
+            status_code=403, detail="Only administrators can create groups"
+        )
 
     if group_name.strip() == "":
-        raise HTTPException(status_code=422, detail="You can't create a group with an empty name")
+        raise HTTPException(
+            status_code=422, detail="You can't create a group with an empty name"
+        )
 
-    new_group = models.Group(
-        name=group_name,
-        schedule_path=None
-    )
+    new_group = models.Group(name=group_name, schedule_path=None)
     db.add(new_group)
 
-    admins = db.query(models.User).filter(models.User.role == models.UserRole.ADMIN).all()
+    admins = (
+        db.query(models.User).filter(models.User.role == models.UserRole.ADMIN).all()
+    )
 
     for admin in admins:
         admin.groups.append(new_group)
@@ -95,10 +115,12 @@ def update_group_name(
     group_id: int,
     group_data: schemas.UpdateGroup,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN.value:
-        raise HTTPException(status_code=403, detail="Only administrators can modify a group")
+        raise HTTPException(
+            status_code=403, detail="Only administrators can modify a group"
+        )
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
@@ -118,17 +140,21 @@ def update_group_name(
 def delete_group(
     group_id: int,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only administrators can delete a group")
+        raise HTTPException(
+            status_code=403, detail="Only administrators can delete a group"
+        )
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
 
     if not group:
         raise HTTPException(status_code=404, detail=f"Group {group_id} not found")
 
-    if group.schedule_path and os.path.exists(f"{settings.SCHEDULES_PATH}/group_{group_id}.ics"):
+    if group.schedule_path and os.path.exists(
+        f"{settings.SCHEDULES_PATH}/group_{group_id}.ics"
+    ):
         os.remove(f"{settings.SCHEDULES_PATH}/group_{group_id}.ics")
 
     events = db.query(models.Event).filter(models.Event.group_id == group_id).all()

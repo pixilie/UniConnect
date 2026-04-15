@@ -13,6 +13,7 @@ class UploaderInfo(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class ResourceResponse(BaseModel):
     id: int
     title: str

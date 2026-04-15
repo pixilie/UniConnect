@@ -1,8 +1,8 @@
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background-color: #F4F4F7;
-  color: #1C1B1F;
+  background-color: #f4f4f7;
+  color: #1c1b1f;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -10,7 +10,7 @@ body {
 }
 
 .card {
-  background: #FFFBFE;
+  background: #fffbfe;
   border-radius: 28px;
   padding: 48px 40px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -24,15 +24,15 @@ body {
 
 .hero-icon {
   font-size: 64px;
-  color: #6750A4;
-  background-color: #EADDFF;
+  color: #6750a4;
+  background-color: #eaddff;
   padding: 20px;
   border-radius: 50%;
   margin-bottom: 24px;
 }
 
 .logo-text {
-  color: #1C1B1F;
+  color: #1c1b1f;
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 8px;
@@ -66,24 +66,24 @@ body {
 }
 
 .btn-filled {
-  background-color: #6750A4;
-  color: #FFFFFF;
+  background-color: #6750a4;
+  color: #ffffff;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-filled:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  background-color: #5F489D;
+  background-color: #5f489d;
 }
 
 .btn-outlined {
   background-color: transparent;
-  color: #6750A4;
-  border: 1px solid #79747E;
+  color: #6750a4;
+  border: 1px solid #79747e;
 }
 
 .btn-outlined:hover {
-  background-color: #EADDFF;
-  border-color: #6750A4;
+  background-color: #eaddff;
+  border-color: #6750a4;
 }

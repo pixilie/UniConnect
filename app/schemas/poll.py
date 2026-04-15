@@ -8,13 +8,16 @@ class ChoiceBase(BaseModel):
     manifesto: str | None = None
     photo_url: str | None = None
 
+
 class ChoiceResponse(ChoiceBase):
     id: int
     poll_id: int | None
     model_config = ConfigDict(from_attributes=True)
 
+
 class PollCreate(BaseModel):
     title: str
+
 
 class PollResponse(BaseModel):
     id: int
@@ -28,9 +31,11 @@ class PollResponse(BaseModel):
     choice_selected: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class ChoiceResult(ChoiceBase):
     id: int
     vote_count: int
+
 
 class PollResultResponse(BaseModel):
     poll_id: int

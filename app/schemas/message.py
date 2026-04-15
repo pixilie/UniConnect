@@ -13,6 +13,7 @@ class AuthorInfo(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class Message(BaseModel):
     id: int
     content: str

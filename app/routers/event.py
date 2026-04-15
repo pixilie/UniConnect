@@ -10,6 +10,7 @@ from app.services.geocoding import get_coordinates
 
 events_router = APIRouter()
 
+
 @events_router.get("/events", response_model=List[schemas.Event])
 def get_event(
     event_id: Optional[int] = None,
@@ -17,7 +18,7 @@ def get_event(
     skip: int = 0,
     limit: int = 20,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     query = db.query(models.Event)
 
@@ -43,15 +44,19 @@ def create_event(
     group_id: int,
     event_data: schemas.NewEvent,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if current_user.role != models.UserRole.ADMIN:
         current_group_ids = [g.id for g in current_user.groups]
         if group_id not in current_group_ids:
-            raise HTTPException(status_code=403, detail="Not authorized to access this group")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to access this group"
+            )
 
     if event_data.title.strip() == "":
-        raise HTTPException(status_code=422, detail="You can't create event with an empty title")
+        raise HTTPException(
+            status_code=422, detail="You can't create event with an empty title"
+        )
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
@@ -63,16 +68,16 @@ def create_event(
         address, latitude, longitude = None, None, None
 
     new_event = models.Event(
-        title = event_data.title,
-        description = getattr(event_data, 'description', None),
-        start = event_data.start,
-        end = event_data.end,
-        location = address,
-        latitude = latitude,
-        longitude = longitude,
-        type = event_data.type,
-        creator_id = current_user.id,
-        group_id = group_id
+        title=event_data.title,
+        description=getattr(event_data, "description", None),
+        start=event_data.start,
+        end=event_data.end,
+        location=address,
+        latitude=latitude,
+        longitude=longitude,
+        type=event_data.type,
+        creator_id=current_user.id,
+        group_id=group_id,
     )
 
     db.add(new_event)
@@ -87,15 +92,20 @@ def update_event(
     event_id: int,
     event_data: schemas.UpdateEvent,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     event = db.query(models.Event).filter(models.Event.id == event_id).first()
 
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="You can only update events you created")
+    if (
+        current_user.id != event.creator_id
+        and current_user.role != models.UserRole.ADMIN
+    ):
+        raise HTTPException(
+            status_code=403, detail="You can only update events you created"
+        )
 
     updated_data = event_data.model_dump(exclude_unset=True)
     for key, value in updated_data.items():
@@ -119,15 +129,20 @@ def update_event(
 def delete_event(
     event_id: int,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     event = db.query(models.Event).filter(models.Event.id == event_id).first()
 
     if not event:
         raise HTTPException(status_code=404, detail=f"Event {event_id} not found")
 
-    if current_user.id != event.creator_id and current_user.role != models.UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="You can only delete events you created")
+    if (
+        current_user.id != event.creator_id
+        and current_user.role != models.UserRole.ADMIN
+    ):
+        raise HTTPException(
+            status_code=403, detail="You can only delete events you created"
+        )
 
     db.delete(event)
     db.commit()

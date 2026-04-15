@@ -18,7 +18,7 @@ body {
 }
 
 .title {
-  color: #6A57A5;
+  color: #6a57a5;
   margin-bottom: 30px;
 }
 
@@ -34,14 +34,14 @@ input {
 
 input:focus {
   outline: none;
-  border: 1px solid #5236B8;
+  border: 1px solid #5236b8;
 }
 
 button {
   width: 100%;
   padding: 14px;
   margin-top: 20px;
-  background: #6A57A5;
+  background: #6a57a5;
   color: white;
   border: none;
   border-radius: 30px;
@@ -61,7 +61,7 @@ button:hover {
 }
 
 .register a {
-  color: #6A57A5;
+  color: #6a57a5;
 
   text-decoration: none;
   font-weight: bold;

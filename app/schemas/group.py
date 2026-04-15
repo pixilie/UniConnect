@@ -8,9 +8,11 @@ class Group(BaseModel):
     name: str
     schedule_path: Optional[str] = None
 
+
 class NewGroup(BaseModel):
     name: str
     schedule_path: Optional[str] = None
+
 
 class UpdateGroup(BaseModel):
     name: Optional[str] = None

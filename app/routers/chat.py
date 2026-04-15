@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
@@ -12,15 +11,15 @@ from app.services.socket_manager import manager
 
 ws_router = APIRouter()
 
+
 @ws_router.websocket("/groups/{group_id}")
 async def websocket_endpoint(
-    websocket: WebSocket,
-    group_id: int,
-    token: str,
-    db: Session = Depends(get_db)
+    websocket: WebSocket, group_id: int, token: str, db: Session = Depends(get_db)
 ):
     try:
-        payload = payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         id = payload.get("sub")
         if id is None:
             await websocket.close(code=1008)
@@ -51,10 +50,10 @@ async def websocket_endpoint(
                 continue
 
             new_message = models.Message(
-                content = data,
-                user_id = user.id,
-                group_id = group_id,
-                sent_at = datetime.now(timezone.utc)
+                content=data,
+                user_id=user.id,
+                group_id=group_id,
+                sent_at=datetime.now(timezone.utc),
             )
 
             db.add(new_message)

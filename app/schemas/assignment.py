@@ -14,6 +14,7 @@ class CreatorInfo(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class Assignment(BaseModel):
     id: int
     title: str
@@ -24,13 +25,15 @@ class Assignment(BaseModel):
     creator: CreatorInfo
 
     class Config:
-            from_attributes = True
+        from_attributes = True
+
 
 class NewAssignment(BaseModel):
     title: str
     description: str
     group_id: int
     due_date: datetime
+
 
 class UpdateAssignment(BaseModel):
     title: Optional[str] = None

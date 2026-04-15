@@ -1,149 +1,157 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniConnect - Access Denied</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniConnect - Access Denied</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #F4F4F7;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .error-card {
-      background-color: #FFFFFF;
-      width: 100%;
-      max-width: 450px;
-      padding: 48px 32px;
-      border-radius: 24px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-      text-align: center;
-      box-sizing: border-box;
-      margin: 20px;
-    }
-
-    .icon-container {
-      width: 80px;
-      height: 80px;
-      background-color: #F9DEDC;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px auto;
-    }
-
-    .icon-container .material-icons-outlined {
-      font-size: 40px;
-      color: #B3261E;
-    }
-
-    .error-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1C1B1F;
-      margin: 0 0 12px 0;
-    }
-
-    .error-message {
-      font-size: 15px;
-      line-height: 1.6;
-      color: #49454F;
-      margin: 0 0 32px 0;
-    }
-
-    .btn-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px 24px;
-      border-radius: 100px;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-filled {
-      background: #6750A4;
-      color: white;
-    }
-
-    .btn-filled:hover {
-      background: #553e8a;
-      box-shadow: 0 2px 6px rgba(103, 80, 164, 0.3);
-    }
-
-    .btn-outlined {
-      background: transparent;
-      color: #6750A4;
-      border: 1px solid #CAC4D0;
-    }
-
-    .btn-outlined:hover {
-      background: #EADDFF;
-      border-color: #6750A4;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="error-card">
-    <div class="icon-container">
-      <span class="material-icons-outlined">gpp_bad</span>
-    </div>
-
-    <h1 class="error-title">Access Denied</h1>
-    <p class="error-message">
-      You don't have the required permissions to view this page. This area is restricted to administrators and authorized staff.
-    </p>
-
-    <div class="btn-container">
-      <button class="btn btn-filled" onclick="goBackSafely()">
-        <span class="material-icons-outlined" style="font-size: 18px;">arrow_back</span>
-        Go Back
-      </button>
-
-      <button class="btn btn-outlined" onclick="window.location.href='chat.html'">
-        <span class="material-icons-outlined" style="font-size: 18px;">home</span>
-        Return to Home
-      </button>
-    </div>
-  </div>
-
-  <script>
-    function goBackSafely() {
-      const previousPage = document.referrer;
-
-      if (previousPage && previousPage.includes(window.location.hostname) && !previousPage.includes("login.html")) {
-        window.location.href = previousPage;
-      } else if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = "chat.html";
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        background-color: #f4f4f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
       }
-    }
-  </script>
 
-</body>
+      .error-card {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 450px;
+        padding: 48px 32px;
+        border-radius: 24px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        box-sizing: border-box;
+        margin: 20px;
+      }
+
+      .icon-container {
+        width: 80px;
+        height: 80px;
+        background-color: #f9dedc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px auto;
+      }
+
+      .icon-container .material-icons-outlined {
+        font-size: 40px;
+        color: #b3261e;
+      }
+
+      .error-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1c1b1f;
+        margin: 0 0 12px 0;
+      }
+
+      .error-message {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #49454f;
+        margin: 0 0 32px 0;
+      }
+
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 12px 24px;
+        border-radius: 100px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-filled {
+        background: #6750a4;
+        color: white;
+      }
+
+      .btn-filled:hover {
+        background: #553e8a;
+        box-shadow: 0 2px 6px rgba(103, 80, 164, 0.3);
+      }
+
+      .btn-outlined {
+        background: transparent;
+        color: #6750a4;
+        border: 1px solid #cac4d0;
+      }
+
+      .btn-outlined:hover {
+        background: #eaddff;
+        border-color: #6750a4;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="error-card">
+      <div class="icon-container">
+        <span class="material-icons-outlined">gpp_bad</span>
+      </div>
+
+      <h1 class="error-title">Access Denied</h1>
+      <p class="error-message">
+        You don't have the required permissions to view this page. This area is restricted to
+        administrators and authorized staff.
+      </p>
+
+      <div class="btn-container">
+        <button class="btn btn-filled" onclick="goBackSafely()">
+          <span class="material-icons-outlined" style="font-size: 18px">arrow_back</span>
+          Go Back
+        </button>
+
+        <button class="btn btn-outlined" onclick="window.location.href='chat.html'">
+          <span class="material-icons-outlined" style="font-size: 18px">home</span>
+          Return to Home
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function goBackSafely() {
+        const previousPage = document.referrer;
+
+        if (
+          previousPage &&
+          previousPage.includes(window.location.hostname) &&
+          !previousPage.includes('login.html')
+        ) {
+          window.location.href = previousPage;
+        } else if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'chat.html';
+        }
+      }
+    </script>
+  </body>
 </html>

@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI):
     print("Shutting down background tasks...")
     task.cancel()
 
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan, title="UniConnect API")
@@ -47,12 +48,15 @@ app.mount("/styles", StaticFiles(directory="client/styles"), name="styles")
 app.mount("/scripts", StaticFiles(directory="client/scripts"), name="scripts")
 app.mount("/assets", StaticFiles(directory="client/assets"), name="assets")
 
+
 @app.get("/")
 def read_root():
     return RedirectResponse(url="/home.html")
 
+
 @app.get("/favicon.ico")
 def get_favicon():
     return FileResponse("client/assets/favicon.ico")
+
 
 app.mount("/", StaticFiles(directory="client/pages", html=True), name="pages")

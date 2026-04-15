@@ -13,6 +13,7 @@ class CreatorInfo(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class Announcement(BaseModel):
     id: int
     title: str
@@ -23,6 +24,7 @@ class Announcement(BaseModel):
     author: CreatorInfo
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class NewAnnoucement(BaseModel):
     title: str

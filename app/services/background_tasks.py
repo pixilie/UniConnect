@@ -13,23 +13,39 @@ async def deactivate_expired_polls():
         try:
             now = datetime.now(timezone.utc)
 
-            expired_polls = db.query(models.Poll).filter(
-                models.Poll.is_active,
-                models.Poll.expires_at != None,
-                models.Poll.expires_at <= now
-            ).all()
+            expired_polls = (
+                db.query(models.Poll)
+                .filter(
+                    models.Poll.is_active,
+                    models.Poll.expires_at != None,
+                    models.Poll.expires_at <= now,
+                )
+                .all()
+            )
 
             if expired_polls:
                 for poll in expired_polls:
                     poll.is_active = False
 
-                    total_votes = db.query(models.Vote).filter(models.Vote.poll_id == poll.id).count()
+                    total_votes = (
+                        db.query(models.Vote)
+                        .filter(models.Vote.poll_id == poll.id)
+                        .count()
+                    )
 
                     results_text = []
                     for choice in poll.choices:
-                        vote_count = db.query(models.Vote).filter(models.Vote.choice_id == choice.id).count()
-                        percentage = (vote_count / total_votes * 100) if total_votes > 0 else 0
-                        results_text.append(f"- <strong>{choice.text}</strong>: {vote_count} vote(s) ({percentage:.1f}%)")
+                        vote_count = (
+                            db.query(models.Vote)
+                            .filter(models.Vote.choice_id == choice.id)
+                            .count()
+                        )
+                        percentage = (
+                            (vote_count / total_votes * 100) if total_votes > 0 else 0
+                        )
+                        results_text.append(
+                            f"- <strong>{choice.text}</strong>: {vote_count} vote(s) ({percentage:.1f}%)"
+                        )
 
                     choices_formatted = "<br>".join(results_text)
 
@@ -46,7 +62,7 @@ async def deactivate_expired_polls():
                         sent_at=datetime.now(timezone.utc),
                         user_id=poll.user_id,
                         group_id=poll.group_id,
-                        urgent=False
+                        urgent=False,
                     )
 
                     db.add(new_announcement)

@@ -6,7 +6,7 @@ services:
     container_name: uniconnect-api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       # URL format : postgresql://[USER]:[PASSWORD]@db:5432/[DB_NAME]
       - DATABASE_URL=postgresql://TO_CHANGE:TO_CHANGE@db:5432/uniconnect
@@ -28,7 +28,7 @@ services:
       - POSTGRES_PASSWORD=TO_CHANGE
       - POSTGRES_DB=uniconnect
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -40,7 +40,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=TO_CHANGE
       - PGADMIN_DEFAULT_PASSWORD=TO_CHANGE
     ports:
-      - "5050:80"
+      - '5050:80'
     depends_on:
       - db
 

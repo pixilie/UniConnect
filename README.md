@@ -3,90 +3,62 @@
 UniConnect is a university group application developed as part of a Software Development Project course.  
 The goal of the application is to facilitate communication and organization within university classes by providing a dedicated platform for students, class delegates, and professors.
 
-The platform allows users to create and join class groups, exchange messages, publish official announcements, access class schedules, organize study events, and elect class delegates through an integrated voting system.  
-By combining messaging features with academic-specific tools, the application aims to provide a structured and reliable alternative to generic chat applications for educational use.
+The platform allows users to create and join class groups, exchange real-time messages, publish official announcements, access class schedules, organize study events, and elect class delegates through an integrated voting system.  
+By combining messaging features with academic-specific tools, the application aims to provide a structured, secure, and reliable alternative to generic chat applications for educational use.
 
 ---
 
-## Features
+## 🚀 Features
 
-- User authentication and role management (students, delegates, professors)
-- Class-based group messaging
-- Official announcements posted by professors and delegates
-- Access to class schedules
-- Creation and management of study events / fun activities
-- Polls system
-- Role-based permissions and access control
-- Ressources uploding system so teacher can share course related documents easily
+- **User Authentication:** Secure login with role management (Students, Delegates, Professors) via JWT.
+- **Real-Time Chat:** Class-based group messaging powered by WebSockets.
+- **Official Announcements:** Priority dashboard posts by professors and delegates.
+- **Interactive Timetables:** Access to class schedules (parsed from `.ics` files) and dynamic study events.
+- **Election System:** Interactive polling system to elect class delegates with real-time results.
+- **Resource Sharing:** File uploading system allowing teachers to share course-related documents easily.
+- **Role-Based Permissions:** Strict access control for administrative and teaching actions.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- HTML5
-- CSS3
-- JavaScript
+- **HTML5 & CSS3** (Custom styling, responsive design)
+- **Vanilla JavaScript** (DOM manipulation, native State Management, no heavy frameworks)
+- **WebSockets** (Real-time bidirectional communication)
 
 ### Backend
-- Python
-- RESTful API
-- SQL database (SQLite / PostgreSQL)
+- **Python 3**
+- **FastAPI** (High-performance REST API and WebSocket routing)
+- **SQLAlchemy ORM** (Database management)
+- **Uvicorn** (ASGI web server)
 
-### Tools
-- Git & GitHub
-- Markdown documentation
-- Trello
-
----
-
-## Architecture Overview
-
-The application follows a client-server architecture with a clear separation between frontend and backend.
-
-- The **frontend** is a static web application built using vanilla web technologies and communicates with the backend through HTTP requests.
-- The **backend** exposes a REST API responsible for authentication, business logic, and database access.
-- The **database** stores users, classes, messages, annoucements, events, schedules, and voting data.
-
-This modular architecture ensures maintainability, scalability, and ease of collaboration within the development team.
-More details can be found in the `docs/` directory.
+### Infrastructure & Database
+- **SQLite / PostgreSQL** (Relational data storage)
+- **Docker & Docker Compose** (Containerization and deployment)
+- **Caddy** (Reverse Proxy & automatic HTTPS)
+- **pgAdmin** (Database administration)
 
 ---
 
-## Installation & Setup
+## 🏗️ Architecture Overview
 
-### Installation (UV)
-1. Navigate to the `server/` directory
-2. Run ``uv sync`` (You need to have ``uv`` installed, see [here](https://docs.astral.sh/uv/getting-started/installation/) for more or type `direnv allow` if you're using Nix)
+The application follows a strict Client-Server architecture with a clear separation of concerns:
 
-### Running
-1. Navigate to the project directory
-2. Run ``uv run uvicorn app.main:app --reload`` and open the url ``127.0.0.1:8000`` in your browser.
+- The **Frontend** is a lightweight Single Page Application (SPA) built natively. It communicates with the backend through REST HTTP requests for data fetching and WebSockets for real-time chat.
+- The **Backend** exposes a modularized FastAPI application responsible for authentication, business logic, and database transactions.
+- The **Database** stores users, classes, messages, announcements, events, schedules, and voting data following a normalized entity-relationship model.
 
----
-
-## Documentation
-
-Additional documentation is available in the `docs/` directory:
-- Architecture overview
-- Functional requirements
-- Use cases
-- Development guidelines
+This modular architecture ensures maintainability, scalability, and zero-dependency frontend operation, perfectly aligning with our academic requirements. More details can be found in the `docs/` directory.
 
 ---
 
-## Contributing
+## 💻 Installation & Setup
 
-This project is developed as part of a university course and follows a collaborative workflow.
+### Option 1: Local Development (UV)
 
-Basic contribution guidelines:
-- Create a feature branch from `main`
-- Commit clear and descriptive messages
-- Open a pull request for review
-- Respect the existing architecture and coding standards
-
----
-
-## License
-
-This project is licensed under the MIT License.
+1. Clone the repository and navigate to the project directory.
+2. Run `uv sync` to install dependencies. *(You need to have [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, or type `direnv allow` if you're using Nix).*
+3. Start the development server:
+   ```bash
+   uv run uvicorn app.main:app --reload

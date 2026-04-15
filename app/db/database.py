@@ -30,6 +30,7 @@ for i in range(MAX_RETRIES):
 else:
     print("Impossible to connect to DB")
 
+
 def get_db():
     db = SessionLocal()
     try:

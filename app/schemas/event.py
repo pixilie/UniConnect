@@ -14,6 +14,7 @@ class CreatorInfo(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class Event(BaseModel):
     id: int
     title: str
@@ -27,6 +28,7 @@ class Event(BaseModel):
     creator: CreatorInfo
     group_id: int
 
+
 class NewEvent(BaseModel):
     title: str
     description: str
@@ -34,6 +36,7 @@ class NewEvent(BaseModel):
     end: datetime
     type: str
     location: Optional[str] = None
+
 
 class UpdateEvent(BaseModel):
     title: Optional[str] = None

@@ -1,43 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniConnect - Pending Assignment</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/no_group.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniConnect - Pending Assignment</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-  <link rel="stylesheet" href="../styles/no_group.css">
-</head>
+  <body>
+    <div class="card">
+      <div class="hero-icon">
+        <span class="material-icons-outlined" style="font-size: 48px">pending_actions</span>
+      </div>
 
-<body>
-  <div class="card">
-    <div class="hero-icon">
-      <span class="material-icons-outlined" style="font-size: 48px;">pending_actions</span>
+      <span class="logo-text">Almost there!</span>
+
+      <p class="tagline">
+        Your account is successfully created, but you haven't been assigned to a class or group yet.
+        <br /><br />
+        Please wait for an administrator to assign you, or contact your university support.
+      </p>
+
+      <div class="btn-container">
+        <button class="btn btn-filled" onclick="reload()">
+          <span
+            class="material-icons-outlined"
+            style="font-size: 18px; margin-right: 8px; vertical-align: middle"
+            >refresh</span
+          >
+          Refresh Status
+        </button>
+
+        <button class="btn btn-outlined" onclick="logout()">Logout</button>
+      </div>
     </div>
 
-    <span class="logo-text">Almost there!</span>
-
-    <p class="tagline">
-      Your account is successfully created, but you haven't been assigned to a class or group yet. <br><br>
-      Please wait for an administrator to assign you, or contact your university support.
-    </p>
-
-    <div class="btn-container">
-      <button class="btn btn-filled" onclick="reload()">
-        <span class="material-icons-outlined"
-          style="font-size: 18px; margin-right: 8px; vertical-align: middle;">refresh</span>
-        Refresh Status
-      </button>
-
-      <button class="btn btn-outlined" onclick="logout()">
-        Logout
-      </button>
-    </div>
-  </div>
-
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/no_group.js"></script>
-</body>
-
+    <script src="../scripts/common.js"></script>
+    <script src="../scripts/no_group.js"></script>
+  </body>
 </html>

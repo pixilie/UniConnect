@@ -1,235 +1,316 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniConnect - Admin Panel</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/admin.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniConnect - Admin Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-  <link rel="stylesheet" href="../styles/admin.css">
-</head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div style="color: #6750a4; font-weight: bold; font-size: 22px; margin-bottom: 20px">
+          UniConnect Admin
+        </div>
 
-<body>
+        <div class="search-box">
+          <span class="material-icons-outlined" style="font-size: 18px; color: #777">search</span>
+          <input
+            type="text"
+            class="search-input"
+            id="adminSearchInput"
+            placeholder="Search a group..."
+            autocomplete="off"
+          />
+        </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div style="color: #6750A4; font-weight: bold; font-size: 22px; margin-bottom: 20px;">UniConnect Admin</div>
-
-      <div class="search-box">
-        <span class="material-icons-outlined" style="font-size: 18px; color: #777;">search</span>
-        <input type="text" class="search-input" id="adminSearchInput" placeholder="Search a group..." autocomplete="off">
+        <button class="btn-create-group" id="btnCreateGroup">
+          <span class="material-icons-outlined">add_circle</span> Create Group
+        </button>
       </div>
 
-      <button class="btn-create-group" id="btnCreateGroup">
-        <span class="material-icons-outlined">add_circle</span> Create Group
-      </button>
-    </div>
-
-    <div class="group-list" id="adminGroupList">
-      <div class="category-label">My Managed Groups</div>
-    </div>
-
-    <div class="user-panel">
-      <div class="user-avatar" id="adminUserAvatar" style="width: 36px; height: 36px; background: #625B71; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;"></div>
-      <div style="flex: 1;">
-        <span class="user-name" id="adminUserName" style="font-size: 14px; font-weight: bold; display: block;"></span>
-        <span class="user-role" id="adminUserRole" style="font-size: 12px; color: #666;"></span>
-      </div>
-      <span class="material-icons-outlined" style="cursor:pointer; color:#666;">settings</span>
-    </div>
-  </aside>
-
-  <main class="main-content">
-    <div class="top-bar" id="adminTopBarTitle">Admin Panel: Select a group</div>
-
-    <div class="dashboard-grid">
-
-      <div class="teacher-card">
-        <div class="card-header">
-          <span class="material-icons-outlined">campaign</span> Post Announcement
-        </div>
-        <input type="text" id="announcementTitle" class="form-input" placeholder="Announcement Title" autocomplete="off">
-        <textarea id="announcementText" placeholder="Write an update for this class..."></textarea>
-        <div class="announcement-footer">
-          <label class="urgent-label">
-            <input type="checkbox" id="announcementUrgent"> Urgent
-          </label>
-          <button class="btn-action btn-primary" id="btnPostAnnouncement">Post to Class</button>
-        </div>
+      <div class="group-list" id="adminGroupList">
+        <div class="category-label">My Managed Groups</div>
       </div>
 
-      <div class="teacher-card">
-        <div class="card-header">
-          <span class="material-icons-outlined">construction</span> Class Tools
+      <div class="user-panel">
+        <div
+          class="user-avatar"
+          id="adminUserAvatar"
+          style="
+            width: 36px;
+            height: 36px;
+            background: #625b71;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+          "
+        ></div>
+        <div style="flex: 1">
+          <span
+            class="user-name"
+            id="adminUserName"
+            style="font-size: 14px; font-weight: bold; display: block"
+          ></span>
+          <span class="user-role" id="adminUserRole" style="font-size: 12px; color: #666"></span>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <button class="btn-action btn-outline" id="btnUpdateTimetable"><span class="material-icons-outlined">upload_file</span> Update Timetable</button>
-          <button class="btn-action btn-outline" id="btnAddEventBtn"><span class="material-icons-outlined">event</span> Add Event</button>
-          <button class="btn-action btn-outline" id="btnStartElection"><span class="material-icons-outlined">how_to_vote</span> Start Poll</button>
-        </div>
+        <span class="material-icons-outlined" style="cursor: pointer; color: #666">settings</span>
       </div>
+    </aside>
 
-      <div class="teacher-card" style="grid-column: span 2;">
-        <div class="card-header">
-          <span class="material-icons-outlined">groups</span> Student Management
-          <button class="btn-action btn-primary" id="btnAddStudentBtn" style="margin-left: auto;">Add Student</button>
-        </div>
+    <main class="main-content">
+      <div class="top-bar" id="adminTopBarTitle">Admin Panel: Select a group</div>
 
-        <div id="studentListContainer"></div>
-      </div>
-
-    </div>
-
-    <div class="create-modal-overlay" id="createGroupModal">
-      <div class="create-modal">
-        <div class="modal-header">
-          <h3>Create New Group</h3>
-          <span class="material-icons-outlined close-modal" id="closeGroupModalBtn">close</span>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Group Name</label>
-            <input type="text" id="newGroupName" placeholder="e.g., Computer Science L3" autocomplete="off">
+      <div class="dashboard-grid">
+        <div class="teacher-card">
+          <div class="card-header">
+            <span class="material-icons-outlined">campaign</span> Post Announcement
+          </div>
+          <input
+            type="text"
+            id="announcementTitle"
+            class="form-input"
+            placeholder="Announcement Title"
+            autocomplete="off"
+          />
+          <textarea
+            id="announcementText"
+            placeholder="Write an update for this class..."
+          ></textarea>
+          <div class="announcement-footer">
+            <label class="urgent-label">
+              <input type="checkbox" id="announcementUrgent" /> Urgent
+            </label>
+            <button class="btn-action btn-primary" id="btnPostAnnouncement">Post to Class</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" id="cancelGroupBtn">Cancel</button>
-          <button class="btn-create" id="confirmCreateGroupBtn">Create</button>
+
+        <div class="teacher-card">
+          <div class="card-header">
+            <span class="material-icons-outlined">construction</span> Class Tools
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <button class="btn-action btn-outline" id="btnUpdateTimetable">
+              <span class="material-icons-outlined">upload_file</span> Update Timetable
+            </button>
+            <button class="btn-action btn-outline" id="btnAddEventBtn">
+              <span class="material-icons-outlined">event</span> Add Event
+            </button>
+            <button class="btn-action btn-outline" id="btnStartElection">
+              <span class="material-icons-outlined">how_to_vote</span> Start Poll
+            </button>
+          </div>
+        </div>
+
+        <div class="teacher-card" style="grid-column: span 2">
+          <div class="card-header">
+            <span class="material-icons-outlined">groups</span> Student Management
+            <button class="btn-action btn-primary" id="btnAddStudentBtn" style="margin-left: auto">
+              Add Student
+            </button>
+          </div>
+
+          <div id="studentListContainer"></div>
         </div>
       </div>
-    </div>
 
-    <div class="create-modal-overlay" id="addStudentModal">
-      <div class="create-modal">
-        <div class="modal-header">
-          <h3>Add Student</h3>
-          <span class="material-icons-outlined close-modal" id="closeStudentModalBtn">close</span>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Student Email</label>
-            <input type="email" id="newStudentEmail" placeholder="student@university.edu" autocomplete="off">
+      <div class="create-modal-overlay" id="createGroupModal">
+        <div class="create-modal">
+          <div class="modal-header">
+            <h3>Create New Group</h3>
+            <span class="material-icons-outlined close-modal" id="closeGroupModalBtn">close</span>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" id="cancelStudentBtn">Cancel</button>
-          <button class="btn-create" id="confirmAddStudentBtn">Add Student</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="create-modal-overlay" id="updateTimetableModal">
-      <div class="create-modal">
-        <div class="modal-header">
-          <h3>Upload Timetable</h3>
-          <span class="material-icons-outlined close-modal" id="closeTimetableModalBtn">close</span>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Upload .ics File</label>
-            <input type="file" id="timetableFile" accept=".ics">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" id="cancelTimetableBtn">Cancel</button>
-          <button class="btn-create" id="confirmUpdateTimetableBtn">Upload</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="create-modal-overlay" id="addEventModal">
-      <div class="create-modal">
-        <div class="modal-header">
-          <h3>Create an Event</h3>
-          <span class="material-icons-outlined close-modal" id="closeEventModalBtn">close</span>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="eventTitle" placeholder="e.g., Study Session" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea id="eventDescription" placeholder="Add some details... (optional)" style="height: 70px;"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Location</label>
-            <input type="text" id="eventLocation" placeholder="e.g., Library" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Type</label>
-            <select id="eventType">
-              <option value="COURSE">Course</option>
-              <option value="STUDY">Study</option>
-              <option value="EXAM">Exam</option>
-              <option value="ACTIVITY">Activity</option>
-            </select>
-          </div>
-          <div style="display: flex;">
+          <div class="modal-body">
             <div class="form-group">
-              <label>Start</label>
-              <input type="datetime-local" id="eventStart">
-            </div>
-            <div class="form-group">
-              <label>End</label>
-              <input type="datetime-local" id="eventEnd">
+              <label>Group Name</label>
+              <input
+                type="text"
+                id="newGroupName"
+                placeholder="e.g., Computer Science L3"
+                autocomplete="off"
+              />
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" id="cancelEventBtn">Cancel</button>
-          <button class="btn-create" id="confirmAddEventBtn">Create</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="create-modal-overlay" id="startElectionModal">
-      <div class="create-modal">
-        <div class="modal-header">
-          <h3>Start Poll</h3>
-          <span class="material-icons-outlined close-modal" id="closeElectionModalBtn">close</span>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="electionTitle" placeholder="e.g., Delegate Election 2026" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Options (comma separated)</label>
-            <input type="text" id="electionOptions" placeholder="e.g., Alice, Bob, Charlie" autocomplete="off">
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelGroupBtn">Cancel</button>
+            <button class="btn-create" id="confirmCreateGroupBtn">Create</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" id="cancelElectionBtn">Cancel</button>
-          <button class="btn-create" id="confirmStartElectionBtn">Start</button>
+      </div>
+
+      <div class="create-modal-overlay" id="addStudentModal">
+        <div class="create-modal">
+          <div class="modal-header">
+            <h3>Add Student</h3>
+            <span class="material-icons-outlined close-modal" id="closeStudentModalBtn">close</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Student Email</label>
+              <input
+                type="email"
+                id="newStudentEmail"
+                placeholder="student@university.edu"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelStudentBtn">Cancel</button>
+            <button class="btn-create" id="confirmAddStudentBtn">Add Student</button>
+          </div>
         </div>
       </div>
-    </div>
 
-  </main>
+      <div class="create-modal-overlay" id="updateTimetableModal">
+        <div class="create-modal">
+          <div class="modal-header">
+            <h3>Upload Timetable</h3>
+            <span class="material-icons-outlined close-modal" id="closeTimetableModalBtn"
+              >close</span
+            >
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Upload .ics File</label>
+              <input type="file" id="timetableFile" accept=".ics" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelTimetableBtn">Cancel</button>
+            <button class="btn-create" id="confirmUpdateTimetableBtn">Upload</button>
+          </div>
+        </div>
+      </div>
 
-  <template id="adminGroupItemTemplate">
-    <a href="#" class="group-item">
-      <span class="material-icons-outlined">groups</span>
-      <span class="group-name"></span>
-    </a>
-  </template>
+      <div class="create-modal-overlay" id="addEventModal">
+        <div class="create-modal">
+          <div class="modal-header">
+            <h3>Create an Event</h3>
+            <span class="material-icons-outlined close-modal" id="closeEventModalBtn">close</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                id="eventTitle"
+                placeholder="e.g., Study Session"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                id="eventDescription"
+                placeholder="Add some details... (optional)"
+                style="height: 70px"
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input
+                type="text"
+                id="eventLocation"
+                placeholder="e.g., Library"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="eventType">
+                <option value="COURSE">Course</option>
+                <option value="STUDY">Study</option>
+                <option value="EXAM">Exam</option>
+                <option value="ACTIVITY">Activity</option>
+              </select>
+            </div>
+            <div style="display: flex">
+              <div class="form-group">
+                <label>Start</label>
+                <input type="datetime-local" id="eventStart" />
+              </div>
+              <div class="form-group">
+                <label>End</label>
+                <input type="datetime-local" id="eventEnd" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelEventBtn">Cancel</button>
+            <button class="btn-create" id="confirmAddEventBtn">Create</button>
+          </div>
+        </div>
+      </div>
 
-  <template id="studentItemTemplate">
+      <div class="create-modal-overlay" id="startElectionModal">
+        <div class="create-modal">
+          <div class="modal-header">
+            <h3>Start Poll</h3>
+            <span class="material-icons-outlined close-modal" id="closeElectionModalBtn"
+              >close</span
+            >
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                id="electionTitle"
+                placeholder="e.g., Delegate Election 2026"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label>Options (comma separated)</label>
+              <input
+                type="text"
+                id="electionOptions"
+                placeholder="e.g., Alice, Bob, Charlie"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" id="cancelElectionBtn">Cancel</button>
+            <button class="btn-create" id="confirmStartElectionBtn">Start</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <template id="adminGroupItemTemplate">
+      <a href="#" class="group-item">
+        <span class="material-icons-outlined">groups</span>
+        <span class="group-name"></span>
+      </a>
+    </template>
+
+    <template id="studentItemTemplate">
       <div class="student-item">
         <div class="student-info">
           <div class="mini-avatar"></div>
-          <span style="font-weight: 500;">
-              <span class="student-name"></span>
+          <span style="font-weight: 500">
+            <span class="student-name"></span>
           </span>
         </div>
         <div class="student-actions"></div>
       </div>
     </template>
 
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/admin.js"></script>
-</body>
-
+    <script src="../scripts/common.js"></script>
+    <script src="../scripts/admin.js"></script>
+  </body>
 </html>
