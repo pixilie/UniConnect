@@ -62,3 +62,16 @@ This modular architecture ensures maintainability, scalability, and zero-depende
 3. Start the development server:
    ```bash
    uv run uvicorn app.main:app --reload
+   ```
+4. Open http://127.0.0.1:8000 in your web browser.
+
+### Option 2: Production Deployment (Docker)
+
+This option may require some adjustements to match your server's configuration.
+
+1. Clone the repository on your server.
+2. Ensure you have ``docker`` and ``docker compose`` installed.
+3. Build and run the containers in the background:
+   ```bash
+   docker compose up -d --build
+   ```
