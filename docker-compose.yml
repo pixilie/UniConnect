@@ -15,6 +15,7 @@ services:
       - RESOURCES_PATH=app/db/resources
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - UPLOAD_SIZE=20971520
     depends_on:
       - db
 
