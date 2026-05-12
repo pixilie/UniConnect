@@ -16,12 +16,22 @@ resource_router = APIRouter()
 os.makedirs(settings.RESOURCES_PATH, exist_ok=True)
 
 
+import os
+import shutil
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from sqlalchemy.orm import Session
+
+# Assure-toi que models, schemas, settings, get_db, get_current_user sont bien importés
+
+
 @resource_router.post(
     "/groups/{group_id}/resources", response_model=schemas.ResourceResponse
 )
 async def upload_resource(
     group_id: int,
-    title: str = Form(...),
+    title: str = Form(default=""),
     category: models.ResourceCategory = Form(models.ResourceCategory.OTHER),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -39,22 +49,37 @@ async def upload_resource(
     if file.size > settings.UPLOAD_SIZE:
         raise HTTPException(
             status_code=422,
-            detail=f"You can't upload a ressource heavier than {settings.UPLOAD_SIZE / 1024 * 2}mb",
+            detail=f"You can't upload a resource heavier than {settings.UPLOAD_SIZE / (1024**2):.1f} MB",
         )
 
-    if file.filename:
-        file_ext = file.filename.split(".")[-1] if "." in file.filename else "unknown"
-        safe_filename = f"{uuid4().hex}.{file_ext}"
-        file_path = os.path.join(settings.RESOURCES_PATH, safe_filename)
-    else:
+    if not file.filename:
         raise HTTPException(
-            status_code=500, detail=f"{file.filename} is not a valid filename"
+            status_code=400, detail="No file provided or invalid filename"
         )
 
-    if title.strip() == "":
-        raise HTTPException(
-            status_code=422, detail="You can't upload a ressource with an empty title"
+    final_title = title.strip()
+    if not final_title:
+        final_title = (
+            file.filename.rsplit(".", 1)[0] if "." in file.filename else file.filename
         )
+
+    existing_resource = (
+        db.query(models.Resource)
+        .filter(
+            models.Resource.group_id == group_id, models.Resource.title == final_title
+        )
+        .first()
+    )
+
+    if existing_resource:
+        raise HTTPException(
+            status_code=409,
+            detail=f"A resource with the title '{final_title}' already exists in this group.",
+        )
+
+    file_ext = file.filename.split(".")[-1] if "." in file.filename else "unknown"
+    safe_filename = f"{uuid4().hex}.{file_ext}"
+    file_path = os.path.join(settings.RESOURCES_PATH, safe_filename)
 
     try:
         with open(file_path, "wb") as buffer:
@@ -63,7 +88,7 @@ async def upload_resource(
         raise HTTPException(status_code=500, detail=f"Could not save file: {str(e)}")
 
     new_resource = models.Resource(
-        title=title,
+        title=final_title,
         file_path=file_path,
         file_type=file_ext,
         category=category,
