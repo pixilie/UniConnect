@@ -36,6 +36,12 @@ async def upload_resource(
             status_code=403, detail="Not authorized to access this group"
         )
 
+    if file.size > settings.UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=422,
+            detail=f"You can't upload a ressource heavier than {settings.UPLOAD_SIZE / 1024 * 2}mb",
+        )
+
     if file.filename:
         file_ext = file.filename.split(".")[-1] if "." in file.filename else "unknown"
         safe_filename = f"{uuid4().hex}.{file_ext}"
