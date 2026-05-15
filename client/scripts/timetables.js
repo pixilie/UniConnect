@@ -45,9 +45,68 @@ function clearGrid() {
   cards.forEach((card) => card.remove());
 }
 
+function splitEventDays(evt){
+  const startDate = new Date(evt.start);
+  const endDate = new Date(evt.end);
+  const startDay = startDate.toDateString();
+  const endDay = endDate.toDateString();
+
+  // Check if the event is on a single day
+  if (startDay === endDay) {
+    renderEventCard(evt);
+  }
+  else if (endDate.getHours() === 0 && endDate.getMinutes() === 0 && (endDate - startDate) <= 86400000) {
+    renderEventCard(evt);
+  }
+  else{
+    const splitDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()+1,
+      0, // Hours
+      0, // Minutes
+      0  // Seconds
+    );
+
+    let startEvent = {
+      title: evt.title,
+      description: evt.description,
+      type: evt.type,
+      start: evt.start,
+      end: splitDate,
+      location: evt.location,
+      displayStart: evt.displayStart || evt.start,
+      displayEnd: evt.displayEnd || evt.end
+    };
+
+    let endEvent = {
+      title: evt.title,
+      description: evt.description,
+      type: evt.type,
+      start: splitDate,
+      end: evt.end,
+      location: evt.location,
+      displayStart: evt.displayStart || evt.start,
+      displayEnd: evt.displayEnd || evt.end
+    };
+
+    renderEventCard(startEvent);
+    splitEventDays(endEvent);
+  }
+}
+
 function renderEventCard(evt) {
   const startDate = new Date(evt.start);
   const endDate = new Date(evt.end);
+  let displayStart = new Date(evt.start);
+  let displayEnd = new Date(evt.end);
+
+  if('displayStart' in evt){
+    displayStart=new Date(evt.displayStart);
+  }
+  if('displayEnd' in evt){
+    displayEnd=new Date(evt.displayEnd);
+  }
 
   const eventMonday = getMonday(startDate);
   if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) return;
@@ -72,14 +131,15 @@ function renderEventCard(evt) {
   eventNode.style.gridRow = `${gridRowStart} / ${gridRowEnd}`;
 
   eventNode.querySelector('.event-time').textContent =
-    `${startHour}:00 - ${startHour + durationHours}:00`;
+    `${displayStart.getHours()}:00 - ${displayEnd.getHours()}:00`;
   eventNode.querySelector('.event-title').textContent = evt.title;
   eventNode.querySelector('.event-location').textContent = evt.location || 'TBD';
 
   eventNode.addEventListener('click', () => {
     document.getElementById('viewEventTitle').textContent = evt.title;
     document.getElementById('viewEventTime').textContent =
-      `${formatShortDate(startDate)} • ${startHour}:00 - ${startHour + durationHours}:00`;
+      `${formatShortDate(displayStart)} ${formatShortDate(displayStart)!=formatShortDate(displayEnd) ?`- ${formatShortDate(displayEnd)}`: ''} 
+      • ${displayStart.getHours()}:00 - ${displayEnd.getHours()}:00`;
     document.getElementById('viewEventLocation').textContent = evt.location || 'No location';
     document.getElementById('viewEventType').textContent = evt.type;
     document.getElementById('viewEventDescription').textContent =
@@ -94,7 +154,7 @@ function renderEventCard(evt) {
 function refreshWeekView() {
   clearGrid();
   updateCalendarHeaders();
-  allEvents.forEach((evt) => renderEventCard(evt));
+  allEvents.forEach((evt) => splitEventDays(evt));
 }
 
 prevWeekBtn.addEventListener('click', () => {
