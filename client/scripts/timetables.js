@@ -2,6 +2,11 @@ requireAuth();
 
 let currentDisplayedMonday = getMonday(new Date());
 let allEvents = [];
+let weekEvents = Array.from({ length: 7 }, () =>
+  Array.from({ length: 24 }, () =>
+    Array.from({ length: 0 }, () => null)
+  )
+);
 
 const calendarGrid = document.getElementById('calendarGrid');
 const eventTemplate = document.getElementById('eventTemplate');
@@ -45,6 +50,27 @@ function clearGrid() {
   cards.forEach((card) => card.remove());
 }
 
+function storeEvent(evt){
+  let startDate = new Date(evt.start);
+  let endDate = new Date(evt.end);
+
+  let day=startDate.getDay();
+  let startHour=startDate.getHours();
+  let endHour=endDate.getHours();
+  if(endHour==0)endHour=24;
+
+  for (let index = startHour; index < endHour; index++) {
+    weekEvents[day][index].push(evt);
+    weekEvents[day][index].forEach((item) =>{
+      if(item['overlap']>weekEvents[day][index].length){}
+      else{
+        item['overlap']=weekEvents[day][index].length;
+        if(!('overlapOrder' in item))item['overlapOrder']=weekEvents[day][index].length;
+      }
+    });
+  }
+}
+
 function splitEventDays(evt){
   const startDate = new Date(evt.start);
   const endDate = new Date(evt.end);
@@ -53,10 +79,10 @@ function splitEventDays(evt){
 
   // Check if the event is on a single day
   if (startDay === endDay) {
-    renderEventCard(evt);
+    storeEvent(evt);
   }
   else if (endDate.getHours() === 0 && endDate.getMinutes() === 0 && (endDate - startDate) <= 86400000) {
-    renderEventCard(evt);
+    storeEvent(evt);
   }
   else{
     const splitDate = new Date(
@@ -90,7 +116,7 @@ function splitEventDays(evt){
       displayEnd: evt.displayEnd || evt.end
     };
 
-    renderEventCard(startEvent);
+    storeEvent(startEvent);
     splitEventDays(endEvent);
   }
 }
@@ -147,6 +173,9 @@ function renderEventCard(evt) {
 
     document.getElementById('viewEventModal').classList.add('active');
   });
+  
+  eventNode.style.marginLeft=`${(evt.overlapOrder-1)*(100/evt.overlap)}%`;
+  eventNode.style.marginRight=`${(evt.overlap-evt.overlapOrder)*(100/evt.overlap)}%`;
 
   calendarGrid.appendChild(eventNode);
 }
@@ -155,6 +184,18 @@ function refreshWeekView() {
   clearGrid();
   updateCalendarHeaders();
   allEvents.forEach((evt) => splitEventDays(evt));
+  for (let i = 0; i < weekEvents.length; i++) {
+    for (let j = 0; j < weekEvents[i].length; j++) {
+      for (let h = 0; h < weekEvents[i][j].length; h++) {
+        let startDate= new Date(weekEvents[i][j][h].start);
+        if(startDate.getHours()==j){
+          renderEventCard(weekEvents[i][j][h])
+        }
+      }
+    }
+  }
+  console.log(weekEvents);
+  
 }
 
 prevWeekBtn.addEventListener('click', () => {
@@ -233,6 +274,11 @@ confirmCreateBtn.addEventListener('click', async () => {
     window.alert(`Error while posting new event: ${error}`);
     return;
   }
+  weekEvents = Array.from({ length: 7 }, () =>
+    Array.from({ length: 24 }, () =>
+      Array.from({ length: 0 }, () => null)
+    )
+  );
 
   allEvents.push(newEvent);
   currentDisplayedMonday = getMonday(startDate);
@@ -245,6 +291,11 @@ async function fetchEvents() {
   if (!AppState.currentGroupId) return;
 
   allEvents = [];
+  weekEvents = Array.from({ length: 7 }, () =>
+    Array.from({ length: 24 }, () =>
+      Array.from({ length: 0 }, () => null)
+    )
+  );
 
   try {
     const resIcs = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
