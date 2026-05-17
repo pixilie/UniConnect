@@ -2,6 +2,11 @@ requireAuth();
 
 let currentDisplayedMonday = getMonday(new Date());
 let allEvents = [];
+let weekEvents = Array.from({ length: 7 }, () =>
+  Array.from({ length: 24 }, () =>
+    Array.from({ length: 0 }, () => null)
+  )
+);
 
 const calendarGrid = document.getElementById('calendarGrid');
 const eventTemplate = document.getElementById('eventTemplate');
@@ -45,9 +50,89 @@ function clearGrid() {
   cards.forEach((card) => card.remove());
 }
 
+function storeEvent(evt){
+  let startDate = new Date(evt.start);
+  let endDate = new Date(evt.end);
+
+  let day=startDate.getDay();
+  let startHour=startDate.getHours();
+  let endHour=endDate.getHours();
+  if(endHour==0)endHour=24;
+
+  for (let index = startHour; index < endHour; index++) {
+    weekEvents[day][index].push(evt);
+    weekEvents[day][index].forEach((item) =>{
+      if(item['overlap']>weekEvents[day][index].length){}
+      else{
+        item['overlap']=weekEvents[day][index].length;
+        if(!('overlapOrder' in item))item['overlapOrder']=weekEvents[day][index].length;
+      }
+    });
+  }
+}
+
+function splitEventDays(evt){
+  const startDate = new Date(evt.start);
+  const endDate = new Date(evt.end);
+  const startDay = startDate.toDateString();
+  const endDay = endDate.toDateString();
+
+  // Check if the event is on a single day
+  if (startDay === endDay) {
+    storeEvent(evt);
+  }
+  else if (endDate.getHours() === 0 && endDate.getMinutes() === 0 && (endDate - startDate) <= 86400000) {
+    storeEvent(evt);
+  }
+  else{
+    const splitDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()+1,
+      0, // Hours
+      0, // Minutes
+      0  // Seconds
+    );
+
+    let startEvent = {
+      title: evt.title,
+      description: evt.description,
+      type: evt.type,
+      start: evt.start,
+      end: splitDate,
+      location: evt.location,
+      displayStart: evt.displayStart || evt.start,
+      displayEnd: evt.displayEnd || evt.end
+    };
+
+    let endEvent = {
+      title: evt.title,
+      description: evt.description,
+      type: evt.type,
+      start: splitDate,
+      end: evt.end,
+      location: evt.location,
+      displayStart: evt.displayStart || evt.start,
+      displayEnd: evt.displayEnd || evt.end
+    };
+
+    storeEvent(startEvent);
+    splitEventDays(endEvent);
+  }
+}
+
 function renderEventCard(evt) {
   const startDate = new Date(evt.start);
   const endDate = new Date(evt.end);
+  let displayStart = new Date(evt.start);
+  let displayEnd = new Date(evt.end);
+
+  if('displayStart' in evt){
+    displayStart=new Date(evt.displayStart);
+  }
+  if('displayEnd' in evt){
+    displayEnd=new Date(evt.displayEnd);
+  }
 
   const eventMonday = getMonday(startDate);
   if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) return;
@@ -72,14 +157,15 @@ function renderEventCard(evt) {
   eventNode.style.gridRow = `${gridRowStart} / ${gridRowEnd}`;
 
   eventNode.querySelector('.event-time').textContent =
-    `${startHour}:00 - ${startHour + durationHours}:00`;
+    `${displayStart.getHours()}:00 - ${displayEnd.getHours()}:00`;
   eventNode.querySelector('.event-title').textContent = evt.title;
   eventNode.querySelector('.event-location').textContent = evt.location || 'TBD';
 
   eventNode.addEventListener('click', () => {
     document.getElementById('viewEventTitle').textContent = evt.title;
     document.getElementById('viewEventTime').textContent =
-      `${formatShortDate(startDate)} • ${startHour}:00 - ${startHour + durationHours}:00`;
+      `${formatShortDate(displayStart)} ${formatShortDate(displayStart)!=formatShortDate(displayEnd) ?`- ${formatShortDate(displayEnd)}`: ''} 
+      • ${displayStart.getHours()}:00 - ${displayEnd.getHours()}:00`;
     document.getElementById('viewEventLocation').textContent = evt.location || 'No location';
     document.getElementById('viewEventType').textContent = evt.type;
     document.getElementById('viewEventDescription').textContent =
@@ -87,6 +173,9 @@ function renderEventCard(evt) {
 
     document.getElementById('viewEventModal').classList.add('active');
   });
+  
+  eventNode.style.marginLeft=`${(evt.overlapOrder-1)*(100/evt.overlap)}%`;
+  eventNode.style.marginRight=`${(evt.overlap-evt.overlapOrder)*(100/evt.overlap)}%`;
 
   calendarGrid.appendChild(eventNode);
 }
@@ -94,7 +183,19 @@ function renderEventCard(evt) {
 function refreshWeekView() {
   clearGrid();
   updateCalendarHeaders();
-  allEvents.forEach((evt) => renderEventCard(evt));
+  allEvents.forEach((evt) => splitEventDays(evt));
+  for (let i = 0; i < weekEvents.length; i++) {
+    for (let j = 0; j < weekEvents[i].length; j++) {
+      for (let h = 0; h < weekEvents[i][j].length; h++) {
+        let startDate= new Date(weekEvents[i][j][h].start);
+        if(startDate.getHours()==j){
+          renderEventCard(weekEvents[i][j][h])
+        }
+      }
+    }
+  }
+  console.log(weekEvents);
+  
 }
 
 prevWeekBtn.addEventListener('click', () => {
@@ -170,9 +271,14 @@ confirmCreateBtn.addEventListener('click', async () => {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while posting new event: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
+  weekEvents = Array.from({ length: 7 }, () =>
+    Array.from({ length: 24 }, () =>
+      Array.from({ length: 0 }, () => null)
+    )
+  );
 
   allEvents.push(newEvent);
   currentDisplayedMonday = getMonday(startDate);
@@ -185,6 +291,11 @@ async function fetchEvents() {
   if (!AppState.currentGroupId) return;
 
   allEvents = [];
+  weekEvents = Array.from({ length: 7 }, () =>
+    Array.from({ length: 24 }, () =>
+      Array.from({ length: 0 }, () => null)
+    )
+  );
 
   try {
     const resIcs = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/schedules`, {
@@ -195,11 +306,13 @@ async function fetchEvents() {
     if (resIcs.ok) {
       const scheduleData = await resIcs.text();
       allEvents = parseICSFromString(scheduleData);
-    } else {
-      const error = await res.json();
-      window.alert(`No schedule uploaded for this group yet: ${error}`);
+    } 
+    else if(!resIcs.status==404){
+      const error = await resIcs.json();
+      window.alert(`${error.detail}`);
       return;
     }
+
   } catch (error) {
     console.error('Failed to fetch schedule:', error);
   }
@@ -229,9 +342,10 @@ async function fetchEvents() {
         };
         allEvents.push(newElement);
       });
-    } else {
-      const error = await res.json();
-      window.alert(`Error while getting events from DB: ${error}`);
+    } 
+    else{
+      const error = await resDB.json();
+      window.alert(`${error.detail}`);
       return;
     }
   } catch (error) {
