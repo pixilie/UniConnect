@@ -17,16 +17,25 @@ def register_user(user: schemas.RegistrationRequest, db: Session = Depends(get_d
         raise HTTPException(status_code=400, detail="User already exists")
 
     hashed_pw = get_password_hash(user.password)
+    assigned_role = (
+        models.UserRole.ADMIN if query.count() == 0 else models.UserRole.STUDENT
+    )
 
     new_user = models.User(
         email=user.email,
         hashed_password=hashed_pw,
         first_name=user.first_name,
         last_name=user.last_name,
-        role=models.UserRole.ADMIN.value
-        if query.count() == 0
-        else models.UserRole.STUDENT.value,
+        role=assigned_role,
     )
+
+    if assigned_role == models.UserRole.ADMIN:
+        admin_group = (
+            db.query(models.Group).filter(models.Group.name == "Administrators").first()
+        )
+
+        if admin_group:
+            new_user.groups.append(admin_group)
 
     db.add(new_user)
     db.commit()

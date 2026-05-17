@@ -1,6 +1,8 @@
 import asyncio
 from datetime import datetime, timezone
 
+from sqlalchemy.orm import Session
+
 from app import models
 from app.db.database import (
     SessionLocal,
@@ -75,3 +77,16 @@ async def deactivate_expired_polls():
             db.close()
 
         await asyncio.sleep(60)
+
+
+def create_default_admin_group(db: Session):
+    existing_group = (
+        db.query(models.Group).filter(models.Group.name == "Administrators").first()
+    )
+
+    if not existing_group:
+        admin_group = models.Group(
+            name="Administrators",
+        )
+        db.add(admin_group)
+        db.commit()

@@ -7,18 +7,27 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import routers
-from app.services import deactivate_expired_polls
+from app.services import create_default_admin_group, deactivate_expired_polls
 
-from .db.database import Base, engine
+from .db.database import Base, SessionLocal, engine
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Starting background tasks...")
-    task = asyncio.create_task(deactivate_expired_polls())
+    print("Starting background tasks and initializations...")
+    db = SessionLocal()
+
+    try:
+        create_default_admin_group(db)
+    finally:
+        db.close()
+
+    expired_polls_task = asyncio.create_task(deactivate_expired_polls())
+
     yield
+
     print("Shutting down background tasks...")
-    task.cancel()
+    expired_polls_task.cancel()
 
 
 Base.metadata.create_all(bind=engine)
