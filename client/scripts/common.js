@@ -36,6 +36,7 @@ async function adminOnly() {
 
     if (!token) {
         logout();
+        return;
     }
 
     try {
@@ -50,18 +51,29 @@ async function adminOnly() {
         if (res.ok) {
             const userData = await res.json();
 
-            if (userData.role !== 'administrator') {
+            if (userData.role !== 'administrator' && userData.role !== 'teacher') {
                 goBackSafely();
-            } else if (userData.groups && userData.groups.length < 0) {
+                return;
+            } else if (userData.groups && userData.groups.length === 0) {
                 window.location.href = 'no_group.html';
+                return;
             }
+
+            AppState.userProfile = userData;
+
         } else if (res.status === 401) {
             logout();
+            return;
         } else {
             console.error('Error fetching status.');
             goBackSafely();
+            return;
         }
     } catch (error) {
+        if (error.name === 'AbortError' || error.message.includes('aborted')) {
+            return;
+        }
+
         goBackSafely();
         console.error('Network error:', error);
     }
