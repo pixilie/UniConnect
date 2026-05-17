@@ -194,6 +194,8 @@ function refreshWeekView() {
             }
         }
     }
+    console.log(weekEvents);
+
 }
 
 prevWeekBtn.addEventListener('click', () => {
