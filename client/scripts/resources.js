@@ -44,6 +44,33 @@ uploadBtn.addEventListener('click', async () => {
   uploadBtn.textContent = 'Upload';
 });
 
+function formatMessageTime(rawDateString) {
+  if (!rawDateString) return '';
+  
+  let safeString = rawDateString.replace(' ', 'T');
+  if (!safeString.endsWith('Z') && !safeString.includes('+')) {
+    safeString += 'Z';
+  }
+  
+  const date = new Date(safeString);
+  
+  if (isNaN(date.getTime())) return '';
+
+  const timeStr = date.toLocaleTimeString('en-GB', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
+
+  const dateStr = date.toLocaleDateString('en-GB', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric' 
+  });
+
+  return `${timeStr} - ${dateStr}`;
+}
+
 async function deleteResource(id) {
   try {
     const res = await fetch(`${API_BASE_URL}/resources/${id}`, {
@@ -56,7 +83,7 @@ async function deleteResource(id) {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while deleting resource: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
     else{
@@ -84,7 +111,7 @@ async function loadResources() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while fetching resources: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   } else {
     let data = await res.json();
@@ -94,7 +121,7 @@ async function loadResources() {
       let title = element.title;
       let name = element.uploader.first_name + ' ' + element.uploader.last_name;
       let category = element.category;
-      let date= new Date(element.uploaded_at);
+      let date= element.uploaded_at;
 
       addResource(resourceId, title, name, category, date);
     });
@@ -120,7 +147,7 @@ function addResource(resourceId, title, name, category, date) {
   iconSpan.textContent = CATEGORY_CONFIG[category].icon;
   resourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
   resourceNode.querySelector('.file-name').textContent = title;
-  resourceNode.querySelector('.file-meta').textContent = name + ` (${date.getHours()}:${date.getMinutes()} - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()})`;
+  resourceNode.querySelector('.file-meta').innerHTML = `${name} <br> ${formatMessageTime(date)}`;
 
   const downloadBtn = resourceNode.querySelector('.download-btn');
   downloadBtn.value = `${API_BASE_URL}/resources/${resourceId}/download`;
@@ -158,7 +185,7 @@ async function downloadFile(btn, fileName) {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Failed to download file: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
 
@@ -209,7 +236,7 @@ async function uploadResource() {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while uploading resource: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
 
@@ -225,7 +252,7 @@ async function uploadResource() {
     let name = data.uploader.first_name + ' ' + data.uploader.last_name;
     let categoryLabel = data.category;
 
-    addResource(resourceId, title, name, categoryLabel);
+    addResource(resourceId, title, name, categoryLabel, new Date().toISOString());
   } catch (error) {
     console.error('Network error:', error);
   }
