@@ -129,12 +129,12 @@ function addResource(resourceId, title, name, category, date) {
     downloadFile(this, title);
   });
 
-  //const deleteBtn = resourceNode.querySelector('.delete-btn');
-  //deleteBtn.value = resourceId;
+  const deleteBtn = resourceNode.querySelector('.delete-btn');
+  deleteBtn.value = resourceId;
 
-  //deleteBtn.addEventListener('click', function () {
-  //  deleteResource(this.value);
-  //});
+  deleteBtn.addEventListener('click', function () {
+    deleteResource(this.value);
+  });
 
   const filesGrid = categorySection.querySelector('.files-grid');
   filesGrid.appendChild(resourceNode);
