@@ -271,7 +271,7 @@ confirmCreateBtn.addEventListener('click', async () => {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while posting new event: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
   weekEvents = Array.from({ length: 7 }, () =>
@@ -306,11 +306,13 @@ async function fetchEvents() {
     if (resIcs.ok) {
       const scheduleData = await resIcs.text();
       allEvents = parseICSFromString(scheduleData);
-    } else {
-      const error = await res.json();
-      window.alert(`No schedule uploaded for this group yet: ${error}`);
+    } 
+    else if(!resIcs.status==404){
+      const error = await resIcs.json();
+      window.alert(`${error.detail}`);
       return;
     }
+
   } catch (error) {
     console.error('Failed to fetch schedule:', error);
   }
@@ -340,9 +342,10 @@ async function fetchEvents() {
         };
         allEvents.push(newElement);
       });
-    } else {
-      const error = await res.json();
-      window.alert(`Error while getting events from DB: ${error}`);
+    } 
+    else{
+      const error = await resDB.json();
+      window.alert(`${error.detail}`);
       return;
     }
   } catch (error) {
