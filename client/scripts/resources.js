@@ -94,13 +94,14 @@ async function loadResources() {
       let title = element.title;
       let name = element.uploader.first_name + ' ' + element.uploader.last_name;
       let category = element.category;
+      let date= new Date(element.uploaded_at);
 
-      addResource(resourceId, title, name, category);
+      addResource(resourceId, title, name, category, date);
     });
   }
 }
 
-function addResource(resourceId, title, name, category) {
+function addResource(resourceId, title, name, category, date) {
   let categorySection = document.getElementById(`category-${category}`);
 
   if (!categorySection) {
@@ -120,6 +121,7 @@ function addResource(resourceId, title, name, category) {
   resourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
   resourceNode.querySelector('.file-name').textContent = title;
   resourceNode.querySelector('.file-meta').textContent = name;
+  resourceNode.querySelector('.file-date').textContent = `${date.getHours()}:${date.getMinutes()} - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
 
   const downloadBtn = resourceNode.querySelector('.download-btn');
   downloadBtn.value = `${API_BASE_URL}/resources/${resourceId}/download`;
