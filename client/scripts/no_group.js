@@ -1,40 +1,48 @@
 requireAuth();
 
 async function reload() {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  if (!token) {
-    logout();
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/users/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (res.ok) {
-      const userData = await res.json();
-
-      if (userData.groups && userData.groups.length > 0) {
-        window.location.href = 'chat.html';
-      }
-    } else if (res.status === 401) {
-      logout();
-    } else {
-      const error = await res.json();
-      window.alert(`${error.detail}`);
+    if (!token) {
+        logout();
+        return;
     }
-  } catch (error) {
-    console.error('Network error:', error);
-  }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (res.ok) {
+            const userData = await res.json();
+            AppState.userProfile = userData;
+
+            if (userData.groups && userData.groups.length > 0) {
+                const defaultGroup = userData.groups[0];
+                AppState.currentGroupId = defaultGroup.id;
+                AppState.currentGroupName = defaultGroup.name || '';
+                localStorage.setItem('groupID', defaultGroup.id);
+                window.location.href = 'chat.html';
+            } else {
+                console.log("Status checked: Still no group assigned.");
+            }
+        } else if (res.status === 401) {
+            logout();
+        } else {
+            const error = await res.json();
+            window.alert(`${error.detail}`);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+    }
 }
 
 function logout() {
-  localStorage.removeItem('token');
-  window.location.href = 'login.html';
+    localStorage.removeItem('token');
+    localStorage.removeItem('groupID');
+    window.location.href = 'login.html';
 }
