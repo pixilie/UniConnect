@@ -89,21 +89,25 @@
       </template>
 
       <template id="resourceCardTemplate">
-        <div class="file-card">
-          <div class="file-icon" style="color: #6750a4">
-            <span class="material-icons-outlined"></span>
-          </div>
-          <div class="file-info">
-            <span class="file-name"></span>
-            <span class="file-meta"></span>
-          </div>
-          <div class="file-actions">
-            <button class="action-btn download-btn" onclick="downloadFile(this)">
-              <span class="material-icons-outlined" style="font-size: 20px">download</span>
-            </button>
-          </div>
-        </div>
-      </template>
+  <div class="file-card">
+    <div class="file-icon" style="color: #6750a4">
+      <span class="material-icons-outlined"></span>
+    </div>
+    <div class="file-info">
+      <span class="file-name"></span>
+      <span class="file-meta"></span>
+    </div>
+    <div class="file-actions">
+      <button class="action-btn download-btn" onclick="downloadFile(this)">
+        <span class="material-icons-outlined" style="font-size: 20px">download</span>
+      </button>
+
+      <button class="action-btn delete-btn" title="Delete">
+        <span class="material-icons-outlined" style="font-size: 20px;">delete</span>
+      </button>
+    </div>
+  </div>
+</template>
 
       <button class="fab-upload" id="openUploadModalBtn">
         <span class="material-icons-outlined">upload</span>

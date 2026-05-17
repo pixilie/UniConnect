@@ -20,9 +20,9 @@ const openModalBtn = document.getElementById('openUploadModalBtn');
 const uploadModal = document.getElementById('uploadModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const cancelUploadBtn = document.getElementById('cancelUploadBtn');
-const ressourceTemplate = document.getElementById('resourceCardTemplate');
+const resourceTemplate = document.getElementById('resourceCardTemplate');
 const categoryTemplate = document.getElementById('categoryTemplate');
-const ressourcesContainer = document.getElementById('resourcesList');
+const resourcesContainer = document.getElementById('resourcesList');
 
 const formTitle = document.getElementById('uploadTitle');
 const formCategory = document.getElementById('uploadCategory');
@@ -39,15 +39,67 @@ uploadModal.addEventListener('click', (e) => {
 uploadBtn.addEventListener('click', async () => {
   uploadBtn.disabled = true;
   uploadBtn.textContent = 'Uploading...';
-  await uploadRessource();
+  await uploadResource();
   uploadBtn.disabled = false;
   uploadBtn.textContent = 'Upload';
 });
 
-async function loadRessources() {
+function formatMessageTime(rawDateString) {
+  if (!rawDateString) return '';
+  
+  let safeString = rawDateString.replace(' ', 'T');
+  if (!safeString.endsWith('Z') && !safeString.includes('+')) {
+    safeString += 'Z';
+  }
+  
+  const date = new Date(safeString);
+  
+  if (isNaN(date.getTime())) return '';
+
+  const timeStr = date.toLocaleTimeString('en-GB', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
+
+  const dateStr = date.toLocaleDateString('en-GB', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric' 
+  });
+
+  return `${timeStr} - ${dateStr}`;
+}
+
+async function deleteResource(id) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/resources/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      }
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      window.alert(`${error.detail}`);
+      return;
+    }
+    else{
+      loadResources();
+    }
+
+  } catch (error) {
+    console.error("Failed to delete resource :", error.message);
+  }
+}
+
+
+async function loadResources() {
   if (!AppState.currentGroupId) return;
 
-  ressourcesContainer.innerHTML = '';
+  resourcesContainer.innerHTML = '';
 
   const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/resources`, {
     method: 'GET',
@@ -59,7 +111,7 @@ async function loadRessources() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while fetching ressources: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   } else {
     let data = await res.json();
@@ -69,13 +121,14 @@ async function loadRessources() {
       let title = element.title;
       let name = element.uploader.first_name + ' ' + element.uploader.last_name;
       let category = element.category;
+      let date= element.uploaded_at;
 
-      addRessource(resourceId, title, name, category);
+      addResource(resourceId, title, name, category, date);
     });
   }
 }
 
-function addRessource(resourceId, title, name, category) {
+function addResource(resourceId, title, name, category, date) {
   let categorySection = document.getElementById(`category-${category}`);
 
   if (!categorySection) {
@@ -85,26 +138,33 @@ function addRessource(resourceId, title, name, category) {
     categorySection.querySelector('.category-name').textContent = CATEGORY_CONFIG[category].title;
     categorySection.querySelector('.category-icon').textContent = CATEGORY_CONFIG[category].icon;
 
-    ressourcesContainer.appendChild(categorySection);
+    resourcesContainer.appendChild(categorySection);
   }
 
-  const ressourceNode = ressourceTemplate.content.cloneNode(true).firstElementChild;
-  const iconSpan = ressourceNode.querySelector('.file-icon .material-icons-outlined');
+  const resourceNode = resourceTemplate.content.cloneNode(true).firstElementChild;
+  const iconSpan = resourceNode.querySelector('.file-icon .material-icons-outlined');
 
   iconSpan.textContent = CATEGORY_CONFIG[category].icon;
-  ressourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
-  ressourceNode.querySelector('.file-name').textContent = title;
-  ressourceNode.querySelector('.file-meta').textContent = name;
+  resourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
+  resourceNode.querySelector('.file-name').textContent = title;
+  resourceNode.querySelector('.file-meta').innerHTML = `${name} <br> ${formatMessageTime(date)}`;
 
-  const downloadBtn = ressourceNode.querySelector('.download-btn');
+  const downloadBtn = resourceNode.querySelector('.download-btn');
   downloadBtn.value = `${API_BASE_URL}/resources/${resourceId}/download`;
 
   downloadBtn.addEventListener('click', function () {
     downloadFile(this, title);
   });
 
+  const deleteBtn = resourceNode.querySelector('.delete-btn');
+  deleteBtn.value = resourceId;
+
+  deleteBtn.addEventListener('click', function () {
+    deleteResource(this.value);
+  });
+
   const filesGrid = categorySection.querySelector('.files-grid');
-  filesGrid.appendChild(ressourceNode);
+  filesGrid.appendChild(resourceNode);
 }
 
 async function downloadFile(btn, fileName) {
@@ -125,7 +185,7 @@ async function downloadFile(btn, fileName) {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Failed to download file: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
 
@@ -141,7 +201,7 @@ async function downloadFile(btn, fileName) {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   } catch (error) {
-    console.error('Erreur lors du téléchargement:', error);
+    console.error('Error while downloading:', error);
     alert('Failed to download the file.');
   } finally {
     icon.textContent = 'download';
@@ -149,7 +209,7 @@ async function downloadFile(btn, fileName) {
   }
 }
 
-async function uploadRessource() {
+async function uploadResource() {
   if (!AppState.currentGroupId) return;
 
   const file = formFile.files[0];
@@ -176,7 +236,7 @@ async function uploadRessource() {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while uploading ressource: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
 
@@ -192,18 +252,18 @@ async function uploadRessource() {
     let name = data.uploader.first_name + ' ' + data.uploader.last_name;
     let categoryLabel = data.category;
 
-    addRessource(resourceId, title, name, categoryLabel);
+    addResource(resourceId, title, name, categoryLabel, new Date().toISOString());
   } catch (error) {
     console.error('Network error:', error);
   }
 }
 
 document.addEventListener('groupChanged', () => {
-  loadRessources();
+  loadResources();
 });
 
 if (AppState.currentGroupId) {
   setTimeout(() => {
-    loadRessources();
+    loadResources();
   }, 100);
 }
