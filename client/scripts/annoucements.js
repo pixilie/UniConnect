@@ -28,7 +28,7 @@ async function LoadAnnoucements() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while fetching past annoucement: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   } else {
     let data = await res.json();
@@ -111,7 +111,7 @@ async function createAnnoucement() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new annoucement: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 }

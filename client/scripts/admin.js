@@ -41,7 +41,7 @@ async function loadAdminData() {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while loading admin data: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
 
@@ -54,7 +54,7 @@ async function loadAdminData() {
 
     populateAdminGroups(profileData.groups);
   } catch (error) {
-    console.error('Error loading admin data:', error);
+    console.error('Error loading admin data:', error.message);
   }
 }
 
@@ -115,7 +115,7 @@ async function loadStudents() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while fetching group members: ${error}`);
+    window.alert(`${error.detail}`);
   } else {
     let data = await res.json();
 
@@ -268,7 +268,7 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new group: ${error}`);
+    window.alert(`${error.detail}`);
   } else {
     closeAllAdminModals();
     btn.disabled = false;
@@ -296,7 +296,7 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Failed to add student: ${error.detail}`);
+    window.alert(`${error.detail}`);
     btn.disabled = false;
     btn.textContent = 'Add';
     return;
@@ -314,7 +314,7 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
   if (!res2.ok) {
     const error = await res2.json();
-    window.alert(`Error while adding the member to the group: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -351,7 +351,7 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new annoucement: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -386,7 +386,7 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while uploading new schedule: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -428,7 +428,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new event: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -464,7 +464,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new poll: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -487,7 +487,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while adding new option: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
   });
@@ -512,7 +512,7 @@ async function promoteToDelegate(studentId, isPromoting) {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while changing role: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 

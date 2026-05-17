@@ -41,7 +41,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while creating new poll: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
@@ -64,7 +64,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
     if (!res.ok) {
       const error = await res.json();
-      window.alert(`Error while creating new option: ${error}`);
+      window.alert(`${error.detail}`);
       return;
     }
   });
@@ -172,7 +172,7 @@ async function sendVote(pollID, choiceID) {
   });
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while sending vote: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 }
@@ -192,7 +192,7 @@ async function getPolls() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while getting polls: ${error}`);
+    window.alert(`${error.detail}`);
     return;
   }
 
