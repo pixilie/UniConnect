@@ -27,7 +27,7 @@ async function reload() {
       logout();
     } else {
       const error = await res.json();
-      window.alert(`Error while getting status: ${error}`);
+      window.alert(`${error.detail}`);
     }
   } catch (error) {
     console.error('Network error:', error);

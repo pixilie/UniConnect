@@ -94,7 +94,7 @@ async function LoadMessages() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`Error while fetching past messages: ${error}`);
+    window.alert(`${error.detail}`);
   } else {
     let data = await res.json();
 
