@@ -120,8 +120,7 @@ function addResource(resourceId, title, name, category, date) {
   iconSpan.textContent = CATEGORY_CONFIG[category].icon;
   resourceNode.querySelector('.file-icon').style.color = CATEGORY_CONFIG[category].color;
   resourceNode.querySelector('.file-name').textContent = title;
-  resourceNode.querySelector('.file-meta').textContent = name;
-  resourceNode.querySelector('.file-date').textContent = `${date.getHours()}:${date.getMinutes()} - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+  resourceNode.querySelector('.file-meta').textContent = name + ` (${date.getHours()}:${date.getMinutes()} - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()})`;
 
   const downloadBtn = resourceNode.querySelector('.download-btn');
   downloadBtn.value = `${API_BASE_URL}/resources/${resourceId}/download`;
@@ -130,12 +129,12 @@ function addResource(resourceId, title, name, category, date) {
     downloadFile(this, title);
   });
 
-  const deleteBtn = resourceNode.querySelector('.delete-btn');
-  deleteBtn.value = resourceId;
+  //const deleteBtn = resourceNode.querySelector('.delete-btn');
+  //deleteBtn.value = resourceId;
 
-  deleteBtn.addEventListener('click', function () {
-    deleteResource(this.value);
-  });
+  //deleteBtn.addEventListener('click', function () {
+  //  deleteResource(this.value);
+  //});
 
   const filesGrid = categorySection.querySelector('.files-grid');
   filesGrid.appendChild(resourceNode);
