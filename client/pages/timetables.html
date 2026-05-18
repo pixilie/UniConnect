@@ -24,22 +24,26 @@
             <div class="group-dropdown-menu" id="groupDropdown">
                 <div class="group-search-box">
                     <span class="material-icons-outlined" style="font-size: 18px; color: #666">search</span>
-                    <input type="text" class="group-search-input" id="groupSearchInput" placeholder="Search a group..."
-                        autocomplete="off" />
+                    <input type="text" class="group-search-input" id="groupSearchInput"
+                        placeholder="Search a group..." />
                 </div>
             </div>
         </div>
 
         <div class="channel-list">
-            <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span>
+            <a href="resources.html" class="nav-item active"><span class="material-icons-outlined icon">folder</span>
                 Resources</a>
-            <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span>
+            <a href="#" class="nav-item"><span class="material-icons-outlined icon">campaign</span>
                 Announcements</a>
             <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
-            <a href="#" class="nav-item active"><span class="material-icons-outlined icon">calendar_month</span>
+            <a href="timetables.html" class="nav-item"><span class="material-icons-outlined icon">calendar_month</span>
                 Timetables</a>
             <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span>
                 Polls</a>
+
+            <a href="admin.html" class="nav-item" id="adminNavBtn">
+                <span class="material-icons-outlined icon">admin_panel_settings</span> Admin
+            </a>
         </div>
 
         <div class="user-panel">
@@ -48,7 +52,9 @@
                 <span class="user-name" id="currentUserName"></span>
                 <span class="user-role" id="currentUserRole"></span>
             </div>
-            <span class="material-icons-outlined" style="cursor: pointer; color: #666">settings</span>
+
+            <span class="material-icons-outlined" style="cursor: pointer; color: #d32f2f"
+                onclick="logout()">logout</span>
         </div>
     </aside>
 
