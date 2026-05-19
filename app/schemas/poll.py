@@ -17,6 +17,7 @@ class ChoiceResponse(ChoiceBase):
 
 class PollCreate(BaseModel):
     title: str
+    end_datetime: datetime
 
 
 class PollResponse(BaseModel):

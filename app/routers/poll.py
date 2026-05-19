@@ -95,7 +95,7 @@ def create_poll(
         title=poll_data.title,
         group_id=group_id,
         user_id=current_user.id,
-        expires_at=datetime.now(timezone.utc) + timedelta(hours=2),
+        expires_at=poll_data.end_datetime,
     )
 
     db.add(new_poll)
