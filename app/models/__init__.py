@@ -1,6 +1,6 @@
 from .models import (
     Announcement,
-    Assignment,
+    # Assignment,
     Choice,
     Event,
     EventType,
