@@ -81,7 +81,7 @@ class User(Base):
     )
     messages = relationship("Message", back_populates="author")
     created_events = relationship("Event", back_populates="creator")
-    created_assignments = relationship("Assignment", back_populates="creator")
+    # created_assignments = relationship("Assignment", back_populates="creator")
     uploaded_resources = relationship("Resource", back_populates="uploader")
     votes = relationship("Vote", back_populates="voter")
     announcement = relationship("Announcement", back_populates="author")
