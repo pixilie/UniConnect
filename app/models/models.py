@@ -60,7 +60,7 @@ class Group(Base):
     )
     messages = relationship("Message", back_populates="group")
     events = relationship("Event", back_populates="group")
-    assignments = relationship("Assignment", back_populates="group")
+    # assignments = relationship("Assignment", back_populates="group")
     resources = relationship("Resource", back_populates="group")
     polls = relationship("Poll", back_populates="group")
     announcement = relationship("Announcement", back_populates="group")
