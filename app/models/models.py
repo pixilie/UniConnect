@@ -126,6 +126,7 @@ class Event(Base):
     group = relationship("Group", back_populates="events")
 
 
+""" Finally unused in final submission
 class Assignment(Base):
     __tablename__ = "assignments"
 
@@ -143,6 +144,7 @@ class Assignment(Base):
 
     group = relationship("Group", back_populates="assignments")
     creator = relationship("User", back_populates="created_assignments")
+"""
 
 
 class Resource(Base):
