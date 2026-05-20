@@ -1,13 +1,3 @@
-requireAuth();
-
-let currentDisplayedMonday = getMonday(new Date());
-let allEvents = [];
-let weekEvents = Array.from({ length: 7 }, () =>
-    Array.from({ length: 24 }, () =>
-        Array.from({ length: 0 }, () => null)
-    )
-);
-
 const calendarGrid = document.getElementById('calendarGrid');
 const eventTemplate = document.getElementById('eventTemplate');
 const currentWeekLabel = document.getElementById('currentWeekLabel');
@@ -19,6 +9,14 @@ const createModal = document.getElementById('createEventModal');
 const closeModalBtn = document.getElementById('closeEventModalBtn');
 const cancelEventBtn = document.getElementById('cancelEventBtn');
 const confirmCreateBtn = document.getElementById('confirmCreateEventBtn');
+
+let currentDisplayedMonday = getMonday(new Date());
+let allEvents = [];
+let weekEvents = Array.from({ length: 7 }, () =>
+    Array.from({ length: 24 }, () =>
+        Array.from({ length: 0 }, () => null)
+    )
+);
 
 function getMonday(d) {
     const date = new Date(d);
@@ -60,7 +58,7 @@ function storeEvent(evt) {
     let endDate = new Date(evt.end);
 
     const eventMonday = getMonday(startDate);
-    if (eventMonday.getTime() !== currentDisplayedMonday.getTime()){
+    if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) {
         return;
     };
 
@@ -81,28 +79,28 @@ function storeEvent(evt) {
     }
 }
 
-async function deleteEvent(id){
-  try {
-    const res = await fetch(`${API_BASE_URL}/events/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      }
-    });
+async function deleteEvent(id) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/events/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        });
 
-    if (!res.ok) {
-      const error = await res.json();
-      window.alert(`${error.detail}`);
-      return;
-    }
-    else{
-      refreshWeekView();
-    }
+        if (!res.ok) {
+            const error = await res.json();
+            window.alert(`${error.detail}`);
+            return;
+        }
+        else {
+            refreshWeekView();
+        }
 
-  } catch (error) {
-    console.error("Failed to delete event :", error.message);
-  }
+    } catch (error) {
+        console.error("Failed to delete event :", error.message);
+    }
 }
 
 function splitEventDays(evt) {
@@ -186,18 +184,6 @@ function renderEventCard(evt) {
         `${displayStart.getHours()}:00 - ${displayEnd.getHours()}:00`;
     eventNode.querySelector('.event-title').textContent = evt.title;
     eventNode.querySelector('.event-location').textContent = evt.location || 'TBD';
-    
-    /*
-    if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role=="student") {
-        eventNode.querySelector(' .delete-btn').style.display='none';
-    }
-    else{
-        eventNode.querySelector(' .delete-btn').value=evt.id;
-        eventNode.querySelector(' .delete-btn').addEventListener('click', () => {
-            deleteEvent(this.value);
-        });
-    }
-    */
 
     eventNode.addEventListener('click', () => {
         document.getElementById('viewEventTitle').textContent = evt.title;
@@ -383,7 +369,7 @@ async function fetchEvents() {
             });
         }
         else {
-            const error = await resDB.json();
+            const error = await resDb.json();
             window.alert(`${error.detail}`);
             return;
         }
@@ -413,12 +399,30 @@ function parseICSFromString(icsString) {
     });
 }
 
-document.addEventListener('groupChanged', () => {
-    fetchEvents();
+document.addEventListener('groupChanged', async () => {
+    await fetchEvents();
 });
 
-if (AppState.currentGroupId) {
-    setTimeout(() => {
-        fetchEvents();
-    }, 100);
+async function initTimetables() {
+    await requireAuth();
+
+    if (AppState.userProfile && AppState.userProfile.role === 'student') {
+        if (openModalBtn) {
+            openModalBtn.style.display = 'none';
+        }
+    }
+
+    if (AppState.userProfile && AppState.userProfile.role === 'student' || AppState.userProfile.role === 'delegate') {
+        const typeSelect = document.getElementById('eventType');
+        if (typeSelect) {
+            typeSelect.value = 'ACTIVITY';
+            typeSelect.disabled = true;
+        }
+    }
+
+    if (AppState.currentGroupId) {
+        await fetchEvents();
+    }
 }
+
+initTimetables();

@@ -53,6 +53,15 @@ def create_event(
                 status_code=403, detail="Not authorized to access this group"
             )
 
+    if (
+        current_user.role == models.UserRole.STUDENT
+        and current_user.role == models.UserRole.DELEGATE
+        and event_data.type != models.EventType.ACTIVITY
+    ):
+        raise HTTPException(
+            status_code=403, detail="Students can only create events of type ACTIVITY."
+        )
+
     if event_data.title.strip() == "":
         raise HTTPException(
             status_code=422, detail="You can't create event with an empty title"
