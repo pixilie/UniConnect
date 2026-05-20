@@ -68,6 +68,11 @@ function setGroupList(profileData) {
         btn.classList.add('disabled');
         btn.style.cursor = 'not-allowed';
         btn.style.opacity = '0.7';
+
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
     }
 
     dropdown.querySelectorAll('.group-item').forEach((e) => e.remove());
@@ -122,6 +127,8 @@ function setGroupList(profileData) {
 
         dropdown.appendChild(item);
     }
+
+
 }
 
 function updateChatInputPlaceholder(groupName) {
@@ -129,10 +136,6 @@ function updateChatInputPlaceholder(groupName) {
     if (chatInput) {
         chatInput.placeholder = `Type a message in ${groupName}...`;
     }
-}
-
-if (AppState.userProfile && AppState.userProfile.role === 'student') {
-    document.getElementById('adminNavBtn').style.display = 'none';
 }
 
 getProfileData();
