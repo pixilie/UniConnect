@@ -157,11 +157,17 @@ function addResource(resourceId, title, name, category, date) {
   });
 
   const deleteBtn = resourceNode.querySelector('.delete-btn');
-  deleteBtn.value = resourceId;
+  if(AppState.userProfile.role=="student"){
+    deleteBtn.style.display="none";
+  }
+  else{
+    deleteBtn.value = resourceId;
 
-  deleteBtn.addEventListener('click', function () {
-    deleteResource(this.value);
-  });
+    deleteBtn.addEventListener('click', function () {
+      deleteResource(this.value);
+    });
+  }
+
 
   const filesGrid = categorySection.querySelector('.files-grid');
   filesGrid.appendChild(resourceNode);
