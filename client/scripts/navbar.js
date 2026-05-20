@@ -127,8 +127,6 @@ function setGroupList(profileData) {
 
         dropdown.appendChild(item);
     }
-
-
 }
 
 function updateChatInputPlaceholder(groupName) {
