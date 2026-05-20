@@ -64,7 +64,7 @@ async function getProfileData() {
 }
 
 function setGroupList(profileData) {
-    if (profileData.role === 'student') {
+    if (profileData.role === 'student' || profileData.role === 'delegate') {
         btn.classList.add('disabled');
         btn.style.cursor = 'not-allowed';
         btn.style.opacity = '0.7';
