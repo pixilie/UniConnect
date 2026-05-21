@@ -204,6 +204,7 @@ function renderEventCard(evt) {
             document.getElementById('viewEventDeleteBtn').style.display='inline';
             document.getElementById('viewEventDeleteBtn').onclick = () => {
                 deleteEvent(evt.id);
+                viewEventModal.classList.remove('active');
             };
         }
     });
