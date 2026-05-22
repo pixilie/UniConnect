@@ -95,6 +95,7 @@ async function deleteEvent(id) {
             return;
         }
         else {
+            fetchEvents();
             refreshWeekView();
         }
 
@@ -170,7 +171,7 @@ function renderEventCard(evt) {
 
     let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
     if (durationHours < 1) durationHours = 1;
-
+    if (endDate.getHours()==0) durationHours+=1;
     let gridRowEnd = gridRowStart + durationHours;
     if (gridRowEnd > 26) gridRowEnd = 26;
 
@@ -196,6 +197,16 @@ function renderEventCard(evt) {
             evt.description || 'No description provided.';
 
         document.getElementById('viewEventModal').classList.add('active');
+        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role=="student"){
+            document.getElementById('viewEventDeleteBtn').style.display='none';
+        }
+        else{
+            document.getElementById('viewEventDeleteBtn').style.display='inline';
+            document.getElementById('viewEventDeleteBtn').onclick = () => {
+                deleteEvent(evt.id);
+                viewEventModal.classList.remove('active');
+            };
+        }
     });
 
     eventNode.style.marginLeft = `${(evt.overlapOrder - 1) * (100 / evt.overlap)}%`;
@@ -218,8 +229,6 @@ function refreshWeekView() {
             }
         }
     }
-    console.log(weekEvents);
-
 }
 
 prevWeekBtn.addEventListener('click', () => {
@@ -304,7 +313,18 @@ confirmCreateBtn.addEventListener('click', async () => {
         )
     );
 
-    allEvents.push(newEvent);
+    const result=await res.json();
+    const AddedEvent = {
+        title: title,
+        description: description,
+        start: startInput,
+        end: endInput,
+        type: type,
+        location: location,
+        id:result.id
+    };
+
+    allEvents.push(AddedEvent);
     currentDisplayedMonday = getMonday(startDate);
     refreshWeekView();
     closeModal();
