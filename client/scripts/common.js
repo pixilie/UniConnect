@@ -4,7 +4,12 @@ const isLocal =
 const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : 'https://uniconnect.pixilie.net/api';
 const WS_BASE_URL = isLocal ? 'ws://localhost:8000/ws' : 'wss://uniconnect.pixilie.net/ws';
 
-//const errorDisplay=document.getElementById('errorDisplay'); // change ID
+const errorDisplay = document.getElementById('errorDisplay');
+const errorMessage = document.getElementById('errorDisplayMessage');
+const errorCloseBtn = document.getElementById('errorDisplayCloseBtn');
+
+let errorTimeout;
+
 const AppState = {
     currentGroupId: localStorage.getItem('groupID') || null,
     currentGroupName: '',
@@ -16,19 +21,29 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-function displayError(msg){
-    window.alert(msg);
+function displayError(msg) {
+    if (!errorDisplay || !errorMessage) {
+        return window.alert(msg);
+    }
 
-    /*
-    errorDisplay.querySelector('#errorDisplayMessage').textContent=msg; // change ID
-    errorDisplay.style.display='inline'; // change display to what you use
-    */
+    errorMessage.textContent = msg;
+    errorDisplay.classList.add('show');
+
+    clearTimeout(errorTimeout);
+    errorTimeout = setTimeout(() => {
+        closeErrorDisplay();
+    }, 5000);
 }
-/* //change ID
-errorDisplay.querySelector('#errorDisplayCloseBtn').addEventListener("click",()=>{
-    errorDisplay.style.display='none';
-});
-*/
+
+function closeErrorDisplay() {
+    if (errorDisplay) {
+        errorDisplay.classList.remove('show');
+    }
+}
+
+if (errorCloseBtn) {
+    errorCloseBtn.addEventListener('click', closeErrorDisplay);
+}
 
 function goBackSafely() {
     const previousPage = document.referrer;

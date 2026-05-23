@@ -33,7 +33,8 @@
         <div class="channel-list">
             <a href="resources.html" class="nav-item"><span class="material-icons-outlined icon">folder</span>
                 Resources</a>
-            <a href="announcements.html" class="nav-item active"><span class="material-icons-outlined icon">campaign</span>
+            <a href="announcements.html" class="nav-item active"><span
+                    class="material-icons-outlined icon">campaign</span>
                 Announcements</a>
             <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
             <a href="timetables.html" class="nav-item"><span class="material-icons-outlined icon">calendar_month</span>
@@ -118,6 +119,12 @@
                 <button class="cancel-form" id="cancelBtn">Cancel</button>
             </div>
         </div>
+    </div>
+
+    <div id="errorDisplay" class="error-toast">
+        <span class="error-icon">⚠️</span>
+        <span id="errorDisplayMessage" class="error-message">Une erreur est survenue.</span>
+        <button id="errorDisplayCloseBtn" class="error-close-btn">&times;</button>
     </div>
 
     <script src="../scripts/common.js"></script>

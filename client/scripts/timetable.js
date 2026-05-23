@@ -171,7 +171,7 @@ function renderEventCard(evt) {
 
     let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
     if (durationHours < 1) durationHours = 1;
-    if (endDate.getHours()==0) durationHours+=1;
+    if (endDate.getHours() == 0) durationHours += 1;
     let gridRowEnd = gridRowStart + durationHours;
     if (gridRowEnd > 26) gridRowEnd = 26;
 
@@ -197,11 +197,11 @@ function renderEventCard(evt) {
             evt.description || 'No description provided.';
 
         document.getElementById('viewEventModal').classList.add('active');
-        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role=="student"){
-            document.getElementById('viewEventDeleteBtn').style.display='none';
+        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role == "student") {
+            document.getElementById('viewEventDeleteBtn').style.display = 'none';
         }
-        else{
-            document.getElementById('viewEventDeleteBtn').style.display='inline';
+        else {
+            document.getElementById('viewEventDeleteBtn').style.display = 'inline';
             document.getElementById('viewEventDeleteBtn').onclick = () => {
                 deleteEvent(evt.id);
                 viewEventModal.classList.remove('active');
@@ -313,7 +313,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         )
     );
 
-    const result=await res.json();
+    const result = await res.json();
     const AddedEvent = {
         title: title,
         description: description,
@@ -321,7 +321,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         end: endInput,
         type: type,
         location: location,
-        id:result.id
+        id: result.id
     };
 
     allEvents.push(AddedEvent);

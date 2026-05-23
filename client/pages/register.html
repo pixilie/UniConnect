@@ -1,58 +1,54 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniConnect - Register</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="../styles/register.css" />
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="card">
-      <span class="logo-text">UniConnect</span>
+        <span class="logo-text">UniConnect</span>
 
-      <form id="registerForm">
-        <div class="form-grid">
-          <div class="name-inputs">
-            <div class="input-group">
-              <input type="text" id="firstname" class="input-field" placeholder=" " required />
-              <label for="firstname" class="input-label">First Name</label>
+        <form id="registerForm">
+            <div class="form-grid">
+                <div class="name-inputs">
+                    <div class="input-group">
+                        <input type="text" id="firstname" class="input-field" placeholder=" " required />
+                        <label for="firstname" class="input-label">First Name</label>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="lastname" class="input-field" placeholder=" " required />
+                        <label for="lastname" class="input-label">Last Name</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="email" class="input-field" placeholder=" " required />
+                    <label for="email" class="input-label">University Email</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" class="input-field" placeholder=" " required />
+                    <label for="password" class="input-label">Password</label>
+                </div>
             </div>
 
-            <div class="input-group">
-              <input type="text" id="lastname" class="input-field" placeholder=" " required />
-              <label for="lastname" class="input-label">Last Name</label>
-            </div>
-          </div>
+            <p id="message" style="margin-top: 16px; font-size: 14px; text-align: center"></p>
 
-          <div class="input-group">
-            <input type="email" id="email" class="input-field" placeholder=" " required />
-            <label for="email" class="input-label">University Email</label>
-          </div>
+            <button type="submit" class="btn">Create Account</button>
+        </form>
 
-          <div class="input-group">
-            <input type="password" id="password" class="input-field" placeholder=" " required />
-            <label for="password" class="input-label">Password</label>
-          </div>
-        </div>
-
-        <p id="message" style="margin-top: 16px; font-size: 14px; text-align: center"></p>
-
-        <button type="submit" class="btn">Create Account</button>
-      </form>
-
-      <div class="footer-link">Already have an account? <a href="login.html">Sign in</a></div>
+        <div class="footer-link">Already have an account? <a href="login.html">Sign in</a></div>
     </div>
 
     <script src="../scripts/common.js"></script>
     <script src="../scripts/register.js"></script>
-  </body>
+</body>
+
 </html>
