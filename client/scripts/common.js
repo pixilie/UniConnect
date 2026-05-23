@@ -180,3 +180,30 @@ async function checkLoginStatus() {
         console.error(error);
     }
 }
+
+function formatMessageTime(rawDateString) {
+    if (!rawDateString) return '';
+
+    let safeString = rawDateString.replace(' ', 'T');
+    if (!safeString.endsWith('Z') && !safeString.includes('+')) {
+        safeString += 'Z';
+    }
+
+    const date = new Date(safeString);
+
+    if (isNaN(date.getTime())) return '';
+
+    const timeStr = date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+
+    const dateStr = date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
+    return `${timeStr} - ${dateStr}`;
+}

@@ -53,8 +53,6 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
     let l = '';
     if (last_name.length > 0) l = last_name[0].toUpperCase();
 
-    const tempDate = new Date(date);
-
     const options = {
         month: 'short',
         day: 'numeric',
@@ -64,11 +62,9 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
         hour12: true,
     };
 
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(tempDate);
-
     annoucementsNode.querySelector('.announcement-avatar').textContent = `${f}${l}`;
     annoucementsNode.querySelector('.announcement-user').textContent = `${first_name} ${last_name}`;
-    annoucementsNode.querySelector('.announcement-date').textContent = formattedDate;
+    annoucementsNode.querySelector('.announcement-date').textContent = formatMessageTime(date);
     annoucementsNode.querySelector('.annoucement-title').textContent = title;
     annoucementsNode.querySelector('.announcement-content').innerHTML = content;
     annoucementsNode.querySelector('.announcement-role').textContent = role.toUpperCase();

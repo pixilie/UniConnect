@@ -1,21 +1,9 @@
-requireAuth();
-
 const chat = document.getElementById('chatBox');
 const input = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const messageTemplate = document.getElementById('messageTemplate');
 
 let socket;
-
-function formatMessageTime(rawDateString) {
-    if (!rawDateString) return '';
-    let safeString = rawDateString.replace(' ', 'T');
-    if (!safeString.endsWith('Z') && !safeString.includes('+')) {
-        safeString += 'Z';
-    }
-    const date = new Date(safeString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 async function WSConnect() {
     const token = localStorage.getItem('token');
@@ -125,9 +113,13 @@ document.addEventListener('groupChanged', async (e) => {
     await LoadMessages();
 });
 
-if (AppState.currentGroupId) {
-    setTimeout(() => {
-        WSConnect();
-        LoadMessages();
-    }, 100);
+async function initChat() {
+    await requireAuth();
+
+    if (AppState.currentGroupId) {
+        await WSConnect();
+        await LoadMessages();
+    }
 }
+
+initChat();
