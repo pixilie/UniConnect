@@ -77,17 +77,12 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
 
 async function createAnnoucement() {
     let title = formTitle.value;
-    formTitle.value = '';
-
     let content = formContent.value;
-    formContent.value = '';
-
     let urgency = formUrgent.checked;
-    formUrgent.checked = false;
 
     if (title == '' || content == '') {
         displayError('Title and message fields must be filled');
-        return;
+        return false;
     }
 
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
@@ -106,8 +101,14 @@ async function createAnnoucement() {
     if (!res.ok) {
         const error = await res.json();
         displayError(`${error.detail}`);
-        return;
+        return false;
     }
+
+    formTitle.value = '';
+    formContent.value = '';
+    formUrgent.checked = false;
+
+    return true;
 }
 
 createBtn.addEventListener('click', () => {
@@ -119,9 +120,12 @@ cancelBtn.addEventListener('click', () => {
 });
 
 postBtn.addEventListener('click', async () => {
-    await createAnnoucement();
-    createForm.classList.remove('form-active');
-    LoadAnnoucements();
+    const success = await createAnnoucement();
+
+    if (success) {
+        createForm.classList.remove('form-active');
+        LoadAnnoucements();
+    }
 });
 
 document.addEventListener('groupChanged', async () => {

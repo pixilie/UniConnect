@@ -1,7 +1,3 @@
-//requireAuth();
-
-let currentGroupId = AppState.currentGroupId;
-
 const openModalBtn = document.getElementById('openCreatePollModalBtn');
 const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
@@ -13,14 +9,18 @@ const pollTemplate = document.getElementById(`pollTemplate`);
 const optionTemplate = document.getElementById(`pollOptionTemplate`);
 const pollsContainer = document.getElementById('pollsContainer');
 
+let currentGroupId = AppState.currentGroupId;
+
 openModalBtn.addEventListener('click', () => {
     createModal.classList.add('active');
 });
 
 postNewPollBtn.addEventListener('click', async () => {
     const endInput = document.getElementById("formEndDate");
+
     let title = formQuestion.value;
     if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
+
     const now = new Date();
     const endDate = new Date(endInput.value);
     const endString = endDate.toISOString();
@@ -35,6 +35,12 @@ postNewPollBtn.addEventListener('click', async () => {
         .split(',')
         .map((opt) => opt.trim())
         .filter((opt) => opt.length > 0);
+
+    if (options.length < 2) {
+        displayError("A poll must have at least two valid options separated by commas.");
+        return;
+    }
+
     formOptions.value = '';
     endInput.value = '';
 
