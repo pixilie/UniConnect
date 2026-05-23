@@ -26,7 +26,7 @@ async function LoadAnnoucements() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     } else {
         let data = await res.json();
@@ -90,7 +90,7 @@ async function createAnnoucement() {
     formUrgent.checked = false;
 
     if (title == '' || content == '') {
-        alert('Title and message fields must be filled');
+        displayError('Title and message fields must be filled');
         return;
     }
 
@@ -109,7 +109,7 @@ async function createAnnoucement() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 }

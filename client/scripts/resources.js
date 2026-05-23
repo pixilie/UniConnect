@@ -81,7 +81,7 @@ async function deleteResource(id) {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
         else {
@@ -109,7 +109,7 @@ async function loadResources() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     } else {
         let data = await res.json();
@@ -189,7 +189,7 @@ async function downloadFile(btn, fileName) {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 
@@ -206,7 +206,7 @@ async function downloadFile(btn, fileName) {
         document.body.removeChild(a);
     } catch (error) {
         console.error('Error while downloading:', error);
-        alert('Failed to download the file.');
+        displayError('Failed to download the file.');
     } finally {
         icon.textContent = 'download';
         btn.disabled = false;
@@ -218,7 +218,7 @@ async function uploadResource() {
 
     const file = formFile.files[0];
     if (!file) {
-        alert('Please select a file first');
+        displayError('Please select a file first');
         return;
     }
 
@@ -240,7 +240,7 @@ async function uploadResource() {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 

@@ -40,7 +40,7 @@ async function loadAdminData() {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 
@@ -118,7 +118,7 @@ async function loadStudents() {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 
@@ -225,22 +225,22 @@ const closeAllAdminModals = () => {
 btnCreateGroup.addEventListener('click', () => createGroupModal.classList.add('active'));
 
 btnAddStudent.addEventListener('click', () => {
-    if (!AppState.currentGroupId) return alert('Please select a group first.');
+    if (!AppState.currentGroupId) return displayError('Please select a group first.');
     addStudentModal.classList.add('active');
 });
 
 btnUpdateTimetable.addEventListener('click', () => {
-    if (!AppState.currentGroupId) return alert('Select a group first.');
+    if (!AppState.currentGroupId) return displayError('Select a group first.');
     updateTimetableModal.classList.add('active');
 });
 
 btnAddEventBtn.addEventListener('click', () => {
-    if (!AppState.currentGroupId) return alert('Select a group first.');
+    if (!AppState.currentGroupId) return displayError('Select a group first.');
     addEventModal.classList.add('active');
 });
 
 btnStartElection.addEventListener('click', () => {
-    if (!AppState.currentGroupId) return alert('Select a group first.');
+    if (!AppState.currentGroupId) return displayError('Select a group first.');
     startElectionModal.classList.add('active');
 });
 
@@ -263,7 +263,7 @@ window.addEventListener('click', (e) => {
 
 document.getElementById('confirmCreateGroupBtn').addEventListener('click', async () => {
     const groupName = document.getElementById('newGroupName').value.trim();
-    if (!groupName) return alert('Please enter a group name.');
+    if (!groupName) return displayError('Please enter a group name.');
     const btn = document.getElementById('confirmCreateGroupBtn');
 
     btn.disabled = true;
@@ -279,7 +279,7 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
     } else {
         closeAllAdminModals();
         btn.disabled = false;
@@ -291,7 +291,7 @@ document.getElementById('confirmCreateGroupBtn').addEventListener('click', async
 
 document.getElementById('confirmAddStudentBtn').addEventListener('click', async () => {
     const studentEmail = document.getElementById('newStudentEmail').value.trim();
-    if (!studentEmail) return alert("Please enter the student's email.");
+    if (!studentEmail) return displayError("Please enter the student's email.");
     const btn = document.getElementById('confirmAddStudentBtn');
 
     btn.disabled = true;
@@ -307,7 +307,7 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         btn.disabled = false;
         btn.textContent = 'Add';
         return;
@@ -325,7 +325,7 @@ document.getElementById('confirmAddStudentBtn').addEventListener('click', async 
 
     if (!res2.ok) {
         const error = await res2.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -341,8 +341,8 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     const isUrgent = document.getElementById('announcementUrgent').checked;
     const btn = document.getElementById('btnPostAnnouncement');
 
-    if (!title || !message) return alert('Please write a title and a message.');
-    if (!AppState.currentGroupId) return alert('Please select a group first.');
+    if (!title || !message) return displayError('Please write a title and a message.');
+    if (!AppState.currentGroupId) return displayError('Please select a group first.');
 
     btn.disabled = true;
     btn.textContent = 'Posting...';
@@ -362,7 +362,7 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -373,12 +373,12 @@ document.getElementById('btnPostAnnouncement').addEventListener('click', async (
     btn.disabled = false;
     btn.textContent = 'Post to Class';
 
-    alert('Announcement posted successfully!');
+    displayError('Announcement posted successfully!');
 });
 
 document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', async () => {
     const fileInput = document.getElementById('timetableFile').files[0];
-    if (!fileInput) return alert('Please select a .ics file.');
+    if (!fileInput) return displayError('Please select a .ics file.');
     const btn = document.getElementById('confirmUpdateTimetableBtn');
 
     btn.disabled = true;
@@ -397,7 +397,7 @@ document.getElementById('confirmUpdateTimetableBtn').addEventListener('click', a
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -416,7 +416,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
     const end = document.getElementById('eventEnd').value;
     const btn = document.getElementById('confirmAddEventBtn');
 
-    if (!title || !start || !end) return alert('Please fill in title, start, and end times.');
+    if (!title || !start || !end) return displayError('Please fill in title, start, and end times.');
 
     btn.disabled = true;
     btn.textContent = 'Creating...';
@@ -439,7 +439,7 @@ document.getElementById('confirmAddEventBtn').addEventListener('click', async ()
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -453,7 +453,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     const optionsRaw = document.getElementById('electionOptions').value.trim();
     const btn = document.getElementById('confirmStartElectionBtn');
 
-    if (!title || !optionsRaw) return alert('Please fill in the title and options.');
+    if (!title || !optionsRaw) return displayError('Please fill in the title and options.');
     const optionsArray = optionsRaw
         .split(',')
         .map((opt) => opt.trim())
@@ -475,7 +475,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -498,7 +498,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
     });
@@ -523,7 +523,7 @@ async function promoteToDelegate(studentId, isPromoting) {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -542,7 +542,7 @@ async function kickStudent(studentId) {
     });
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`Error while kicking user: ${error}`);
+        displayError(`${error.detail}`);
         return;
     }
 

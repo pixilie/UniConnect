@@ -91,7 +91,7 @@ async function deleteEvent(id) {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
         else {
@@ -275,12 +275,12 @@ confirmCreateBtn.addEventListener('click', async () => {
     const type = document.getElementById('eventType').value;
     const location = document.getElementById('eventLocation').value.trim();
 
-    if (!title || !startInput || !endInput) return alert('Fill all required fields');
+    if (!title || !startInput || !endInput) return displayError('Fill all required fields');
 
     const startDate = new Date(startInput);
     const endDate = new Date(endInput);
 
-    if (endDate <= startDate) return alert('End time must be after start time.');
+    if (endDate <= startDate) return displayError('End time must be after start time.');
 
     confirmCreateBtn.disabled = true;
 
@@ -304,7 +304,7 @@ confirmCreateBtn.addEventListener('click', async () => {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
     weekEvents = Array.from({ length: 7 }, () =>
@@ -353,7 +353,7 @@ async function fetchEvents() {
         }
         else if (!resIcs.status == 404) {
             const error = await resIcs.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 
@@ -390,7 +390,7 @@ async function fetchEvents() {
         }
         else {
             const error = await resDb.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
     } catch (error) {

@@ -94,7 +94,7 @@ async function LoadMessages() {
 
   if (!res.ok) {
     const error = await res.json();
-    window.alert(`${error.detail}`);
+    displayError(`${error.detail}`);
   } else {
     let data = await res.json();
 

@@ -4,6 +4,7 @@ const isLocal =
 const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : 'https://uniconnect.pixilie.net/api';
 const WS_BASE_URL = isLocal ? 'ws://localhost:8000/ws' : 'wss://uniconnect.pixilie.net/ws';
 
+//const errorDisplay=document.getElementById('errorDisplay');
 const AppState = {
     currentGroupId: localStorage.getItem('groupID') || null,
     currentGroupName: '',
@@ -14,6 +15,20 @@ function logout() {
     localStorage.removeItem('token');
     window.location.href = 'login.html';
 }
+
+function displayError(msg){
+    window.alert(msg);
+
+    /*
+    errorDisplay.querySelector('#errorDisplayMessage').textContent=msg;
+    errorDisplay.style.display='inline';
+    */
+}
+/*
+errorDisplay.querySelector('#errorDisplayCloseBtn').addEventListener("click",()=>{
+    errorDisplay.style.display='none';
+});
+*/
 
 function goBackSafely() {
     const previousPage = document.referrer;
