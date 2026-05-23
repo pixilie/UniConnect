@@ -66,11 +66,7 @@ def create_poll(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    if current_user.role not in [
-        models.UserRole.ADMIN,
-        models.UserRole.TEACHER,
-        models.UserRole.DELEGATE,
-    ]:
+    if current_user.role is models.UserRole.STUDENT:
         raise HTTPException(
             status_code=403, detail="You're not allowed to create polls"
         )
@@ -85,6 +81,11 @@ def create_poll(
     if poll_data.title.strip() == "":
         raise HTTPException(
             status_code=422, detail="You can't create a poll with an empty title"
+        )
+
+    if poll_data.end_datetime < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=422, detail="You can't create a poll with an expired end date"
         )
 
     group = db.query(models.Group).filter(models.Group.id == group_id).first()

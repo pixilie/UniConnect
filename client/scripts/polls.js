@@ -18,15 +18,25 @@ openModalBtn.addEventListener('click', () => {
 });
 
 postNewPollBtn.addEventListener('click', async () => {
+    const endInput=document.getElementById("formEndDate");
     let title = formQuestion.value;
-    formQuestion.value = '';
+    const now = new Date();
+    const endDate =new Date(endInput.value);
+    const endString=endDate.toISOString();
 
-    if (!title || !formOptions.value) return alert('Please fill in the title and options.');
+    if(endDate<=now){
+        window.alert("The deadline cannot be in the past");
+        endInput.value='';
+        return;
+    }
+
+    if (!title || !formOptions.value || !endInput.value) return alert('Please fill in the title, options and end date.');
     const options = formOptions.value
         .split(',')
         .map((opt) => opt.trim())
         .filter((opt) => opt.length > 0);
     formOptions.value = '';
+    endInput.value='';
 
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
@@ -36,6 +46,7 @@ postNewPollBtn.addEventListener('click', async () => {
         },
         body: JSON.stringify({
             title: title,
+            end_datetime: endString
         }),
     });
 
@@ -80,6 +91,7 @@ const closeModal = () => {
     createModal.classList.remove('active');
     document.getElementById('pollQuestion').value = '';
     document.getElementById('pollOptions').value = '';
+    document.getElementById("formEndDate").value='';
 };
 
 closeModalBtn.addEventListener('click', closeModal);
