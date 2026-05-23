@@ -20,6 +20,7 @@ openModalBtn.addEventListener('click', () => {
 postNewPollBtn.addEventListener('click', async () => {
     const endInput = document.getElementById("formEndDate");
     let title = formQuestion.value;
+    if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
     const now = new Date();
     const endDate = new Date(endInput.value);
     const endString = endDate.toISOString();
@@ -30,7 +31,6 @@ postNewPollBtn.addEventListener('click', async () => {
         return;
     }
 
-    if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
     const options = formOptions.value
         .split(',')
         .map((opt) => opt.trim())

@@ -452,8 +452,20 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     const title = document.getElementById('electionTitle').value.trim();
     const optionsRaw = document.getElementById('electionOptions').value.trim();
     const btn = document.getElementById('confirmStartElectionBtn');
+    const endInput = document.getElementById("formEndDate");
+    
+    if (!title || !optionsRaw || !endInput.value) return displayError('Please fill in the title, options and end date.');
 
-    if (!title || !optionsRaw) return displayError('Please fill in the title and options.');
+    const now = new Date();
+    const endDate = new Date(endInput.value);
+    const endString = endDate.toISOString();
+
+    if (endDate <= now) {
+        displayError("The deadline cannot be in the past");
+        endInput.value = '';
+        return;
+    }
+
     const optionsArray = optionsRaw
         .split(',')
         .map((opt) => opt.trim())
@@ -461,6 +473,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
 
     btn.disabled = true;
     btn.textContent = 'Starting...';
+    endInput.value = '';
 
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
@@ -470,12 +483,14 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
         },
         body: JSON.stringify({
             title: title,
+            end_datetime: endString
         }),
     });
 
     if (!res.ok) {
         const error = await res.json();
         displayError(`${error.detail}`);
+        btn.textContent = 'Start';
         return;
     }
 
@@ -499,6 +514,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
         if (!res.ok) {
             const error = await res.json();
             displayError(`${error.detail}`);
+            btn.textContent = 'Start';
             return;
         }
     });
