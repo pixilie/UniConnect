@@ -4,7 +4,7 @@ const isLocal =
 const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : 'https://uniconnect.pixilie.net/api';
 const WS_BASE_URL = isLocal ? 'ws://localhost:8000/ws' : 'wss://uniconnect.pixilie.net/ws';
 
-//const errorDisplay=document.getElementById('errorDisplay');
+//const errorDisplay=document.getElementById('errorDisplay'); // change ID
 const AppState = {
     currentGroupId: localStorage.getItem('groupID') || null,
     currentGroupName: '',
@@ -20,11 +20,11 @@ function displayError(msg){
     window.alert(msg);
 
     /*
-    errorDisplay.querySelector('#errorDisplayMessage').textContent=msg;
-    errorDisplay.style.display='inline';
+    errorDisplay.querySelector('#errorDisplayMessage').textContent=msg; // change ID
+    errorDisplay.style.display='inline'; // change display to what you use
     */
 }
-/*
+/* //change ID
 errorDisplay.querySelector('#errorDisplayCloseBtn').addEventListener("click",()=>{
     errorDisplay.style.display='none';
 });
