@@ -91,7 +91,7 @@ async function deleteEvent(id) {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
         else {
@@ -171,7 +171,7 @@ function renderEventCard(evt) {
 
     let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
     if (durationHours < 1) durationHours = 1;
-    if (endDate.getHours()==0) durationHours+=1;
+    if (endDate.getHours() == 0) durationHours += 1;
     let gridRowEnd = gridRowStart + durationHours;
     if (gridRowEnd > 26) gridRowEnd = 26;
 
@@ -197,11 +197,11 @@ function renderEventCard(evt) {
             evt.description || 'No description provided.';
 
         document.getElementById('viewEventModal').classList.add('active');
-        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role=="student"){
-            document.getElementById('viewEventDeleteBtn').style.display='none';
+        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role == "student") {
+            document.getElementById('viewEventDeleteBtn').style.display = 'none';
         }
-        else{
-            document.getElementById('viewEventDeleteBtn').style.display='inline';
+        else {
+            document.getElementById('viewEventDeleteBtn').style.display = 'inline';
             document.getElementById('viewEventDeleteBtn').onclick = () => {
                 deleteEvent(evt.id);
                 viewEventModal.classList.remove('active');
@@ -275,12 +275,12 @@ confirmCreateBtn.addEventListener('click', async () => {
     const type = document.getElementById('eventType').value;
     const location = document.getElementById('eventLocation').value.trim();
 
-    if (!title || !startInput || !endInput) return alert('Fill all required fields');
+    if (!title || !startInput || !endInput) return displayError('Fill all required fields');
 
     const startDate = new Date(startInput);
     const endDate = new Date(endInput);
 
-    if (endDate <= startDate) return alert('End time must be after start time.');
+    if (endDate <= startDate) return displayError('End time must be after start time.');
 
     confirmCreateBtn.disabled = true;
 
@@ -304,7 +304,7 @@ confirmCreateBtn.addEventListener('click', async () => {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
     weekEvents = Array.from({ length: 7 }, () =>
@@ -313,7 +313,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         )
     );
 
-    const result=await res.json();
+    const result = await res.json();
     const AddedEvent = {
         title: title,
         description: description,
@@ -321,7 +321,7 @@ confirmCreateBtn.addEventListener('click', async () => {
         end: endInput,
         type: type,
         location: location,
-        id:result.id
+        id: result.id
     };
 
     allEvents.push(AddedEvent);
@@ -353,7 +353,7 @@ async function fetchEvents() {
         }
         else if (!resIcs.status == 404) {
             const error = await resIcs.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
 
@@ -390,7 +390,7 @@ async function fetchEvents() {
         }
         else {
             const error = await resDb.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
     } catch (error) {

@@ -36,7 +36,8 @@
             <a href="announcements.html" class="nav-item"><span class="material-icons-outlined icon">campaign</span>
                 Announcements</a>
             <a href="chat.html" class="nav-item"><span class="material-icons-outlined icon">chat_bubble</span> Chat</a>
-            <a href="timetables.html" class="nav-item active"><span class="material-icons-outlined icon">calendar_month</span>
+            <a href="timetables.html" class="nav-item active"><span
+                    class="material-icons-outlined icon">calendar_month</span>
                 Timetables</a>
             <a href="polls.html" class="nav-item"><span class="material-icons-outlined icon">how_to_vote</span>
                 Polls</a>
@@ -209,11 +210,18 @@
                         <strong style="display: block; margin-bottom: 4px">Description:</strong>
                         <div id="viewEventDescription" style="white-space: pre-wrap; font-size: 14px"></div>
                     </div>
-                    <span class="material-icons-outlined close-modal" style="align-self: end;" id="viewEventDeleteBtn">delete</span>
+                    <span class="material-icons-outlined close-modal" style="align-self: end;"
+                        id="viewEventDeleteBtn">delete</span>
                 </div>
             </div>
         </div>
     </main>
+
+    <div id="errorDisplay" class="error-toast">
+        <span class="error-icon">⚠️</span>
+        <span id="errorDisplayMessage" class="error-message">Une erreur est survenue.</span>
+        <button id="errorDisplayCloseBtn" class="error-close-btn">&times;</button>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.js"></script>
     <script src="../scripts/common.js"></script>

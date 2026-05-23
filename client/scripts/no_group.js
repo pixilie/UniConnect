@@ -34,7 +34,7 @@ async function reload() {
             logout();
         } else {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
         }
     } catch (error) {
         console.error('Network error:', error);

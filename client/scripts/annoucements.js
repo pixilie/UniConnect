@@ -26,7 +26,7 @@ async function LoadAnnoucements() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     } else {
         let data = await res.json();
@@ -53,8 +53,6 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
     let l = '';
     if (last_name.length > 0) l = last_name[0].toUpperCase();
 
-    const tempDate = new Date(date);
-
     const options = {
         month: 'short',
         day: 'numeric',
@@ -64,11 +62,9 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
         hour12: true,
     };
 
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(tempDate);
-
     annoucementsNode.querySelector('.announcement-avatar').textContent = `${f}${l}`;
     annoucementsNode.querySelector('.announcement-user').textContent = `${first_name} ${last_name}`;
-    annoucementsNode.querySelector('.announcement-date').textContent = formattedDate;
+    annoucementsNode.querySelector('.announcement-date').textContent = formatMessageTime(date);
     annoucementsNode.querySelector('.annoucement-title').textContent = title;
     annoucementsNode.querySelector('.announcement-content').innerHTML = content;
     annoucementsNode.querySelector('.announcement-role').textContent = role.toUpperCase();
@@ -81,17 +77,12 @@ function addAnnoucement(first_name, last_name, role, title, content, date, urgen
 
 async function createAnnoucement() {
     let title = formTitle.value;
-    formTitle.value = '';
-
     let content = formContent.value;
-    formContent.value = '';
-
     let urgency = formUrgent.checked;
-    formUrgent.checked = false;
 
     if (title == '' || content == '') {
-        alert('Title and message fields must be filled');
-        return;
+        displayError('Title and message fields must be filled');
+        return false;
     }
 
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
@@ -109,9 +100,15 @@ async function createAnnoucement() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
-        return;
+        displayError(`${error.detail}`);
+        return false;
     }
+
+    formTitle.value = '';
+    formContent.value = '';
+    formUrgent.checked = false;
+
+    return true;
 }
 
 createBtn.addEventListener('click', () => {
@@ -123,9 +120,12 @@ cancelBtn.addEventListener('click', () => {
 });
 
 postBtn.addEventListener('click', async () => {
-    await createAnnoucement();
-    createForm.classList.remove('form-active');
-    LoadAnnoucements();
+    const success = await createAnnoucement();
+
+    if (success) {
+        createForm.classList.remove('form-active');
+        LoadAnnoucements();
+    }
 });
 
 document.addEventListener('groupChanged', async () => {

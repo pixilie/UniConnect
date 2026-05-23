@@ -1,7 +1,3 @@
-//requireAuth();
-
-let currentGroupId = AppState.currentGroupId;
-
 const openModalBtn = document.getElementById('openCreatePollModalBtn');
 const createModal = document.getElementById('createPollModal');
 const closeModalBtn = document.getElementById('closePollModalBtn');
@@ -13,30 +9,40 @@ const pollTemplate = document.getElementById(`pollTemplate`);
 const optionTemplate = document.getElementById(`pollOptionTemplate`);
 const pollsContainer = document.getElementById('pollsContainer');
 
+let currentGroupId = AppState.currentGroupId;
+
 openModalBtn.addEventListener('click', () => {
     createModal.classList.add('active');
 });
 
 postNewPollBtn.addEventListener('click', async () => {
-    const endInput=document.getElementById("formEndDate");
-    let title = formQuestion.value;
-    const now = new Date();
-    const endDate =new Date(endInput.value);
-    const endString=endDate.toISOString();
+    const endInput = document.getElementById("formEndDate");
 
-    if(endDate<=now){
-        window.alert("The deadline cannot be in the past");
-        endInput.value='';
+    let title = formQuestion.value;
+    if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
+
+    const now = new Date();
+    const endDate = new Date(endInput.value);
+    const endString = endDate.toISOString();
+
+    if (endDate <= now) {
+        displayError("The deadline cannot be in the past");
+        endInput.value = '';
         return;
     }
 
-    if (!title || !formOptions.value || !endInput.value) return alert('Please fill in the title, options and end date.');
     const options = formOptions.value
         .split(',')
         .map((opt) => opt.trim())
         .filter((opt) => opt.length > 0);
+
+    if (options.length < 2) {
+        displayError("A poll must have at least two valid options separated by commas.");
+        return;
+    }
+
     formOptions.value = '';
-    endInput.value='';
+    endInput.value = '';
 
     let res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/polls`, {
         method: 'POST',
@@ -52,7 +58,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -75,7 +81,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
     });
@@ -91,7 +97,7 @@ const closeModal = () => {
     createModal.classList.remove('active');
     document.getElementById('pollQuestion').value = '';
     document.getElementById('pollOptions').value = '';
-    document.getElementById("formEndDate").value='';
+    document.getElementById("formEndDate").value = '';
 };
 
 closeModalBtn.addEventListener('click', closeModal);
@@ -184,7 +190,7 @@ async function sendVote(pollID, choiceID) {
     });
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 }
@@ -204,7 +210,7 @@ async function getPolls() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
