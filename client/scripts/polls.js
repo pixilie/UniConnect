@@ -25,12 +25,12 @@ postNewPollBtn.addEventListener('click', async () => {
     const endString = endDate.toISOString();
 
     if (endDate <= now) {
-        window.alert("The deadline cannot be in the past");
+        displayError("The deadline cannot be in the past");
         endInput.value = '';
         return;
     }
 
-    if (!title || !formOptions.value || !endInput.value) return alert('Please fill in the title, options and end date.');
+    if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
     const options = formOptions.value
         .split(',')
         .map((opt) => opt.trim())
@@ -52,7 +52,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
@@ -75,7 +75,7 @@ postNewPollBtn.addEventListener('click', async () => {
 
         if (!res.ok) {
             const error = await res.json();
-            window.alert(`${error.detail}`);
+            displayError(`${error.detail}`);
             return;
         }
     });
@@ -184,7 +184,7 @@ async function sendVote(pollID, choiceID) {
     });
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 }
@@ -204,7 +204,7 @@ async function getPolls() {
 
     if (!res.ok) {
         const error = await res.json();
-        window.alert(`${error.detail}`);
+        displayError(`${error.detail}`);
         return;
     }
 
