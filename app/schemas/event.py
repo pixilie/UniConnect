@@ -23,8 +23,6 @@ class Event(BaseModel):
     end: datetime
     type: str
     location: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
     creator: CreatorInfo
     group_id: int
 
