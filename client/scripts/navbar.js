@@ -68,7 +68,11 @@ function setGroupList(profileData) {
         btn.style.cursor = 'not-allowed';
         btn.style.opacity = '0.7';
 
-        const adminBtn = document.getElementById('adminNavBtn');
+        
+    }
+    
+    if(profileData.role != 'administrator'){
+    const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
             adminBtn.style.display = 'none';
         }
