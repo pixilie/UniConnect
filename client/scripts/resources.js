@@ -13,6 +13,13 @@ const CATEGORY_CONFIG = {
     other: { title: 'Other Resources', icon: 'folder_open', color: '#F57C00' },
 };
 
+const ROLES = {
+  administrator: 3,
+  teacher: 2,
+  delegate: 1,
+  student: 0
+};
+
 const uploadBtn = document.getElementById('confirmUploadBtn');
 const openModalBtn = document.getElementById('openUploadModalBtn');
 const uploadModal = document.getElementById('uploadModal');
@@ -119,13 +126,15 @@ async function loadResources() {
             let name = element.uploader.first_name + ' ' + element.uploader.last_name;
             let category = element.category;
             let date = element.uploaded_at;
+            let authorId=element.uploader.id;
+            let role=element.uploader.role;
 
-            addResource(resourceId, title, name, category, date);
+            addResource(resourceId, title, name, category, date, authorId, role);
         });
     }
 }
 
-function addResource(resourceId, title, name, category, date) {
+function addResource(resourceId, title, name, category, date, authorId, role) {
     let categorySection = document.getElementById(`category-${category}`);
 
     if (!categorySection) {
@@ -154,7 +163,7 @@ function addResource(resourceId, title, name, category, date) {
     });
 
     const deleteBtn = resourceNode.querySelector('.delete-btn');
-    if (AppState.userProfile.role == "student") {
+    if (ROLES[AppState.userProfile.role]<=ROLES[role] && AppState.userProfile.id!=authorId) {
         deleteBtn.style.display = "none";
     }
     else {
