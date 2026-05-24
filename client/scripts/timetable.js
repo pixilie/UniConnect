@@ -11,10 +11,10 @@ const cancelEventBtn = document.getElementById('cancelEventBtn');
 const confirmCreateBtn = document.getElementById('confirmCreateEventBtn');
 
 const ROLES = {
-  administrator: 3,
-  teacher: 2,
-  delegate: 1,
-  student: 0
+    administrator: 3,
+    teacher: 2,
+    delegate: 1,
+    student: 0
 };
 
 let currentDisplayedMonday = getMonday(new Date());
@@ -207,7 +207,7 @@ function renderEventCard(evt) {
             evt.description || 'No description provided.';
         document.getElementById('viewEventModal').classList.add('active');
 
-        if (!Object.hasOwn(evt, 'id') || (ROLES[AppState.userProfile.role]<=ROLES[evt.authorRole] && AppState.userProfile.id!=evt.authorId)) {
+        if (!Object.hasOwn(evt, 'id') || (ROLES[AppState.userProfile.role] <= ROLES[evt.authorRole] && AppState.userProfile.id != evt.authorId)) {
             document.getElementById('viewEventDeleteBtn').style.display = 'none';
         }
         else {
@@ -300,8 +300,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const newEvent = {
         title: title,
         description: description,
-        start: startInput,
-        end: endInput,
+        start: startInput.toISOString(),
+        end: endInput.toISOString(),
         type: type,
         location: location,
     };
@@ -330,8 +330,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const AddedEvent = {
         title: title,
         description: description,
-        start: startInput,
-        end: endInput,
+        start: startInput.toISOString(),
+        end: endInput.toISOString(),
         type: type,
         location: location,
         id: result.id
