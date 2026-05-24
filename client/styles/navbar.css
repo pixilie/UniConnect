@@ -189,6 +189,10 @@
     color: #666;
 }
 
+#adminNavBtn {
+    display: none;
+}
+
 /* Error display */
 .error-toast {
     position: fixed;

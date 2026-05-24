@@ -104,6 +104,20 @@
 
                 <div id="studentListContainer"></div>
             </div>
+
+            <div class="teacher-card">
+                <div class="card-header">
+                    <span class="material-icons-outlined">manage_accounts</span> System Administration
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px">
+                    <button class="btn-action btn-outline" id="btnPromoteTeacher">
+                        <span class="material-icons-outlined">school</span> Promote to Teacher
+                    </button>
+                    <button class="btn-action btn-outline" id="btnPromoteAdmin">
+                        <span class="material-icons-outlined">admin_panel_settings</span> Promote to Admin
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="create-modal-overlay" id="createGroupModal">
@@ -238,6 +252,27 @@
                 <div class="modal-footer">
                     <button class="btn-cancel" id="cancelElectionBtn">Cancel</button>
                     <button class="btn-create" id="confirmStartElectionBtn">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-modal-overlay" id="promoteUserModal">
+            <div class="create-modal">
+                <div class="modal-header">
+                    <h3 id="promoteModalTitle">Promote User</h3>
+                    <span class="material-icons-outlined close-modal" id="closePromoteModalBtn">close</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>User Email</label>
+                        <input type="email" id="promoteUserEmail" placeholder="user@university.edu"
+                            autocomplete="off" />
+                        <input type="hidden" id="promoteUserRole" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancelPromoteBtn">Cancel</button>
+                    <button class="btn-create" id="confirmPromoteBtn">Promote</button>
                 </div>
             </div>
         </div>

@@ -56,20 +56,20 @@ body {
 }
 
 .send-btn {
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    background-color: #6750a4;
-    color: white;
-    width: 44px;
-    height: 44px;
-    border-radius: 25%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background-color: #6750a4;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .send-btn:hover {

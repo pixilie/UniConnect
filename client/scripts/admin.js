@@ -1,5 +1,3 @@
-adminOnly();
-
 const adminUserName = document.getElementById('adminUserName');
 const adminUserAvatar = document.getElementById('adminUserAvatar');
 const adminUserRole = document.getElementById('adminUserRole');
@@ -210,6 +208,7 @@ const closeAllAdminModals = () => {
     updateTimetableModal.classList.remove('active');
     addEventModal.classList.remove('active');
     startElectionModal.classList.remove('active');
+    promoteUserModal.classList.remove('active');
 
     document.getElementById('newGroupName').value = '';
     document.getElementById('newStudentEmail').value = '';
@@ -220,7 +219,82 @@ const closeAllAdminModals = () => {
     document.getElementById('eventLocation').value = '';
     document.getElementById('eventStart').value = '';
     document.getElementById('eventEnd').value = '';
+    document.getElementById('promoteUserEmail').value = '';
 };
+
+const btnPromoteTeacher = document.getElementById('btnPromoteTeacher');
+const btnPromoteAdmin = document.getElementById('btnPromoteAdmin');
+const promoteUserModal = document.getElementById('promoteUserModal');
+
+const openPromoteModal = (role) => {
+    document.getElementById('promoteUserRole').value = role;
+    document.getElementById('promoteModalTitle').textContent = `Promote to ${role === 'teacher' ? 'Teacher' : 'Administrator'}`;
+    promoteUserModal.classList.add('active');
+};
+
+if (btnPromoteTeacher) btnPromoteTeacher.addEventListener('click', () => openPromoteModal('teacher'));
+if (btnPromoteAdmin) btnPromoteAdmin.addEventListener('click', () => openPromoteModal('administrator'));
+
+const closePromoteModal = () => {
+    promoteUserModal.classList.remove('active');
+    document.getElementById('promoteUserEmail').value = '';
+};
+
+document.getElementById('closePromoteModalBtn').addEventListener('click', closePromoteModal);
+document.getElementById('cancelPromoteBtn').addEventListener('click', closePromoteModal);
+
+document.getElementById('confirmPromoteBtn').addEventListener('click', async () => {
+    const email = document.getElementById('promoteUserEmail').value.trim();
+    const role = document.getElementById('promoteUserRole').value;
+    const btn = document.getElementById('confirmPromoteBtn');
+
+    if (!email) return displayError("Please enter the user's email.");
+
+    btn.disabled = true;
+    btn.textContent = 'Promoting...';
+
+    try {
+        const resUser = await fetch(`${API_BASE_URL}/users?search=${email}&skip=0&limit=1`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!resUser.ok) throw await resUser.json();
+        const users = await resUser.json();
+
+        if (users.length === 0) {
+            displayError("User not found.");
+            btn.disabled = false;
+            btn.textContent = 'Promote';
+            return;
+        }
+
+        const memberID = users[0].id;
+
+        const resRole = await fetch(`${API_BASE_URL}/users/${memberID}/role?role=${role}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!resRole.ok) throw await resRole.json();
+
+        displayError(`User promoted to ${role} successfully!`);
+        closePromoteModal();
+        loadStudents();
+
+    } catch (error) {
+        displayError(error.detail || "An error occurred.");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Promote';
+    }
+});
 
 btnCreateGroup.addEventListener('click', () => createGroupModal.classList.add('active'));
 
@@ -453,7 +527,7 @@ document.getElementById('confirmStartElectionBtn').addEventListener('click', asy
     const optionsRaw = document.getElementById('electionOptions').value.trim();
     const btn = document.getElementById('confirmStartElectionBtn');
     const endInput = document.getElementById("formEndDate");
-    
+
     if (!title || !optionsRaw || !endInput.value) return displayError('Please fill in the title, options and end date.');
 
     const now = new Date();
@@ -565,12 +639,17 @@ async function kickStudent(studentId) {
     loadStudents();
 }
 
-document.addEventListener('groupChanged', () => {
-    loadStudents();
+document.addEventListener('groupChanged', async () => {
+    await loadStudents();
 });
 
-if (AppState.currentGroupId) {
-    setTimeout(loadStudents, 100);
+async function initAdminPanel() {
+    await adminOnly();
+    await loadAdminData();
+
+    if (AppState.currentGroupId) {
+        await loadStudents();
+    }
 }
 
-loadAdminData();
+initAdminPanel();

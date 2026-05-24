@@ -82,7 +82,7 @@ async function adminOnly() {
         if (res.ok) {
             const userData = await res.json();
 
-            if (userData.role !== 'administrator' && userData.role !== 'teacher') {
+            if (userData.role !== 'administrator') {
                 goBackSafely();
                 return;
             } else if (userData.groups && userData.groups.length === 0) {

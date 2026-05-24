@@ -28,7 +28,7 @@ class UserRole(str, enum.Enum):
 class EventType(str, enum.Enum):
     STUDY = "study"
     ACTIVITY = "activity"
-    EXAM = "examen"
+    EXAM = "exam"
     COURSE = "course"
 
 
@@ -116,8 +116,8 @@ class Event(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
     location: Mapped[str | None] = mapped_column()
-    latitude: Mapped[float | None] = mapped_column()
-    longitude: Mapped[float | None] = mapped_column()
+    # latitude: Mapped[float | None] = mapped_column()
+    # longitude: Mapped[float | None] = mapped_column()
     type: Mapped[EventType] = mapped_column(default=EventType.STUDY)
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))

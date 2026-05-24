@@ -10,6 +10,13 @@ const closeModalBtn = document.getElementById('closeEventModalBtn');
 const cancelEventBtn = document.getElementById('cancelEventBtn');
 const confirmCreateBtn = document.getElementById('confirmCreateEventBtn');
 
+const ROLES = {
+    administrator: 3,
+    teacher: 2,
+    delegate: 1,
+    student: 0
+};
+
 let currentDisplayedMonday = getMonday(new Date());
 let allEvents = [];
 let weekEvents = Array.from({ length: 7 }, () =>
@@ -200,7 +207,7 @@ function renderEventCard(evt) {
             evt.description || 'No description provided.';
         document.getElementById('viewEventModal').classList.add('active');
 
-        if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role == "student") {
+        if (!Object.hasOwn(evt, 'id') || (ROLES[AppState.userProfile.role] <= ROLES[evt.authorRole] && AppState.userProfile.id != evt.authorId)) {
             document.getElementById('viewEventDeleteBtn').style.display = 'none';
         }
         else {
@@ -293,8 +300,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const newEvent = {
         title: title,
         description: description,
-        start: startInput,
-        end: endInput,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
         type: type,
         location: location,
     };
@@ -323,8 +330,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const AddedEvent = {
         title: title,
         description: description,
-        start: startInput,
-        end: endInput,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
         type: type,
         location: location,
         id: result.id
@@ -382,14 +389,25 @@ async function fetchEvents() {
         if (resDb.ok) {
             const eventsData = await resDb.json();
             eventsData.forEach((element) => {
+
+                let safeStart = (element.start.endsWith('Z') || element.start.includes('+'))
+                    ? element.start
+                    : element.start + 'Z';
+
+                let safeEnd = (element.end.endsWith('Z') || element.end.includes('+'))
+                    ? element.end
+                    : element.end + 'Z';
+
                 let newElement = {
                     title: element.title,
                     description: element.description,
                     type: element.type,
-                    start: element.start,
-                    end: element.end,
+                    start: safeStart,
+                    end: safeEnd,
                     location: element.location,
-                    id: element.id
+                    id: element.id,
+                    authorId: element.creator.id,
+                    authorRole: element.creator.role,
                 };
                 allEvents.push(newElement);
             });
@@ -431,12 +449,6 @@ document.addEventListener('groupChanged', async () => {
 
 async function initTimetables() {
     await requireAuth();
-
-    if (AppState.userProfile && AppState.userProfile.role === 'student') {
-        if (openModalBtn) {
-            openModalBtn.style.display = 'none';
-        }
-    }
 
     if (AppState.userProfile && AppState.userProfile.role === 'student' || AppState.userProfile.role === 'delegate') {
         const typeSelect = document.getElementById('eventType');

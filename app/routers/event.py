@@ -74,16 +74,14 @@ def create_event(
     if event_data.location:
         address, latitude, longitude = get_coordinates(event_data.location)
     else:
-        address, latitude, longitude = None, None, None
+        event_data.location = "TBD"
 
     new_event = models.Event(
         title=event_data.title,
         description=getattr(event_data, "description", None),
         start=event_data.start,
         end=event_data.end,
-        location=address,
-        latitude=latitude,
-        longitude=longitude,
+        location=event_data.location,
         type=event_data.type,
         creator_id=current_user.id,
         group_id=group_id,
@@ -122,11 +120,7 @@ def update_event(
             setattr(event, key, value)
 
     if event_data.location:
-        address, latitude, longitude = get_coordinates(event_data.location)
-        if address and latitude and longitude:
-            event.location = address
-            event.latitude = latitude
-            event.longitude = longitude
+        event.location = event_data.location
 
     db.commit()
     db.refresh(event)
