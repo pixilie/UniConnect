@@ -300,8 +300,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const newEvent = {
         title: title,
         description: description,
-        start: startInput.toISOString(),
-        end: endInput.toISOString(),
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
         type: type,
         location: location,
     };
@@ -330,8 +330,8 @@ confirmCreateBtn.addEventListener('click', async () => {
     const AddedEvent = {
         title: title,
         description: description,
-        start: startInput.toISOString(),
-        end: endInput.toISOString(),
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
         type: type,
         location: location,
         id: result.id
@@ -389,12 +389,21 @@ async function fetchEvents() {
         if (resDb.ok) {
             const eventsData = await resDb.json();
             eventsData.forEach((element) => {
+
+                let safeStart = (element.start.endsWith('Z') || element.start.includes('+'))
+                    ? element.start
+                    : element.start + 'Z';
+
+                let safeEnd = (element.end.endsWith('Z') || element.end.includes('+'))
+                    ? element.end
+                    : element.end + 'Z';
+
                 let newElement = {
                     title: element.title,
                     description: element.description,
                     type: element.type,
-                    start: element.start,
-                    end: element.end,
+                    start: safeStart,
+                    end: safeEnd,
                     location: element.location,
                     id: element.id,
                     authorId: element.creator.id,
