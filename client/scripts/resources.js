@@ -14,10 +14,10 @@ const CATEGORY_CONFIG = {
 };
 
 const ROLES = {
-  administrator: 3,
-  teacher: 2,
-  delegate: 1,
-  student: 0
+    administrator: 3,
+    teacher: 2,
+    delegate: 1,
+    student: 0
 };
 
 const uploadBtn = document.getElementById('confirmUploadBtn');
@@ -126,8 +126,8 @@ async function loadResources() {
             let name = element.uploader.first_name + ' ' + element.uploader.last_name;
             let category = element.category;
             let date = element.uploaded_at;
-            let authorId=element.uploader.id;
-            let role=element.uploader.role;
+            let authorId = element.uploader.id;
+            let role = element.uploader.role;
 
             addResource(resourceId, title, name, category, date, authorId, role);
         });
@@ -163,7 +163,7 @@ function addResource(resourceId, title, name, category, date, authorId, role) {
     });
 
     const deleteBtn = resourceNode.querySelector('.delete-btn');
-    if (ROLES[AppState.userProfile.role]<=ROLES[role] && AppState.userProfile.id!=authorId) {
+    if (ROLES[AppState.userProfile.role] <= ROLES[role] && AppState.userProfile.id != authorId) {
         deleteBtn.style.display = "none";
     }
     else {
