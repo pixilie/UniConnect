@@ -28,7 +28,7 @@ class UserRole(str, enum.Enum):
 class EventType(str, enum.Enum):
     STUDY = "study"
     ACTIVITY = "activity"
-    EXAM = "examen"
+    EXAM = "exam"
     COURSE = "course"
 
 
