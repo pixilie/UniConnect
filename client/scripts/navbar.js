@@ -63,19 +63,10 @@ async function getProfileData() {
 }
 
 function setGroupList(profileData) {
-    if (profileData.role === 'student' || profileData.role === 'delegate') {
-        btn.classList.add('disabled');
-        btn.style.cursor = 'not-allowed';
-        btn.style.opacity = '0.7';
-
-        
-    }
-    
-    if(profileData.role != 'administrator'){
     const adminBtn = document.getElementById('adminNavBtn');
-        if (adminBtn) {
-            adminBtn.style.display = 'none';
-        }
+
+    if (profileData.role === 'administrator') {
+        adminBtn.style.display = 'block';
     }
 
     dropdown.querySelectorAll('.group-item').forEach((e) => e.remove());
