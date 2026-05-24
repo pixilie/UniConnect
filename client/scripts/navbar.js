@@ -1,7 +1,6 @@
 const profileName = document.getElementById('currentUserName');
 const profileAvatar = document.getElementById('currentUserAvatar');
 const profileRole = document.getElementById('currentUserRole');
-
 const btn = document.getElementById('groupSelectorBtn');
 const dropdown = document.getElementById('groupDropdown');
 const searchInput = document.getElementById('groupSearchInput');
@@ -90,6 +89,7 @@ function setGroupList(profileData) {
 
     for (const group of profileData.groups) {
         const item = document.createElement('div');
+
         item.className = 'group-item';
         item.textContent = group.name;
         item.dataset.groupId = group.id;
@@ -114,7 +114,7 @@ function setGroupList(profileData) {
             allItems.forEach((i) => (i.style.display = 'block'));
 
             const newGroupId = group.id.toString();
-            console.log(`New group selected: ${newGroupId}`);
+
             localStorage.setItem('groupID', newGroupId);
             AppState.currentGroupId = newGroupId;
             AppState.currentGroupName = group.name;

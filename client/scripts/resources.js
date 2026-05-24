@@ -21,7 +21,6 @@ const cancelUploadBtn = document.getElementById('cancelUploadBtn');
 const resourceTemplate = document.getElementById('resourceCardTemplate');
 const categoryTemplate = document.getElementById('categoryTemplate');
 const resourcesContainer = document.getElementById('resourcesList');
-
 const formTitle = document.getElementById('uploadTitle');
 const formCategory = document.getElementById('uploadCategory');
 const formFile = document.getElementById('uploadFile');
@@ -46,6 +45,7 @@ function formatMessageTime(rawDateString) {
     if (!rawDateString) return '';
 
     let safeString = rawDateString.replace(' ', 'T');
+
     if (!safeString.endsWith('Z') && !safeString.includes('+')) {
         safeString += 'Z';
     }
@@ -92,7 +92,6 @@ async function deleteResource(id) {
         console.error("Failed to delete resource :", error.message);
     }
 }
-
 
 async function loadResources() {
     if (!AppState.currentGroupId) return;
@@ -205,8 +204,7 @@ async function downloadFile(btn, fileName) {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     } catch (error) {
-        console.error('Error while downloading:', error);
-        displayError('Failed to download the file.');
+        displayError(`Failed to download the file: ${error}`);
     } finally {
         icon.textContent = 'download';
         btn.disabled = false;
@@ -264,7 +262,7 @@ async function uploadResource() {
 
         addResource(resourceId, title, name, categoryLabel, new Date().toISOString());
     } catch (error) {
-        console.error('Network error:', error);
+        displayError(`Netwotk error: ${error}`);
     }
 }
 

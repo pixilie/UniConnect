@@ -10,12 +10,11 @@ const postBtn = document.getElementById('postBtn');
 
 async function LoadAnnoucements() {
     if (AppState.userProfile.role == 'student') createBtn.remove();
-
     displayBox.innerHTML = '';
 
     if (!AppState.currentGroupId) return;
-
     displayBox.innerHTML = '';
+
     const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/announcement`, {
         method: 'GET',
         headers: {

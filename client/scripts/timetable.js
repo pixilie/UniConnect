@@ -22,6 +22,7 @@ function getMonday(d) {
     const date = new Date(d);
     const day = date.getDay();
     const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+
     return new Date(date.getFullYear(), date.getMonth(), diff, 0, 0, 0, 0);
 }
 
@@ -31,11 +32,11 @@ function formatShortDate(date) {
 
 function updateCalendarHeaders() {
     let sunday = new Date(currentDisplayedMonday);
-    sunday.setDate(currentDisplayedMonday.getDate() + 6);
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
+    sunday.setDate(currentDisplayedMonday.getDate() + 6);
     currentWeekLabel.textContent = `${formatShortDate(currentDisplayedMonday)} - ${formatShortDate(sunday)}, ${currentDisplayedMonday.getFullYear()}`;
 
-    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     days.forEach((dayId, index) => {
         let d = new Date(currentDisplayedMonday);
         d.setDate(currentDisplayedMonday.getDate() + index);
@@ -45,6 +46,7 @@ function updateCalendarHeaders() {
 
 function clearGrid() {
     const cards = calendarGrid.querySelectorAll('.event-card');
+
     cards.forEach((card) => card.remove());
     weekEvents = Array.from({ length: 7 }, () =>
         Array.from({ length: 24 }, () =>
@@ -56,8 +58,8 @@ function clearGrid() {
 function storeEvent(evt) {
     let startDate = new Date(evt.start);
     let endDate = new Date(evt.end);
-
     const eventMonday = getMonday(startDate);
+
     if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) {
         return;
     };
@@ -149,24 +151,25 @@ function splitEventDays(evt) {
 function renderEventCard(evt) {
     const startDate = new Date(evt.start);
     const endDate = new Date(evt.end);
+
     let displayStart = new Date(evt.start);
     let displayEnd = new Date(evt.end);
 
     if ('displayStart' in evt) {
         displayStart = new Date(evt.displayStart);
     }
+
     if ('displayEnd' in evt) {
         displayEnd = new Date(evt.displayEnd);
     }
 
     const eventMonday = getMonday(startDate);
+
     if (eventMonday.getTime() !== currentDisplayedMonday.getTime()) return;
 
     const dayIndex = startDate.getDay();
     const gridColumn = dayIndex === 0 ? 8 : dayIndex + 1;
-
     const startHour = startDate.getHours();
-
     const gridRowStart = startHour + 2;
 
     let durationHours = Math.round((endDate - startDate) / (1000 * 60 * 60));
@@ -195,8 +198,8 @@ function renderEventCard(evt) {
         document.getElementById('viewEventType').textContent = evt.type;
         document.getElementById('viewEventDescription').textContent =
             evt.description || 'No description provided.';
-
         document.getElementById('viewEventModal').classList.add('active');
+
         if (!Object.hasOwn(evt, 'id') || AppState.userProfile.role == "student") {
             document.getElementById('viewEventDeleteBtn').style.display = 'none';
         }
@@ -218,11 +221,14 @@ function renderEventCard(evt) {
 function refreshWeekView() {
     clearGrid();
     updateCalendarHeaders();
+
     allEvents.forEach((evt) => splitEventDays(evt));
+
     for (let i = 0; i < weekEvents.length; i++) {
         for (let j = 0; j < weekEvents[i].length; j++) {
             for (let h = 0; h < weekEvents[i][j].length; h++) {
                 let startDate = new Date(weekEvents[i][j][h].start);
+
                 if (startDate.getHours() == j) {
                     renderEventCard(weekEvents[i][j][h])
                 }

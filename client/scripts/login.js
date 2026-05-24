@@ -21,8 +21,10 @@ async function login(username, password) {
 
         return true;
     } catch (err) {
-        console.log(err);
+        let message = document.getElementById('message');
+        message.style.color = 'red';
         error = err.message || 'Network error';
+        message.innerText = error;
         return false;
     }
 }
@@ -38,9 +40,13 @@ async function getUserProfile(token) {
         });
 
         if (!res.ok) return null;
+
         return await res.json();
     } catch (err) {
-        console.log(err);
+        let message = document.getElementById('message');
+        message.style.color = 'red';
+        message.innerText = err;
+
         return null;
     }
 }
@@ -51,7 +57,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     let email = document.getElementById('email').value;
     let password = document.getElementById('password').value;
     let message = document.getElementById('message');
-
     let loginSuccess = await login(email, password);
 
     if (loginSuccess) {
@@ -60,6 +65,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
         const token = localStorage.getItem('token');
         const userData = await getUserProfile(token);
+
         AppState.userProfile = userData;
 
         if (userData && userData.groups && userData.groups.length > 0) {

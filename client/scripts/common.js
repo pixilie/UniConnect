@@ -30,6 +30,7 @@ function displayError(msg) {
     errorDisplay.classList.add('show');
 
     clearTimeout(errorTimeout);
+
     errorTimeout = setTimeout(() => {
         closeErrorDisplay();
     }, 5000);

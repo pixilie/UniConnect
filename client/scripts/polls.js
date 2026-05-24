@@ -17,8 +17,8 @@ openModalBtn.addEventListener('click', () => {
 
 postNewPollBtn.addEventListener('click', async () => {
     const endInput = document.getElementById("formEndDate");
-
     let title = formQuestion.value;
+
     if (!title || !formOptions.value || !endInput.value) return displayError('Please fill in the title, options and end date.');
 
     const now = new Date();
@@ -223,7 +223,6 @@ async function getPolls() {
 }
 
 document.addEventListener('groupChanged', async (e) => {
-    console.log('test');
     await getPolls();
 });
 

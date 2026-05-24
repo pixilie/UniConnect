@@ -27,6 +27,7 @@ async function WSConnect() {
         const data = JSON.parse(event.data);
         let first_name = data.author_name.split(' ')[0];
         let last_name = data.author_name.split(' ')[1];
+
         addMessage(first_name, last_name, data.sent_at, data.content);
     };
 
@@ -60,6 +61,7 @@ function addMessage(first_name, last_name, sent_at, text) {
     messageNode.querySelector('.bubble').textContent = text;
 
     const me = AppState.userProfile;
+
     if (me && first_name === me.first_name && last_name === me.last_name) {
         messageNode.querySelector('.message-row').classList.add('me');
     }
@@ -70,8 +72,8 @@ function addMessage(first_name, last_name, sent_at, text) {
 
 async function LoadMessages() {
     if (!AppState.currentGroupId) return;
-
     chat.innerHTML = '';
+
     const res = await fetch(`${API_BASE_URL}/groups/${AppState.currentGroupId}/messages`, {
         method: 'GET',
         headers: {

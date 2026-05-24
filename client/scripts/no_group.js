@@ -23,12 +23,13 @@ async function reload() {
 
             if (userData.groups && userData.groups.length > 0) {
                 const defaultGroup = userData.groups[0];
+
                 AppState.currentGroupId = defaultGroup.id;
                 AppState.currentGroupName = defaultGroup.name || '';
                 localStorage.setItem('groupID', defaultGroup.id);
                 window.location.href = 'chat.html';
             } else {
-                console.log("Status checked: Still no group assigned.");
+                displayError("Status checked: Still no group assigned.");
             }
         } else if (res.status === 401) {
             logout();
@@ -37,7 +38,7 @@ async function reload() {
             displayError(`${error.detail}`);
         }
     } catch (error) {
-        console.error('Network error:', error);
+        displayError(`Network error: ${displayError}`);
     }
 }
 
